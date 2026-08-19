@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.2
 // - protoc             (unknown)
-// source: v1/driver.proto
+// source: driver.proto
 
 package wujiv1
 
@@ -27,9 +27,6 @@ const (
 // DriverRegistryClient is the client API for DriverRegistry service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-//
-// DriverRegistry is the gRPC service exposed by the Wuji core.
-// Remote drivers connect here to register themselves.
 type DriverRegistryClient interface {
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	Heartbeat(ctx context.Context, in *HeartbeatRequest, opts ...grpc.CallOption) (*HeartbeatResponse, error)
@@ -77,9 +74,6 @@ func (c *driverRegistryClient) Unregister(ctx context.Context, in *UnregisterReq
 // DriverRegistryServer is the server API for DriverRegistry service.
 // All implementations must embed UnimplementedDriverRegistryServer
 // for forward compatibility.
-//
-// DriverRegistry is the gRPC service exposed by the Wuji core.
-// Remote drivers connect here to register themselves.
 type DriverRegistryServer interface {
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	Heartbeat(context.Context, *HeartbeatRequest) (*HeartbeatResponse, error)
@@ -199,23 +193,38 @@ var DriverRegistry_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "v1/driver.proto",
+	Metadata: "driver.proto",
 }
 
 const (
-	DriverService_GetInfo_FullMethodName      = "/wuji.v1.DriverService/GetInfo"
-	DriverService_GenerateText_FullMethodName = "/wuji.v1.DriverService/GenerateText"
+	DriverService_GetInfo_FullMethodName       = "/wuji.v1.DriverService/GetInfo"
+	DriverService_GenerateText_FullMethodName  = "/wuji.v1.DriverService/GenerateText"
+	DriverService_GenerateImage_FullMethodName = "/wuji.v1.DriverService/GenerateImage"
+	DriverService_GenerateVideo_FullMethodName = "/wuji.v1.DriverService/GenerateVideo"
+	DriverService_GenerateAudio_FullMethodName = "/wuji.v1.DriverService/GenerateAudio"
+	DriverService_Generate3D_FullMethodName    = "/wuji.v1.DriverService/Generate3D"
+	DriverService_Synthesize_FullMethodName    = "/wuji.v1.DriverService/Synthesize"
+	DriverService_Transcribe_FullMethodName    = "/wuji.v1.DriverService/Transcribe"
+	DriverService_CloneVoice_FullMethodName    = "/wuji.v1.DriverService/CloneVoice"
+	DriverService_Train_FullMethodName         = "/wuji.v1.DriverService/Train"
+	DriverService_ManageDataset_FullMethodName = "/wuji.v1.DriverService/ManageDataset"
 )
 
 // DriverServiceClient is the client API for DriverService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-//
-// DriverService is implemented by each remote driver process.
-// The Wuji core calls into drivers through this interface.
 type DriverServiceClient interface {
 	GetInfo(ctx context.Context, in *GetInfoRequest, opts ...grpc.CallOption) (*GetInfoResponse, error)
 	GenerateText(ctx context.Context, in *GenerateTextRequest, opts ...grpc.CallOption) (*GenerateTextResponse, error)
+	GenerateImage(ctx context.Context, in *GenerateImageRequest, opts ...grpc.CallOption) (*GenerateImageResponse, error)
+	GenerateVideo(ctx context.Context, in *GenerateVideoRequest, opts ...grpc.CallOption) (*GenerateVideoResponse, error)
+	GenerateAudio(ctx context.Context, in *GenerateAudioRequest, opts ...grpc.CallOption) (*GenerateAudioResponse, error)
+	Generate3D(ctx context.Context, in *Generate3DRequest, opts ...grpc.CallOption) (*Generate3DResponse, error)
+	Synthesize(ctx context.Context, in *SynthesizeRequest, opts ...grpc.CallOption) (*SynthesizeResponse, error)
+	Transcribe(ctx context.Context, in *TranscribeRequest, opts ...grpc.CallOption) (*TranscribeResponse, error)
+	CloneVoice(ctx context.Context, in *CloneVoiceRequest, opts ...grpc.CallOption) (*CloneVoiceResponse, error)
+	Train(ctx context.Context, in *TrainRequest, opts ...grpc.CallOption) (*TrainResponse, error)
+	ManageDataset(ctx context.Context, in *ManageDatasetRequest, opts ...grpc.CallOption) (*ManageDatasetResponse, error)
 }
 
 type driverServiceClient struct {
@@ -246,15 +255,111 @@ func (c *driverServiceClient) GenerateText(ctx context.Context, in *GenerateText
 	return out, nil
 }
 
+func (c *driverServiceClient) GenerateImage(ctx context.Context, in *GenerateImageRequest, opts ...grpc.CallOption) (*GenerateImageResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GenerateImageResponse)
+	err := c.cc.Invoke(ctx, DriverService_GenerateImage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *driverServiceClient) GenerateVideo(ctx context.Context, in *GenerateVideoRequest, opts ...grpc.CallOption) (*GenerateVideoResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GenerateVideoResponse)
+	err := c.cc.Invoke(ctx, DriverService_GenerateVideo_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *driverServiceClient) GenerateAudio(ctx context.Context, in *GenerateAudioRequest, opts ...grpc.CallOption) (*GenerateAudioResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GenerateAudioResponse)
+	err := c.cc.Invoke(ctx, DriverService_GenerateAudio_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *driverServiceClient) Generate3D(ctx context.Context, in *Generate3DRequest, opts ...grpc.CallOption) (*Generate3DResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Generate3DResponse)
+	err := c.cc.Invoke(ctx, DriverService_Generate3D_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *driverServiceClient) Synthesize(ctx context.Context, in *SynthesizeRequest, opts ...grpc.CallOption) (*SynthesizeResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SynthesizeResponse)
+	err := c.cc.Invoke(ctx, DriverService_Synthesize_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *driverServiceClient) Transcribe(ctx context.Context, in *TranscribeRequest, opts ...grpc.CallOption) (*TranscribeResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TranscribeResponse)
+	err := c.cc.Invoke(ctx, DriverService_Transcribe_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *driverServiceClient) CloneVoice(ctx context.Context, in *CloneVoiceRequest, opts ...grpc.CallOption) (*CloneVoiceResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CloneVoiceResponse)
+	err := c.cc.Invoke(ctx, DriverService_CloneVoice_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *driverServiceClient) Train(ctx context.Context, in *TrainRequest, opts ...grpc.CallOption) (*TrainResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TrainResponse)
+	err := c.cc.Invoke(ctx, DriverService_Train_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *driverServiceClient) ManageDataset(ctx context.Context, in *ManageDatasetRequest, opts ...grpc.CallOption) (*ManageDatasetResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ManageDatasetResponse)
+	err := c.cc.Invoke(ctx, DriverService_ManageDataset_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DriverServiceServer is the server API for DriverService service.
 // All implementations must embed UnimplementedDriverServiceServer
 // for forward compatibility.
-//
-// DriverService is implemented by each remote driver process.
-// The Wuji core calls into drivers through this interface.
 type DriverServiceServer interface {
 	GetInfo(context.Context, *GetInfoRequest) (*GetInfoResponse, error)
 	GenerateText(context.Context, *GenerateTextRequest) (*GenerateTextResponse, error)
+	GenerateImage(context.Context, *GenerateImageRequest) (*GenerateImageResponse, error)
+	GenerateVideo(context.Context, *GenerateVideoRequest) (*GenerateVideoResponse, error)
+	GenerateAudio(context.Context, *GenerateAudioRequest) (*GenerateAudioResponse, error)
+	Generate3D(context.Context, *Generate3DRequest) (*Generate3DResponse, error)
+	Synthesize(context.Context, *SynthesizeRequest) (*SynthesizeResponse, error)
+	Transcribe(context.Context, *TranscribeRequest) (*TranscribeResponse, error)
+	CloneVoice(context.Context, *CloneVoiceRequest) (*CloneVoiceResponse, error)
+	Train(context.Context, *TrainRequest) (*TrainResponse, error)
+	ManageDataset(context.Context, *ManageDatasetRequest) (*ManageDatasetResponse, error)
 	mustEmbedUnimplementedDriverServiceServer()
 }
 
@@ -270,6 +375,33 @@ func (UnimplementedDriverServiceServer) GetInfo(context.Context, *GetInfoRequest
 }
 func (UnimplementedDriverServiceServer) GenerateText(context.Context, *GenerateTextRequest) (*GenerateTextResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GenerateText not implemented")
+}
+func (UnimplementedDriverServiceServer) GenerateImage(context.Context, *GenerateImageRequest) (*GenerateImageResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GenerateImage not implemented")
+}
+func (UnimplementedDriverServiceServer) GenerateVideo(context.Context, *GenerateVideoRequest) (*GenerateVideoResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GenerateVideo not implemented")
+}
+func (UnimplementedDriverServiceServer) GenerateAudio(context.Context, *GenerateAudioRequest) (*GenerateAudioResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GenerateAudio not implemented")
+}
+func (UnimplementedDriverServiceServer) Generate3D(context.Context, *Generate3DRequest) (*Generate3DResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method Generate3D not implemented")
+}
+func (UnimplementedDriverServiceServer) Synthesize(context.Context, *SynthesizeRequest) (*SynthesizeResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method Synthesize not implemented")
+}
+func (UnimplementedDriverServiceServer) Transcribe(context.Context, *TranscribeRequest) (*TranscribeResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method Transcribe not implemented")
+}
+func (UnimplementedDriverServiceServer) CloneVoice(context.Context, *CloneVoiceRequest) (*CloneVoiceResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CloneVoice not implemented")
+}
+func (UnimplementedDriverServiceServer) Train(context.Context, *TrainRequest) (*TrainResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method Train not implemented")
+}
+func (UnimplementedDriverServiceServer) ManageDataset(context.Context, *ManageDatasetRequest) (*ManageDatasetResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ManageDataset not implemented")
 }
 func (UnimplementedDriverServiceServer) mustEmbedUnimplementedDriverServiceServer() {}
 func (UnimplementedDriverServiceServer) testEmbeddedByValue()                       {}
@@ -328,6 +460,168 @@ func _DriverService_GenerateText_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _DriverService_GenerateImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GenerateImageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DriverServiceServer).GenerateImage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DriverService_GenerateImage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DriverServiceServer).GenerateImage(ctx, req.(*GenerateImageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DriverService_GenerateVideo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GenerateVideoRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DriverServiceServer).GenerateVideo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DriverService_GenerateVideo_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DriverServiceServer).GenerateVideo(ctx, req.(*GenerateVideoRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DriverService_GenerateAudio_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GenerateAudioRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DriverServiceServer).GenerateAudio(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DriverService_GenerateAudio_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DriverServiceServer).GenerateAudio(ctx, req.(*GenerateAudioRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DriverService_Generate3D_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Generate3DRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DriverServiceServer).Generate3D(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DriverService_Generate3D_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DriverServiceServer).Generate3D(ctx, req.(*Generate3DRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DriverService_Synthesize_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SynthesizeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DriverServiceServer).Synthesize(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DriverService_Synthesize_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DriverServiceServer).Synthesize(ctx, req.(*SynthesizeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DriverService_Transcribe_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TranscribeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DriverServiceServer).Transcribe(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DriverService_Transcribe_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DriverServiceServer).Transcribe(ctx, req.(*TranscribeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DriverService_CloneVoice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CloneVoiceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DriverServiceServer).CloneVoice(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DriverService_CloneVoice_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DriverServiceServer).CloneVoice(ctx, req.(*CloneVoiceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DriverService_Train_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TrainRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DriverServiceServer).Train(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DriverService_Train_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DriverServiceServer).Train(ctx, req.(*TrainRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DriverService_ManageDataset_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ManageDatasetRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DriverServiceServer).ManageDataset(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DriverService_ManageDataset_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DriverServiceServer).ManageDataset(ctx, req.(*ManageDatasetRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // DriverService_ServiceDesc is the grpc.ServiceDesc for DriverService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -343,7 +637,43 @@ var DriverService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "GenerateText",
 			Handler:    _DriverService_GenerateText_Handler,
 		},
+		{
+			MethodName: "GenerateImage",
+			Handler:    _DriverService_GenerateImage_Handler,
+		},
+		{
+			MethodName: "GenerateVideo",
+			Handler:    _DriverService_GenerateVideo_Handler,
+		},
+		{
+			MethodName: "GenerateAudio",
+			Handler:    _DriverService_GenerateAudio_Handler,
+		},
+		{
+			MethodName: "Generate3D",
+			Handler:    _DriverService_Generate3D_Handler,
+		},
+		{
+			MethodName: "Synthesize",
+			Handler:    _DriverService_Synthesize_Handler,
+		},
+		{
+			MethodName: "Transcribe",
+			Handler:    _DriverService_Transcribe_Handler,
+		},
+		{
+			MethodName: "CloneVoice",
+			Handler:    _DriverService_CloneVoice_Handler,
+		},
+		{
+			MethodName: "Train",
+			Handler:    _DriverService_Train_Handler,
+		},
+		{
+			MethodName: "ManageDataset",
+			Handler:    _DriverService_ManageDataset_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "v1/driver.proto",
+	Metadata: "driver.proto",
 }

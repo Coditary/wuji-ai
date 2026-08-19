@@ -9,22 +9,33 @@ import (
 	"github.com/coditary/wuji/internal/driver/dummy"
 )
 
-func TestDummyDriverGenerateText(t *testing.T) {
+func TestDummyDriverCapabilities(t *testing.T) {
 	d := dummy.New()
+	caps := d.Capabilities()
 
-	if !d.HasCapability(capability.TextGeneration) {
-		t.Fatal("dummy driver should support text generation")
+	expected := []capability.Type{
+		capability.TextGeneration, capability.ImageGeneration, capability.VideoGeneration,
+		capability.AudioGeneration, capability.Asset3D, capability.TTS, capability.STT,
+		capability.VoiceCloning, capability.Training, capability.DatasetMgmt,
 	}
 
-	resp, err := d.GenerateText(context.Background(), driver.TextRequest{
-		Prompt:      "hello",
-		MaxTokens:   64,
-		Temperature: 0.7,
-	})
+	if len(caps) != len(expected) {
+		t.Fatalf("expected %d capabilities, got %d", len(expected), len(caps))
+	}
+
+	for _, c := range expected {
+		if !driver.HasCapability(d, c) {
+			t.Fatalf("dummy driver should support %s", c)
+		}
+	}
+}
+
+func TestDummyDriverGenerateText(t *testing.T) {
+	d := dummy.New()
+	resp, err := d.GenerateText(context.Background(), driver.TextRequest{Prompt: "hello"})
 	if err != nil {
 		t.Fatalf("GenerateText: %v", err)
 	}
-
 	if resp.Text == "" {
 		t.Fatal("expected non-empty response")
 	}
@@ -32,9 +43,7 @@ func TestDummyDriverGenerateText(t *testing.T) {
 
 func TestDummyDriverInfo(t *testing.T) {
 	d := dummy.New()
-	info := d.Info()
-
-	if info.ID != dummy.DriverID {
-		t.Fatalf("expected ID %q, got %q", dummy.DriverID, info.ID)
+	if d.Info().ID != dummy.DriverID {
+		t.Fatalf("expected ID %q, got %q", dummy.DriverID, d.Info().ID)
 	}
 }

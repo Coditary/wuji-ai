@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        (unknown)
-// source: v1/driver.proto
+// source: driver.proto
 
 package wujiv1
 
@@ -34,7 +34,7 @@ type DriverMetadata struct {
 
 func (x *DriverMetadata) Reset() {
 	*x = DriverMetadata{}
-	mi := &file_v1_driver_proto_msgTypes[0]
+	mi := &file_driver_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -46,7 +46,7 @@ func (x *DriverMetadata) String() string {
 func (*DriverMetadata) ProtoMessage() {}
 
 func (x *DriverMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_driver_proto_msgTypes[0]
+	mi := &file_driver_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -59,7 +59,7 @@ func (x *DriverMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DriverMetadata.ProtoReflect.Descriptor instead.
 func (*DriverMetadata) Descriptor() ([]byte, []int) {
-	return file_v1_driver_proto_rawDescGZIP(), []int{0}
+	return file_driver_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *DriverMetadata) GetId() string {
@@ -107,7 +107,7 @@ type RegisterRequest struct {
 
 func (x *RegisterRequest) Reset() {
 	*x = RegisterRequest{}
-	mi := &file_v1_driver_proto_msgTypes[1]
+	mi := &file_driver_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -119,7 +119,7 @@ func (x *RegisterRequest) String() string {
 func (*RegisterRequest) ProtoMessage() {}
 
 func (x *RegisterRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_driver_proto_msgTypes[1]
+	mi := &file_driver_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -132,7 +132,7 @@ func (x *RegisterRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegisterRequest.ProtoReflect.Descriptor instead.
 func (*RegisterRequest) Descriptor() ([]byte, []int) {
-	return file_v1_driver_proto_rawDescGZIP(), []int{1}
+	return file_driver_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *RegisterRequest) GetMetadata() *DriverMetadata {
@@ -159,7 +159,7 @@ type RegisterResponse struct {
 
 func (x *RegisterResponse) Reset() {
 	*x = RegisterResponse{}
-	mi := &file_v1_driver_proto_msgTypes[2]
+	mi := &file_driver_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -171,7 +171,7 @@ func (x *RegisterResponse) String() string {
 func (*RegisterResponse) ProtoMessage() {}
 
 func (x *RegisterResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_driver_proto_msgTypes[2]
+	mi := &file_driver_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -184,7 +184,7 @@ func (x *RegisterResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegisterResponse.ProtoReflect.Descriptor instead.
 func (*RegisterResponse) Descriptor() ([]byte, []int) {
-	return file_v1_driver_proto_rawDescGZIP(), []int{2}
+	return file_driver_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *RegisterResponse) GetSuccess() bool {
@@ -210,7 +210,7 @@ type HeartbeatRequest struct {
 
 func (x *HeartbeatRequest) Reset() {
 	*x = HeartbeatRequest{}
-	mi := &file_v1_driver_proto_msgTypes[3]
+	mi := &file_driver_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -222,7 +222,7 @@ func (x *HeartbeatRequest) String() string {
 func (*HeartbeatRequest) ProtoMessage() {}
 
 func (x *HeartbeatRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_driver_proto_msgTypes[3]
+	mi := &file_driver_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -235,7 +235,7 @@ func (x *HeartbeatRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HeartbeatRequest.ProtoReflect.Descriptor instead.
 func (*HeartbeatRequest) Descriptor() ([]byte, []int) {
-	return file_v1_driver_proto_rawDescGZIP(), []int{3}
+	return file_driver_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *HeartbeatRequest) GetDriverId() string {
@@ -254,7 +254,7 @@ type HeartbeatResponse struct {
 
 func (x *HeartbeatResponse) Reset() {
 	*x = HeartbeatResponse{}
-	mi := &file_v1_driver_proto_msgTypes[4]
+	mi := &file_driver_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -266,7 +266,7 @@ func (x *HeartbeatResponse) String() string {
 func (*HeartbeatResponse) ProtoMessage() {}
 
 func (x *HeartbeatResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_driver_proto_msgTypes[4]
+	mi := &file_driver_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -279,7 +279,7 @@ func (x *HeartbeatResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HeartbeatResponse.ProtoReflect.Descriptor instead.
 func (*HeartbeatResponse) Descriptor() ([]byte, []int) {
-	return file_v1_driver_proto_rawDescGZIP(), []int{4}
+	return file_driver_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *HeartbeatResponse) GetAlive() bool {
@@ -298,7 +298,7 @@ type UnregisterRequest struct {
 
 func (x *UnregisterRequest) Reset() {
 	*x = UnregisterRequest{}
-	mi := &file_v1_driver_proto_msgTypes[5]
+	mi := &file_driver_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -310,7 +310,7 @@ func (x *UnregisterRequest) String() string {
 func (*UnregisterRequest) ProtoMessage() {}
 
 func (x *UnregisterRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_driver_proto_msgTypes[5]
+	mi := &file_driver_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -323,7 +323,7 @@ func (x *UnregisterRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UnregisterRequest.ProtoReflect.Descriptor instead.
 func (*UnregisterRequest) Descriptor() ([]byte, []int) {
-	return file_v1_driver_proto_rawDescGZIP(), []int{5}
+	return file_driver_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *UnregisterRequest) GetDriverId() string {
@@ -342,7 +342,7 @@ type UnregisterResponse struct {
 
 func (x *UnregisterResponse) Reset() {
 	*x = UnregisterResponse{}
-	mi := &file_v1_driver_proto_msgTypes[6]
+	mi := &file_driver_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -354,7 +354,7 @@ func (x *UnregisterResponse) String() string {
 func (*UnregisterResponse) ProtoMessage() {}
 
 func (x *UnregisterResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_driver_proto_msgTypes[6]
+	mi := &file_driver_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -367,7 +367,7 @@ func (x *UnregisterResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UnregisterResponse.ProtoReflect.Descriptor instead.
 func (*UnregisterResponse) Descriptor() ([]byte, []int) {
-	return file_v1_driver_proto_rawDescGZIP(), []int{6}
+	return file_driver_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *UnregisterResponse) GetSuccess() bool {
@@ -385,7 +385,7 @@ type GetInfoRequest struct {
 
 func (x *GetInfoRequest) Reset() {
 	*x = GetInfoRequest{}
-	mi := &file_v1_driver_proto_msgTypes[7]
+	mi := &file_driver_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -397,7 +397,7 @@ func (x *GetInfoRequest) String() string {
 func (*GetInfoRequest) ProtoMessage() {}
 
 func (x *GetInfoRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_driver_proto_msgTypes[7]
+	mi := &file_driver_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -410,7 +410,7 @@ func (x *GetInfoRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetInfoRequest.ProtoReflect.Descriptor instead.
 func (*GetInfoRequest) Descriptor() ([]byte, []int) {
-	return file_v1_driver_proto_rawDescGZIP(), []int{7}
+	return file_driver_proto_rawDescGZIP(), []int{7}
 }
 
 type GetInfoResponse struct {
@@ -422,7 +422,7 @@ type GetInfoResponse struct {
 
 func (x *GetInfoResponse) Reset() {
 	*x = GetInfoResponse{}
-	mi := &file_v1_driver_proto_msgTypes[8]
+	mi := &file_driver_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -434,7 +434,7 @@ func (x *GetInfoResponse) String() string {
 func (*GetInfoResponse) ProtoMessage() {}
 
 func (x *GetInfoResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_driver_proto_msgTypes[8]
+	mi := &file_driver_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -447,7 +447,7 @@ func (x *GetInfoResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetInfoResponse.ProtoReflect.Descriptor instead.
 func (*GetInfoResponse) Descriptor() ([]byte, []int) {
-	return file_v1_driver_proto_rawDescGZIP(), []int{8}
+	return file_driver_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *GetInfoResponse) GetMetadata() *DriverMetadata {
@@ -468,7 +468,7 @@ type GenerateTextRequest struct {
 
 func (x *GenerateTextRequest) Reset() {
 	*x = GenerateTextRequest{}
-	mi := &file_v1_driver_proto_msgTypes[9]
+	mi := &file_driver_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -480,7 +480,7 @@ func (x *GenerateTextRequest) String() string {
 func (*GenerateTextRequest) ProtoMessage() {}
 
 func (x *GenerateTextRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_driver_proto_msgTypes[9]
+	mi := &file_driver_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -493,7 +493,7 @@ func (x *GenerateTextRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GenerateTextRequest.ProtoReflect.Descriptor instead.
 func (*GenerateTextRequest) Descriptor() ([]byte, []int) {
-	return file_v1_driver_proto_rawDescGZIP(), []int{9}
+	return file_driver_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *GenerateTextRequest) GetPrompt() string {
@@ -528,7 +528,7 @@ type GenerateTextResponse struct {
 
 func (x *GenerateTextResponse) Reset() {
 	*x = GenerateTextResponse{}
-	mi := &file_v1_driver_proto_msgTypes[10]
+	mi := &file_driver_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -540,7 +540,7 @@ func (x *GenerateTextResponse) String() string {
 func (*GenerateTextResponse) ProtoMessage() {}
 
 func (x *GenerateTextResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_driver_proto_msgTypes[10]
+	mi := &file_driver_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -553,7 +553,7 @@ func (x *GenerateTextResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GenerateTextResponse.ProtoReflect.Descriptor instead.
 func (*GenerateTextResponse) Descriptor() ([]byte, []int) {
-	return file_v1_driver_proto_rawDescGZIP(), []int{10}
+	return file_driver_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *GenerateTextResponse) GetText() string {
@@ -577,11 +577,1055 @@ func (x *GenerateTextResponse) GetFinishReason() string {
 	return ""
 }
 
-var File_v1_driver_proto protoreflect.FileDescriptor
+type GenerateImageRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Prompt        string                 `protobuf:"bytes,1,opt,name=prompt,proto3" json:"prompt,omitempty"`
+	Width         int32                  `protobuf:"varint,2,opt,name=width,proto3" json:"width,omitempty"`
+	Height        int32                  `protobuf:"varint,3,opt,name=height,proto3" json:"height,omitempty"`
+	Steps         int32                  `protobuf:"varint,4,opt,name=steps,proto3" json:"steps,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
 
-const file_v1_driver_proto_rawDesc = "" +
+func (x *GenerateImageRequest) Reset() {
+	*x = GenerateImageRequest{}
+	mi := &file_driver_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GenerateImageRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GenerateImageRequest) ProtoMessage() {}
+
+func (x *GenerateImageRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_driver_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GenerateImageRequest.ProtoReflect.Descriptor instead.
+func (*GenerateImageRequest) Descriptor() ([]byte, []int) {
+	return file_driver_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *GenerateImageRequest) GetPrompt() string {
+	if x != nil {
+		return x.Prompt
+	}
+	return ""
+}
+
+func (x *GenerateImageRequest) GetWidth() int32 {
+	if x != nil {
+		return x.Width
+	}
+	return 0
+}
+
+func (x *GenerateImageRequest) GetHeight() int32 {
+	if x != nil {
+		return x.Height
+	}
+	return 0
+}
+
+func (x *GenerateImageRequest) GetSteps() int32 {
+	if x != nil {
+		return x.Steps
+	}
+	return 0
+}
+
+type GenerateImageResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Path          string                 `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
+	Format        string                 `protobuf:"bytes,2,opt,name=format,proto3" json:"format,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GenerateImageResponse) Reset() {
+	*x = GenerateImageResponse{}
+	mi := &file_driver_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GenerateImageResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GenerateImageResponse) ProtoMessage() {}
+
+func (x *GenerateImageResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_driver_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GenerateImageResponse.ProtoReflect.Descriptor instead.
+func (*GenerateImageResponse) Descriptor() ([]byte, []int) {
+	return file_driver_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *GenerateImageResponse) GetPath() string {
+	if x != nil {
+		return x.Path
+	}
+	return ""
+}
+
+func (x *GenerateImageResponse) GetFormat() string {
+	if x != nil {
+		return x.Format
+	}
+	return ""
+}
+
+type GenerateVideoRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Prompt        string                 `protobuf:"bytes,1,opt,name=prompt,proto3" json:"prompt,omitempty"`
+	Duration      float32                `protobuf:"fixed32,2,opt,name=duration,proto3" json:"duration,omitempty"`
+	Fps           int32                  `protobuf:"varint,3,opt,name=fps,proto3" json:"fps,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GenerateVideoRequest) Reset() {
+	*x = GenerateVideoRequest{}
+	mi := &file_driver_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GenerateVideoRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GenerateVideoRequest) ProtoMessage() {}
+
+func (x *GenerateVideoRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_driver_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GenerateVideoRequest.ProtoReflect.Descriptor instead.
+func (*GenerateVideoRequest) Descriptor() ([]byte, []int) {
+	return file_driver_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *GenerateVideoRequest) GetPrompt() string {
+	if x != nil {
+		return x.Prompt
+	}
+	return ""
+}
+
+func (x *GenerateVideoRequest) GetDuration() float32 {
+	if x != nil {
+		return x.Duration
+	}
+	return 0
+}
+
+func (x *GenerateVideoRequest) GetFps() int32 {
+	if x != nil {
+		return x.Fps
+	}
+	return 0
+}
+
+type GenerateVideoResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Path          string                 `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
+	Duration      float32                `protobuf:"fixed32,2,opt,name=duration,proto3" json:"duration,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GenerateVideoResponse) Reset() {
+	*x = GenerateVideoResponse{}
+	mi := &file_driver_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GenerateVideoResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GenerateVideoResponse) ProtoMessage() {}
+
+func (x *GenerateVideoResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_driver_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GenerateVideoResponse.ProtoReflect.Descriptor instead.
+func (*GenerateVideoResponse) Descriptor() ([]byte, []int) {
+	return file_driver_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *GenerateVideoResponse) GetPath() string {
+	if x != nil {
+		return x.Path
+	}
+	return ""
+}
+
+func (x *GenerateVideoResponse) GetDuration() float32 {
+	if x != nil {
+		return x.Duration
+	}
+	return 0
+}
+
+type GenerateAudioRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Prompt        string                 `protobuf:"bytes,1,opt,name=prompt,proto3" json:"prompt,omitempty"`
+	Duration      float32                `protobuf:"fixed32,2,opt,name=duration,proto3" json:"duration,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GenerateAudioRequest) Reset() {
+	*x = GenerateAudioRequest{}
+	mi := &file_driver_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GenerateAudioRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GenerateAudioRequest) ProtoMessage() {}
+
+func (x *GenerateAudioRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_driver_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GenerateAudioRequest.ProtoReflect.Descriptor instead.
+func (*GenerateAudioRequest) Descriptor() ([]byte, []int) {
+	return file_driver_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *GenerateAudioRequest) GetPrompt() string {
+	if x != nil {
+		return x.Prompt
+	}
+	return ""
+}
+
+func (x *GenerateAudioRequest) GetDuration() float32 {
+	if x != nil {
+		return x.Duration
+	}
+	return 0
+}
+
+type GenerateAudioResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Path          string                 `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
+	Duration      float32                `protobuf:"fixed32,2,opt,name=duration,proto3" json:"duration,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GenerateAudioResponse) Reset() {
+	*x = GenerateAudioResponse{}
+	mi := &file_driver_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GenerateAudioResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GenerateAudioResponse) ProtoMessage() {}
+
+func (x *GenerateAudioResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_driver_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GenerateAudioResponse.ProtoReflect.Descriptor instead.
+func (*GenerateAudioResponse) Descriptor() ([]byte, []int) {
+	return file_driver_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *GenerateAudioResponse) GetPath() string {
+	if x != nil {
+		return x.Path
+	}
+	return ""
+}
+
+func (x *GenerateAudioResponse) GetDuration() float32 {
+	if x != nil {
+		return x.Duration
+	}
+	return 0
+}
+
+type Generate3DRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Prompt        string                 `protobuf:"bytes,1,opt,name=prompt,proto3" json:"prompt,omitempty"`
+	Format        string                 `protobuf:"bytes,2,opt,name=format,proto3" json:"format,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Generate3DRequest) Reset() {
+	*x = Generate3DRequest{}
+	mi := &file_driver_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Generate3DRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Generate3DRequest) ProtoMessage() {}
+
+func (x *Generate3DRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_driver_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Generate3DRequest.ProtoReflect.Descriptor instead.
+func (*Generate3DRequest) Descriptor() ([]byte, []int) {
+	return file_driver_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *Generate3DRequest) GetPrompt() string {
+	if x != nil {
+		return x.Prompt
+	}
+	return ""
+}
+
+func (x *Generate3DRequest) GetFormat() string {
+	if x != nil {
+		return x.Format
+	}
+	return ""
+}
+
+type Generate3DResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Path          string                 `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
+	Format        string                 `protobuf:"bytes,2,opt,name=format,proto3" json:"format,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Generate3DResponse) Reset() {
+	*x = Generate3DResponse{}
+	mi := &file_driver_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Generate3DResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Generate3DResponse) ProtoMessage() {}
+
+func (x *Generate3DResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_driver_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Generate3DResponse.ProtoReflect.Descriptor instead.
+func (*Generate3DResponse) Descriptor() ([]byte, []int) {
+	return file_driver_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *Generate3DResponse) GetPath() string {
+	if x != nil {
+		return x.Path
+	}
+	return ""
+}
+
+func (x *Generate3DResponse) GetFormat() string {
+	if x != nil {
+		return x.Format
+	}
+	return ""
+}
+
+type SynthesizeRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Text          string                 `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
+	Voice         string                 `protobuf:"bytes,2,opt,name=voice,proto3" json:"voice,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SynthesizeRequest) Reset() {
+	*x = SynthesizeRequest{}
+	mi := &file_driver_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SynthesizeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SynthesizeRequest) ProtoMessage() {}
+
+func (x *SynthesizeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_driver_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SynthesizeRequest.ProtoReflect.Descriptor instead.
+func (*SynthesizeRequest) Descriptor() ([]byte, []int) {
+	return file_driver_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *SynthesizeRequest) GetText() string {
+	if x != nil {
+		return x.Text
+	}
+	return ""
+}
+
+func (x *SynthesizeRequest) GetVoice() string {
+	if x != nil {
+		return x.Voice
+	}
+	return ""
+}
+
+type SynthesizeResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Path          string                 `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
+	Duration      float32                `protobuf:"fixed32,2,opt,name=duration,proto3" json:"duration,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SynthesizeResponse) Reset() {
+	*x = SynthesizeResponse{}
+	mi := &file_driver_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SynthesizeResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SynthesizeResponse) ProtoMessage() {}
+
+func (x *SynthesizeResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_driver_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SynthesizeResponse.ProtoReflect.Descriptor instead.
+func (*SynthesizeResponse) Descriptor() ([]byte, []int) {
+	return file_driver_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *SynthesizeResponse) GetPath() string {
+	if x != nil {
+		return x.Path
+	}
+	return ""
+}
+
+func (x *SynthesizeResponse) GetDuration() float32 {
+	if x != nil {
+		return x.Duration
+	}
+	return 0
+}
+
+type TranscribeRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AudioPath     string                 `protobuf:"bytes,1,opt,name=audio_path,json=audioPath,proto3" json:"audio_path,omitempty"`
+	Language      string                 `protobuf:"bytes,2,opt,name=language,proto3" json:"language,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TranscribeRequest) Reset() {
+	*x = TranscribeRequest{}
+	mi := &file_driver_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TranscribeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TranscribeRequest) ProtoMessage() {}
+
+func (x *TranscribeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_driver_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TranscribeRequest.ProtoReflect.Descriptor instead.
+func (*TranscribeRequest) Descriptor() ([]byte, []int) {
+	return file_driver_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *TranscribeRequest) GetAudioPath() string {
+	if x != nil {
+		return x.AudioPath
+	}
+	return ""
+}
+
+func (x *TranscribeRequest) GetLanguage() string {
+	if x != nil {
+		return x.Language
+	}
+	return ""
+}
+
+type TranscribeResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Text          string                 `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
+	Confidence    float32                `protobuf:"fixed32,2,opt,name=confidence,proto3" json:"confidence,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TranscribeResponse) Reset() {
+	*x = TranscribeResponse{}
+	mi := &file_driver_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TranscribeResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TranscribeResponse) ProtoMessage() {}
+
+func (x *TranscribeResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_driver_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TranscribeResponse.ProtoReflect.Descriptor instead.
+func (*TranscribeResponse) Descriptor() ([]byte, []int) {
+	return file_driver_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *TranscribeResponse) GetText() string {
+	if x != nil {
+		return x.Text
+	}
+	return ""
+}
+
+func (x *TranscribeResponse) GetConfidence() float32 {
+	if x != nil {
+		return x.Confidence
+	}
+	return 0
+}
+
+type CloneVoiceRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SamplePath    string                 `protobuf:"bytes,1,opt,name=sample_path,json=samplePath,proto3" json:"sample_path,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CloneVoiceRequest) Reset() {
+	*x = CloneVoiceRequest{}
+	mi := &file_driver_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CloneVoiceRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CloneVoiceRequest) ProtoMessage() {}
+
+func (x *CloneVoiceRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_driver_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CloneVoiceRequest.ProtoReflect.Descriptor instead.
+func (*CloneVoiceRequest) Descriptor() ([]byte, []int) {
+	return file_driver_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *CloneVoiceRequest) GetSamplePath() string {
+	if x != nil {
+		return x.SamplePath
+	}
+	return ""
+}
+
+func (x *CloneVoiceRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+type CloneVoiceResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	VoiceId       string                 `protobuf:"bytes,1,opt,name=voice_id,json=voiceId,proto3" json:"voice_id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CloneVoiceResponse) Reset() {
+	*x = CloneVoiceResponse{}
+	mi := &file_driver_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CloneVoiceResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CloneVoiceResponse) ProtoMessage() {}
+
+func (x *CloneVoiceResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_driver_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CloneVoiceResponse.ProtoReflect.Descriptor instead.
+func (*CloneVoiceResponse) Descriptor() ([]byte, []int) {
+	return file_driver_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *CloneVoiceResponse) GetVoiceId() string {
+	if x != nil {
+		return x.VoiceId
+	}
+	return ""
+}
+
+func (x *CloneVoiceResponse) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+type TrainRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	DatasetId     string                 `protobuf:"bytes,1,opt,name=dataset_id,json=datasetId,proto3" json:"dataset_id,omitempty"`
+	ModelType     string                 `protobuf:"bytes,2,opt,name=model_type,json=modelType,proto3" json:"model_type,omitempty"`
+	Epochs        int32                  `protobuf:"varint,3,opt,name=epochs,proto3" json:"epochs,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TrainRequest) Reset() {
+	*x = TrainRequest{}
+	mi := &file_driver_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TrainRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TrainRequest) ProtoMessage() {}
+
+func (x *TrainRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_driver_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TrainRequest.ProtoReflect.Descriptor instead.
+func (*TrainRequest) Descriptor() ([]byte, []int) {
+	return file_driver_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *TrainRequest) GetDatasetId() string {
+	if x != nil {
+		return x.DatasetId
+	}
+	return ""
+}
+
+func (x *TrainRequest) GetModelType() string {
+	if x != nil {
+		return x.ModelType
+	}
+	return ""
+}
+
+func (x *TrainRequest) GetEpochs() int32 {
+	if x != nil {
+		return x.Epochs
+	}
+	return 0
+}
+
+type TrainResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	JobId         string                 `protobuf:"bytes,1,opt,name=job_id,json=jobId,proto3" json:"job_id,omitempty"`
+	Status        string                 `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TrainResponse) Reset() {
+	*x = TrainResponse{}
+	mi := &file_driver_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TrainResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TrainResponse) ProtoMessage() {}
+
+func (x *TrainResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_driver_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TrainResponse.ProtoReflect.Descriptor instead.
+func (*TrainResponse) Descriptor() ([]byte, []int) {
+	return file_driver_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *TrainResponse) GetJobId() string {
+	if x != nil {
+		return x.JobId
+	}
+	return ""
+}
+
+func (x *TrainResponse) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+type DatasetEntry struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Path          string                 `protobuf:"bytes,3,opt,name=path,proto3" json:"path,omitempty"`
+	Size          int64                  `protobuf:"varint,4,opt,name=size,proto3" json:"size,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DatasetEntry) Reset() {
+	*x = DatasetEntry{}
+	mi := &file_driver_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DatasetEntry) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DatasetEntry) ProtoMessage() {}
+
+func (x *DatasetEntry) ProtoReflect() protoreflect.Message {
+	mi := &file_driver_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DatasetEntry.ProtoReflect.Descriptor instead.
+func (*DatasetEntry) Descriptor() ([]byte, []int) {
+	return file_driver_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *DatasetEntry) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *DatasetEntry) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *DatasetEntry) GetPath() string {
+	if x != nil {
+		return x.Path
+	}
+	return ""
+}
+
+func (x *DatasetEntry) GetSize() int64 {
+	if x != nil {
+		return x.Size
+	}
+	return 0
+}
+
+type ManageDatasetRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Action        string                 `protobuf:"bytes,1,opt,name=action,proto3" json:"action,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Path          string                 `protobuf:"bytes,3,opt,name=path,proto3" json:"path,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ManageDatasetRequest) Reset() {
+	*x = ManageDatasetRequest{}
+	mi := &file_driver_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ManageDatasetRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ManageDatasetRequest) ProtoMessage() {}
+
+func (x *ManageDatasetRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_driver_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ManageDatasetRequest.ProtoReflect.Descriptor instead.
+func (*ManageDatasetRequest) Descriptor() ([]byte, []int) {
+	return file_driver_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *ManageDatasetRequest) GetAction() string {
+	if x != nil {
+		return x.Action
+	}
+	return ""
+}
+
+func (x *ManageDatasetRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ManageDatasetRequest) GetPath() string {
+	if x != nil {
+		return x.Path
+	}
+	return ""
+}
+
+type ManageDatasetResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Datasets      []*DatasetEntry        `protobuf:"bytes,1,rep,name=datasets,proto3" json:"datasets,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ManageDatasetResponse) Reset() {
+	*x = ManageDatasetResponse{}
+	mi := &file_driver_proto_msgTypes[29]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ManageDatasetResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ManageDatasetResponse) ProtoMessage() {}
+
+func (x *ManageDatasetResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_driver_proto_msgTypes[29]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ManageDatasetResponse.ProtoReflect.Descriptor instead.
+func (*ManageDatasetResponse) Descriptor() ([]byte, []int) {
+	return file_driver_proto_rawDescGZIP(), []int{29}
+}
+
+func (x *ManageDatasetResponse) GetDatasets() []*DatasetEntry {
+	if x != nil {
+		return x.Datasets
+	}
+	return nil
+}
+
+func (x *ManageDatasetResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+var File_driver_proto protoreflect.FileDescriptor
+
+const file_driver_proto_rawDesc = "" +
 	"\n" +
-	"\x0fv1/driver.proto\x12\awuji.v1\"\x94\x01\n" +
+	"\fdriver.proto\x12\awuji.v1\"\x94\x01\n" +
 	"\x0eDriverMetadata\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x18\n" +
@@ -614,82 +1658,203 @@ const file_v1_driver_proto_rawDesc = "" +
 	"\x04text\x18\x01 \x01(\tR\x04text\x12\x1f\n" +
 	"\vtokens_used\x18\x02 \x01(\x05R\n" +
 	"tokensUsed\x12#\n" +
-	"\rfinish_reason\x18\x03 \x01(\tR\ffinishReason2\xdc\x01\n" +
+	"\rfinish_reason\x18\x03 \x01(\tR\ffinishReason\"r\n" +
+	"\x14GenerateImageRequest\x12\x16\n" +
+	"\x06prompt\x18\x01 \x01(\tR\x06prompt\x12\x14\n" +
+	"\x05width\x18\x02 \x01(\x05R\x05width\x12\x16\n" +
+	"\x06height\x18\x03 \x01(\x05R\x06height\x12\x14\n" +
+	"\x05steps\x18\x04 \x01(\x05R\x05steps\"C\n" +
+	"\x15GenerateImageResponse\x12\x12\n" +
+	"\x04path\x18\x01 \x01(\tR\x04path\x12\x16\n" +
+	"\x06format\x18\x02 \x01(\tR\x06format\"\\\n" +
+	"\x14GenerateVideoRequest\x12\x16\n" +
+	"\x06prompt\x18\x01 \x01(\tR\x06prompt\x12\x1a\n" +
+	"\bduration\x18\x02 \x01(\x02R\bduration\x12\x10\n" +
+	"\x03fps\x18\x03 \x01(\x05R\x03fps\"G\n" +
+	"\x15GenerateVideoResponse\x12\x12\n" +
+	"\x04path\x18\x01 \x01(\tR\x04path\x12\x1a\n" +
+	"\bduration\x18\x02 \x01(\x02R\bduration\"J\n" +
+	"\x14GenerateAudioRequest\x12\x16\n" +
+	"\x06prompt\x18\x01 \x01(\tR\x06prompt\x12\x1a\n" +
+	"\bduration\x18\x02 \x01(\x02R\bduration\"G\n" +
+	"\x15GenerateAudioResponse\x12\x12\n" +
+	"\x04path\x18\x01 \x01(\tR\x04path\x12\x1a\n" +
+	"\bduration\x18\x02 \x01(\x02R\bduration\"C\n" +
+	"\x11Generate3DRequest\x12\x16\n" +
+	"\x06prompt\x18\x01 \x01(\tR\x06prompt\x12\x16\n" +
+	"\x06format\x18\x02 \x01(\tR\x06format\"@\n" +
+	"\x12Generate3DResponse\x12\x12\n" +
+	"\x04path\x18\x01 \x01(\tR\x04path\x12\x16\n" +
+	"\x06format\x18\x02 \x01(\tR\x06format\"=\n" +
+	"\x11SynthesizeRequest\x12\x12\n" +
+	"\x04text\x18\x01 \x01(\tR\x04text\x12\x14\n" +
+	"\x05voice\x18\x02 \x01(\tR\x05voice\"D\n" +
+	"\x12SynthesizeResponse\x12\x12\n" +
+	"\x04path\x18\x01 \x01(\tR\x04path\x12\x1a\n" +
+	"\bduration\x18\x02 \x01(\x02R\bduration\"N\n" +
+	"\x11TranscribeRequest\x12\x1d\n" +
+	"\n" +
+	"audio_path\x18\x01 \x01(\tR\taudioPath\x12\x1a\n" +
+	"\blanguage\x18\x02 \x01(\tR\blanguage\"H\n" +
+	"\x12TranscribeResponse\x12\x12\n" +
+	"\x04text\x18\x01 \x01(\tR\x04text\x12\x1e\n" +
+	"\n" +
+	"confidence\x18\x02 \x01(\x02R\n" +
+	"confidence\"H\n" +
+	"\x11CloneVoiceRequest\x12\x1f\n" +
+	"\vsample_path\x18\x01 \x01(\tR\n" +
+	"samplePath\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\"C\n" +
+	"\x12CloneVoiceResponse\x12\x19\n" +
+	"\bvoice_id\x18\x01 \x01(\tR\avoiceId\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\"d\n" +
+	"\fTrainRequest\x12\x1d\n" +
+	"\n" +
+	"dataset_id\x18\x01 \x01(\tR\tdatasetId\x12\x1d\n" +
+	"\n" +
+	"model_type\x18\x02 \x01(\tR\tmodelType\x12\x16\n" +
+	"\x06epochs\x18\x03 \x01(\x05R\x06epochs\">\n" +
+	"\rTrainResponse\x12\x15\n" +
+	"\x06job_id\x18\x01 \x01(\tR\x05jobId\x12\x16\n" +
+	"\x06status\x18\x02 \x01(\tR\x06status\"Z\n" +
+	"\fDatasetEntry\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x12\n" +
+	"\x04path\x18\x03 \x01(\tR\x04path\x12\x12\n" +
+	"\x04size\x18\x04 \x01(\x03R\x04size\"V\n" +
+	"\x14ManageDatasetRequest\x12\x16\n" +
+	"\x06action\x18\x01 \x01(\tR\x06action\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x12\n" +
+	"\x04path\x18\x03 \x01(\tR\x04path\"d\n" +
+	"\x15ManageDatasetResponse\x121\n" +
+	"\bdatasets\x18\x01 \x03(\v2\x15.wuji.v1.DatasetEntryR\bdatasets\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage2\xdc\x01\n" +
 	"\x0eDriverRegistry\x12?\n" +
 	"\bRegister\x12\x18.wuji.v1.RegisterRequest\x1a\x19.wuji.v1.RegisterResponse\x12B\n" +
 	"\tHeartbeat\x12\x19.wuji.v1.HeartbeatRequest\x1a\x1a.wuji.v1.HeartbeatResponse\x12E\n" +
 	"\n" +
-	"Unregister\x12\x1a.wuji.v1.UnregisterRequest\x1a\x1b.wuji.v1.UnregisterResponse2\x9a\x01\n" +
+	"Unregister\x12\x1a.wuji.v1.UnregisterRequest\x1a\x1b.wuji.v1.UnregisterResponse2\xae\x06\n" +
 	"\rDriverService\x12<\n" +
 	"\aGetInfo\x12\x17.wuji.v1.GetInfoRequest\x1a\x18.wuji.v1.GetInfoResponse\x12K\n" +
-	"\fGenerateText\x12\x1c.wuji.v1.GenerateTextRequest\x1a\x1d.wuji.v1.GenerateTextResponseB.Z,github.com/coditary/wuji/api/proto/v1;wujiv1b\x06proto3"
+	"\fGenerateText\x12\x1c.wuji.v1.GenerateTextRequest\x1a\x1d.wuji.v1.GenerateTextResponse\x12N\n" +
+	"\rGenerateImage\x12\x1d.wuji.v1.GenerateImageRequest\x1a\x1e.wuji.v1.GenerateImageResponse\x12N\n" +
+	"\rGenerateVideo\x12\x1d.wuji.v1.GenerateVideoRequest\x1a\x1e.wuji.v1.GenerateVideoResponse\x12N\n" +
+	"\rGenerateAudio\x12\x1d.wuji.v1.GenerateAudioRequest\x1a\x1e.wuji.v1.GenerateAudioResponse\x12E\n" +
+	"\n" +
+	"Generate3D\x12\x1a.wuji.v1.Generate3DRequest\x1a\x1b.wuji.v1.Generate3DResponse\x12E\n" +
+	"\n" +
+	"Synthesize\x12\x1a.wuji.v1.SynthesizeRequest\x1a\x1b.wuji.v1.SynthesizeResponse\x12E\n" +
+	"\n" +
+	"Transcribe\x12\x1a.wuji.v1.TranscribeRequest\x1a\x1b.wuji.v1.TranscribeResponse\x12E\n" +
+	"\n" +
+	"CloneVoice\x12\x1a.wuji.v1.CloneVoiceRequest\x1a\x1b.wuji.v1.CloneVoiceResponse\x126\n" +
+	"\x05Train\x12\x15.wuji.v1.TrainRequest\x1a\x16.wuji.v1.TrainResponse\x12N\n" +
+	"\rManageDataset\x12\x1d.wuji.v1.ManageDatasetRequest\x1a\x1e.wuji.v1.ManageDatasetResponseB.Z,github.com/coditary/wuji/api/proto/v1;wujiv1b\x06proto3"
 
 var (
-	file_v1_driver_proto_rawDescOnce sync.Once
-	file_v1_driver_proto_rawDescData []byte
+	file_driver_proto_rawDescOnce sync.Once
+	file_driver_proto_rawDescData []byte
 )
 
-func file_v1_driver_proto_rawDescGZIP() []byte {
-	file_v1_driver_proto_rawDescOnce.Do(func() {
-		file_v1_driver_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_v1_driver_proto_rawDesc), len(file_v1_driver_proto_rawDesc)))
+func file_driver_proto_rawDescGZIP() []byte {
+	file_driver_proto_rawDescOnce.Do(func() {
+		file_driver_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_driver_proto_rawDesc), len(file_driver_proto_rawDesc)))
 	})
-	return file_v1_driver_proto_rawDescData
+	return file_driver_proto_rawDescData
 }
 
-var file_v1_driver_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
-var file_v1_driver_proto_goTypes = []any{
-	(*DriverMetadata)(nil),       // 0: wuji.v1.DriverMetadata
-	(*RegisterRequest)(nil),      // 1: wuji.v1.RegisterRequest
-	(*RegisterResponse)(nil),     // 2: wuji.v1.RegisterResponse
-	(*HeartbeatRequest)(nil),     // 3: wuji.v1.HeartbeatRequest
-	(*HeartbeatResponse)(nil),    // 4: wuji.v1.HeartbeatResponse
-	(*UnregisterRequest)(nil),    // 5: wuji.v1.UnregisterRequest
-	(*UnregisterResponse)(nil),   // 6: wuji.v1.UnregisterResponse
-	(*GetInfoRequest)(nil),       // 7: wuji.v1.GetInfoRequest
-	(*GetInfoResponse)(nil),      // 8: wuji.v1.GetInfoResponse
-	(*GenerateTextRequest)(nil),  // 9: wuji.v1.GenerateTextRequest
-	(*GenerateTextResponse)(nil), // 10: wuji.v1.GenerateTextResponse
+var file_driver_proto_msgTypes = make([]protoimpl.MessageInfo, 30)
+var file_driver_proto_goTypes = []any{
+	(*DriverMetadata)(nil),        // 0: wuji.v1.DriverMetadata
+	(*RegisterRequest)(nil),       // 1: wuji.v1.RegisterRequest
+	(*RegisterResponse)(nil),      // 2: wuji.v1.RegisterResponse
+	(*HeartbeatRequest)(nil),      // 3: wuji.v1.HeartbeatRequest
+	(*HeartbeatResponse)(nil),     // 4: wuji.v1.HeartbeatResponse
+	(*UnregisterRequest)(nil),     // 5: wuji.v1.UnregisterRequest
+	(*UnregisterResponse)(nil),    // 6: wuji.v1.UnregisterResponse
+	(*GetInfoRequest)(nil),        // 7: wuji.v1.GetInfoRequest
+	(*GetInfoResponse)(nil),       // 8: wuji.v1.GetInfoResponse
+	(*GenerateTextRequest)(nil),   // 9: wuji.v1.GenerateTextRequest
+	(*GenerateTextResponse)(nil),  // 10: wuji.v1.GenerateTextResponse
+	(*GenerateImageRequest)(nil),  // 11: wuji.v1.GenerateImageRequest
+	(*GenerateImageResponse)(nil), // 12: wuji.v1.GenerateImageResponse
+	(*GenerateVideoRequest)(nil),  // 13: wuji.v1.GenerateVideoRequest
+	(*GenerateVideoResponse)(nil), // 14: wuji.v1.GenerateVideoResponse
+	(*GenerateAudioRequest)(nil),  // 15: wuji.v1.GenerateAudioRequest
+	(*GenerateAudioResponse)(nil), // 16: wuji.v1.GenerateAudioResponse
+	(*Generate3DRequest)(nil),     // 17: wuji.v1.Generate3DRequest
+	(*Generate3DResponse)(nil),    // 18: wuji.v1.Generate3DResponse
+	(*SynthesizeRequest)(nil),     // 19: wuji.v1.SynthesizeRequest
+	(*SynthesizeResponse)(nil),    // 20: wuji.v1.SynthesizeResponse
+	(*TranscribeRequest)(nil),     // 21: wuji.v1.TranscribeRequest
+	(*TranscribeResponse)(nil),    // 22: wuji.v1.TranscribeResponse
+	(*CloneVoiceRequest)(nil),     // 23: wuji.v1.CloneVoiceRequest
+	(*CloneVoiceResponse)(nil),    // 24: wuji.v1.CloneVoiceResponse
+	(*TrainRequest)(nil),          // 25: wuji.v1.TrainRequest
+	(*TrainResponse)(nil),         // 26: wuji.v1.TrainResponse
+	(*DatasetEntry)(nil),          // 27: wuji.v1.DatasetEntry
+	(*ManageDatasetRequest)(nil),  // 28: wuji.v1.ManageDatasetRequest
+	(*ManageDatasetResponse)(nil), // 29: wuji.v1.ManageDatasetResponse
 }
-var file_v1_driver_proto_depIdxs = []int32{
+var file_driver_proto_depIdxs = []int32{
 	0,  // 0: wuji.v1.RegisterRequest.metadata:type_name -> wuji.v1.DriverMetadata
 	0,  // 1: wuji.v1.GetInfoResponse.metadata:type_name -> wuji.v1.DriverMetadata
-	1,  // 2: wuji.v1.DriverRegistry.Register:input_type -> wuji.v1.RegisterRequest
-	3,  // 3: wuji.v1.DriverRegistry.Heartbeat:input_type -> wuji.v1.HeartbeatRequest
-	5,  // 4: wuji.v1.DriverRegistry.Unregister:input_type -> wuji.v1.UnregisterRequest
-	7,  // 5: wuji.v1.DriverService.GetInfo:input_type -> wuji.v1.GetInfoRequest
-	9,  // 6: wuji.v1.DriverService.GenerateText:input_type -> wuji.v1.GenerateTextRequest
-	2,  // 7: wuji.v1.DriverRegistry.Register:output_type -> wuji.v1.RegisterResponse
-	4,  // 8: wuji.v1.DriverRegistry.Heartbeat:output_type -> wuji.v1.HeartbeatResponse
-	6,  // 9: wuji.v1.DriverRegistry.Unregister:output_type -> wuji.v1.UnregisterResponse
-	8,  // 10: wuji.v1.DriverService.GetInfo:output_type -> wuji.v1.GetInfoResponse
-	10, // 11: wuji.v1.DriverService.GenerateText:output_type -> wuji.v1.GenerateTextResponse
-	7,  // [7:12] is the sub-list for method output_type
-	2,  // [2:7] is the sub-list for method input_type
-	2,  // [2:2] is the sub-list for extension type_name
-	2,  // [2:2] is the sub-list for extension extendee
-	0,  // [0:2] is the sub-list for field type_name
+	27, // 2: wuji.v1.ManageDatasetResponse.datasets:type_name -> wuji.v1.DatasetEntry
+	1,  // 3: wuji.v1.DriverRegistry.Register:input_type -> wuji.v1.RegisterRequest
+	3,  // 4: wuji.v1.DriverRegistry.Heartbeat:input_type -> wuji.v1.HeartbeatRequest
+	5,  // 5: wuji.v1.DriverRegistry.Unregister:input_type -> wuji.v1.UnregisterRequest
+	7,  // 6: wuji.v1.DriverService.GetInfo:input_type -> wuji.v1.GetInfoRequest
+	9,  // 7: wuji.v1.DriverService.GenerateText:input_type -> wuji.v1.GenerateTextRequest
+	11, // 8: wuji.v1.DriverService.GenerateImage:input_type -> wuji.v1.GenerateImageRequest
+	13, // 9: wuji.v1.DriverService.GenerateVideo:input_type -> wuji.v1.GenerateVideoRequest
+	15, // 10: wuji.v1.DriverService.GenerateAudio:input_type -> wuji.v1.GenerateAudioRequest
+	17, // 11: wuji.v1.DriverService.Generate3D:input_type -> wuji.v1.Generate3DRequest
+	19, // 12: wuji.v1.DriverService.Synthesize:input_type -> wuji.v1.SynthesizeRequest
+	21, // 13: wuji.v1.DriverService.Transcribe:input_type -> wuji.v1.TranscribeRequest
+	23, // 14: wuji.v1.DriverService.CloneVoice:input_type -> wuji.v1.CloneVoiceRequest
+	25, // 15: wuji.v1.DriverService.Train:input_type -> wuji.v1.TrainRequest
+	28, // 16: wuji.v1.DriverService.ManageDataset:input_type -> wuji.v1.ManageDatasetRequest
+	2,  // 17: wuji.v1.DriverRegistry.Register:output_type -> wuji.v1.RegisterResponse
+	4,  // 18: wuji.v1.DriverRegistry.Heartbeat:output_type -> wuji.v1.HeartbeatResponse
+	6,  // 19: wuji.v1.DriverRegistry.Unregister:output_type -> wuji.v1.UnregisterResponse
+	8,  // 20: wuji.v1.DriverService.GetInfo:output_type -> wuji.v1.GetInfoResponse
+	10, // 21: wuji.v1.DriverService.GenerateText:output_type -> wuji.v1.GenerateTextResponse
+	12, // 22: wuji.v1.DriverService.GenerateImage:output_type -> wuji.v1.GenerateImageResponse
+	14, // 23: wuji.v1.DriverService.GenerateVideo:output_type -> wuji.v1.GenerateVideoResponse
+	16, // 24: wuji.v1.DriverService.GenerateAudio:output_type -> wuji.v1.GenerateAudioResponse
+	18, // 25: wuji.v1.DriverService.Generate3D:output_type -> wuji.v1.Generate3DResponse
+	20, // 26: wuji.v1.DriverService.Synthesize:output_type -> wuji.v1.SynthesizeResponse
+	22, // 27: wuji.v1.DriverService.Transcribe:output_type -> wuji.v1.TranscribeResponse
+	24, // 28: wuji.v1.DriverService.CloneVoice:output_type -> wuji.v1.CloneVoiceResponse
+	26, // 29: wuji.v1.DriverService.Train:output_type -> wuji.v1.TrainResponse
+	29, // 30: wuji.v1.DriverService.ManageDataset:output_type -> wuji.v1.ManageDatasetResponse
+	17, // [17:31] is the sub-list for method output_type
+	3,  // [3:17] is the sub-list for method input_type
+	3,  // [3:3] is the sub-list for extension type_name
+	3,  // [3:3] is the sub-list for extension extendee
+	0,  // [0:3] is the sub-list for field type_name
 }
 
-func init() { file_v1_driver_proto_init() }
-func file_v1_driver_proto_init() {
-	if File_v1_driver_proto != nil {
+func init() { file_driver_proto_init() }
+func file_driver_proto_init() {
+	if File_driver_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_v1_driver_proto_rawDesc), len(file_v1_driver_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_driver_proto_rawDesc), len(file_driver_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   11,
+			NumMessages:   30,
 			NumExtensions: 0,
 			NumServices:   2,
 		},
-		GoTypes:           file_v1_driver_proto_goTypes,
-		DependencyIndexes: file_v1_driver_proto_depIdxs,
-		MessageInfos:      file_v1_driver_proto_msgTypes,
+		GoTypes:           file_driver_proto_goTypes,
+		DependencyIndexes: file_driver_proto_depIdxs,
+		MessageInfos:      file_driver_proto_msgTypes,
 	}.Build()
-	File_v1_driver_proto = out.File
-	file_v1_driver_proto_goTypes = nil
-	file_v1_driver_proto_depIdxs = nil
+	File_driver_proto = out.File
+	file_driver_proto_goTypes = nil
+	file_driver_proto_depIdxs = nil
 }

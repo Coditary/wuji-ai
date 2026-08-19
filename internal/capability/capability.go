@@ -4,16 +4,16 @@ package capability
 type Type string
 
 const (
-	TextGeneration  Type = "text_generation"
-	ImageGeneration Type = "image_generation"
-	VideoGeneration Type = "video_generation"
-	AudioGeneration Type = "audio_generation"
-	Asset3D         Type = "3d_asset_generation"
+	TextGeneration  Type = "text"
+	ImageGeneration Type = "image"
+	VideoGeneration Type = "video"
+	AudioGeneration Type = "audio"
+	Asset3D         Type = "3d"
 	TTS             Type = "tts"
 	STT             Type = "stt"
-	VoiceCloning    Type = "voice_cloning"
-	Training        Type = "training"
-	DatasetMgmt     Type = "dataset_management"
+	VoiceCloning    Type = "voice"
+	Training        Type = "train"
+	DatasetMgmt     Type = "dataset"
 )
 
 // All returns every known capability type.

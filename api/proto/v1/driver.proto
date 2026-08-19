@@ -4,19 +4,24 @@ package wuji.v1;
 
 option go_package = "github.com/coditary/wuji/api/proto/v1;wujiv1";
 
-// DriverRegistry is the gRPC service exposed by the Wuji core.
-// Remote drivers connect here to register themselves.
 service DriverRegistry {
   rpc Register(RegisterRequest) returns (RegisterResponse);
   rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse);
   rpc Unregister(UnregisterRequest) returns (UnregisterResponse);
 }
 
-// DriverService is implemented by each remote driver process.
-// The Wuji core calls into drivers through this interface.
 service DriverService {
   rpc GetInfo(GetInfoRequest) returns (GetInfoResponse);
   rpc GenerateText(GenerateTextRequest) returns (GenerateTextResponse);
+  rpc GenerateImage(GenerateImageRequest) returns (GenerateImageResponse);
+  rpc GenerateVideo(GenerateVideoRequest) returns (GenerateVideoResponse);
+  rpc GenerateAudio(GenerateAudioRequest) returns (GenerateAudioResponse);
+  rpc Generate3D(Generate3DRequest) returns (Generate3DResponse);
+  rpc Synthesize(SynthesizeRequest) returns (SynthesizeResponse);
+  rpc Transcribe(TranscribeRequest) returns (TranscribeResponse);
+  rpc CloneVoice(CloneVoiceRequest) returns (CloneVoiceResponse);
+  rpc Train(TrainRequest) returns (TrainResponse);
+  rpc ManageDataset(ManageDatasetRequest) returns (ManageDatasetResponse);
 }
 
 message DriverMetadata {
@@ -69,4 +74,106 @@ message GenerateTextResponse {
   string text = 1;
   int32 tokens_used = 2;
   string finish_reason = 3;
+}
+
+message GenerateImageRequest {
+  string prompt = 1;
+  int32 width = 2;
+  int32 height = 3;
+  int32 steps = 4;
+}
+
+message GenerateImageResponse {
+  string path = 1;
+  string format = 2;
+}
+
+message GenerateVideoRequest {
+  string prompt = 1;
+  float duration = 2;
+  int32 fps = 3;
+}
+
+message GenerateVideoResponse {
+  string path = 1;
+  float duration = 2;
+}
+
+message GenerateAudioRequest {
+  string prompt = 1;
+  float duration = 2;
+}
+
+message GenerateAudioResponse {
+  string path = 1;
+  float duration = 2;
+}
+
+message Generate3DRequest {
+  string prompt = 1;
+  string format = 2;
+}
+
+message Generate3DResponse {
+  string path = 1;
+  string format = 2;
+}
+
+message SynthesizeRequest {
+  string text = 1;
+  string voice = 2;
+}
+
+message SynthesizeResponse {
+  string path = 1;
+  float duration = 2;
+}
+
+message TranscribeRequest {
+  string audio_path = 1;
+  string language = 2;
+}
+
+message TranscribeResponse {
+  string text = 1;
+  float confidence = 2;
+}
+
+message CloneVoiceRequest {
+  string sample_path = 1;
+  string name = 2;
+}
+
+message CloneVoiceResponse {
+  string voice_id = 1;
+  string name = 2;
+}
+
+message TrainRequest {
+  string dataset_id = 1;
+  string model_type = 2;
+  int32 epochs = 3;
+}
+
+message TrainResponse {
+  string job_id = 1;
+  string status = 2;
+}
+
+message DatasetEntry {
+  string id = 1;
+  string name = 2;
+  string path = 3;
+  int64 size = 4;
+}
+
+message ManageDatasetRequest {
+  string action = 1;
+  string name = 2;
+  string path = 3;
+}
+
+message ManageDatasetResponse {
+  repeated DatasetEntry datasets = 1;
+  string message = 2;
 }

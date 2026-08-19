@@ -41,6 +41,11 @@ without changing how you interact with the tool.`,
 
 	root.AddCommand(
 		newGenerateCmd(app),
+		newTTSCmd(app),
+		newSTTCmd(app),
+		newVoiceCmd(app),
+		newTrainCmd(app),
+		newDatasetCmd(app),
 		newDriverCmd(app),
 		newServeCmd(app),
 	)

@@ -81,7 +81,7 @@ func (r *Registry) FindByCapability(c capability.Type) []Driver {
 
 	var result []Driver
 	for _, d := range r.drivers {
-		if d.HasCapability(c) {
+		if HasCapability(d, c) {
 			result = append(result, d)
 		}
 	}
