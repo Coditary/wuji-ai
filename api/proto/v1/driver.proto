@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package wuji.v1;
+
+option go_package = "github.com/coditary/wuji/api/proto/v1;wujiv1";
+
+// DriverRegistry is the gRPC service exposed by the Wuji core.
+// Remote drivers connect here to register themselves.
+service DriverRegistry {
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+  rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse);
+  rpc Unregister(UnregisterRequest) returns (UnregisterResponse);
+}
+
+// DriverService is implemented by each remote driver process.
+// The Wuji core calls into drivers through this interface.
+service DriverService {
+  rpc GetInfo(GetInfoRequest) returns (GetInfoResponse);
+  rpc GenerateText(GenerateTextRequest) returns (GenerateTextResponse);
+}
+
+message DriverMetadata {
+  string id = 1;
+  string name = 2;
+  string version = 3;
+  string description = 4;
+  repeated string capabilities = 5;
+}
+
+message RegisterRequest {
+  DriverMetadata metadata = 1;
+  string endpoint = 2;
+}
+
+message RegisterResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message HeartbeatRequest {
+  string driver_id = 1;
+}
+
+message HeartbeatResponse {
+  bool alive = 1;
+}
+
+message UnregisterRequest {
+  string driver_id = 1;
+}
+
+message UnregisterResponse {
+  bool success = 1;
+}
+
+message GetInfoRequest {}
+
+message GetInfoResponse {
+  DriverMetadata metadata = 1;
+}
+
+message GenerateTextRequest {
+  string prompt = 1;
+  int32 max_tokens = 2;
+  float temperature = 3;
+}
+
+message GenerateTextResponse {
+  string text = 1;
+  int32 tokens_used = 2;
+  string finish_reason = 3;
+}
