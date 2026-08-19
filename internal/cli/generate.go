@@ -28,6 +28,7 @@ func newGenerateCmd(app *App) *cobra.Command {
 	}
 
 	// text
+	var model string
 	var maxTokens int
 	var temperature float32
 	textCmd := &cobra.Command{
@@ -36,7 +37,7 @@ func newGenerateCmd(app *App) *cobra.Command {
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			resp, err := app.Core.GenerateText(context.Background(), driverID, driver.TextRequest{
-				Prompt: joinArgs(args), MaxTokens: maxTokens, Temperature: temperature,
+				Prompt: joinArgs(args), Model: model, MaxTokens: maxTokens, Temperature: temperature,
 			})
 			if err != nil {
 				return err
@@ -45,8 +46,9 @@ func newGenerateCmd(app *App) *cobra.Command {
 			return nil
 		},
 	}
-	textCmd.Flags().IntVar(&maxTokens, "max-tokens", 256, "maximum tokens to generate")
+	textCmd.Flags().IntVar(&maxTokens, "max-tokens", 1024, "maximum tokens to generate (-1 for unlimited)")
 	textCmd.Flags().Float32Var(&temperature, "temperature", 0.7, "sampling temperature")
+	textCmd.Flags().StringVar(&model, "model", "", "model name (driver-specific)")
 	addDriverFlag(textCmd, &driverID)
 
 	// image

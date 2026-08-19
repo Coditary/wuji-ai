@@ -462,6 +462,7 @@ type GenerateTextRequest struct {
 	Prompt        string                 `protobuf:"bytes,1,opt,name=prompt,proto3" json:"prompt,omitempty"`
 	MaxTokens     int32                  `protobuf:"varint,2,opt,name=max_tokens,json=maxTokens,proto3" json:"max_tokens,omitempty"`
 	Temperature   float32                `protobuf:"fixed32,3,opt,name=temperature,proto3" json:"temperature,omitempty"`
+	Model         string                 `protobuf:"bytes,4,opt,name=model,proto3" json:"model,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -515,6 +516,13 @@ func (x *GenerateTextRequest) GetTemperature() float32 {
 		return x.Temperature
 	}
 	return 0
+}
+
+func (x *GenerateTextRequest) GetModel() string {
+	if x != nil {
+		return x.Model
+	}
+	return ""
 }
 
 type GenerateTextResponse struct {
@@ -1648,12 +1656,13 @@ const file_driver_proto_rawDesc = "" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\"\x10\n" +
 	"\x0eGetInfoRequest\"F\n" +
 	"\x0fGetInfoResponse\x123\n" +
-	"\bmetadata\x18\x01 \x01(\v2\x17.wuji.v1.DriverMetadataR\bmetadata\"n\n" +
+	"\bmetadata\x18\x01 \x01(\v2\x17.wuji.v1.DriverMetadataR\bmetadata\"\x84\x01\n" +
 	"\x13GenerateTextRequest\x12\x16\n" +
 	"\x06prompt\x18\x01 \x01(\tR\x06prompt\x12\x1d\n" +
 	"\n" +
 	"max_tokens\x18\x02 \x01(\x05R\tmaxTokens\x12 \n" +
-	"\vtemperature\x18\x03 \x01(\x02R\vtemperature\"p\n" +
+	"\vtemperature\x18\x03 \x01(\x02R\vtemperature\x12\x14\n" +
+	"\x05model\x18\x04 \x01(\tR\x05model\"p\n" +
 	"\x14GenerateTextResponse\x12\x12\n" +
 	"\x04text\x18\x01 \x01(\tR\x04text\x12\x1f\n" +
 	"\vtokens_used\x18\x02 \x01(\x05R\n" +

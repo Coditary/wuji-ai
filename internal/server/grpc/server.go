@@ -55,18 +55,21 @@ func (s *Server) Stop() {
 	s.grpcSrv.GracefulStop()
 }
 
-func (s *Server) Register(_ context.Context, req *wujiv1.RegisterRequest) (*wujiv1.RegisterResponse, error) {
+func (s *Server) Register(ctx context.Context, req *wujiv1.RegisterRequest) (*wujiv1.RegisterResponse, error) {
 	if req.Metadata == nil || req.Metadata.Id == "" {
-		return &wujiv1.RegisterResponse{
-			Success: false,
-			Message: "driver metadata with ID is required",
-		}, nil
+		return &wujiv1.RegisterResponse{Success: false, Message: "driver metadata with ID is required"}, nil
+	}
+	if req.Endpoint == "" {
+		return &wujiv1.RegisterResponse{Success: false, Message: "driver endpoint is required"}, nil
 	}
 
-	// Remote driver registration will be wired in a follow-up iteration.
+	if err := s.core.ConnectRemote(ctx, req.Endpoint, true); err != nil {
+		return &wujiv1.RegisterResponse{Success: false, Message: err.Error()}, nil
+	}
+
 	return &wujiv1.RegisterResponse{
 		Success: true,
-		Message: fmt.Sprintf("driver %q registration accepted (endpoint: %s)", req.Metadata.Id, req.Endpoint),
+		Message: fmt.Sprintf("driver %q registered from %s", req.Metadata.Id, req.Endpoint),
 	}, nil
 }
 
@@ -74,11 +77,15 @@ func (s *Server) Heartbeat(_ context.Context, req *wujiv1.HeartbeatRequest) (*wu
 	if req.DriverId == "" {
 		return &wujiv1.HeartbeatResponse{Alive: false}, nil
 	}
-	return &wujiv1.HeartbeatResponse{Alive: true}, nil
+	_, err := s.core.Registry().Get(req.DriverId)
+	return &wujiv1.HeartbeatResponse{Alive: err == nil}, nil
 }
 
 func (s *Server) Unregister(_ context.Context, req *wujiv1.UnregisterRequest) (*wujiv1.UnregisterResponse, error) {
 	if req.DriverId == "" {
+		return &wujiv1.UnregisterResponse{Success: false}, nil
+	}
+	if err := s.core.Registry().Unregister(req.DriverId); err != nil {
 		return &wujiv1.UnregisterResponse{Success: false}, nil
 	}
 	return &wujiv1.UnregisterResponse{Success: true}, nil

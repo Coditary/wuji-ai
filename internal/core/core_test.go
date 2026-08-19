@@ -53,11 +53,19 @@ func TestCoreListDrivers(t *testing.T) {
 	defer c.Close()
 
 	drivers := c.ListDrivers()
-	if len(drivers) != 1 {
-		t.Fatalf("expected 1 driver, got %d", len(drivers))
+	if len(drivers) < 1 {
+		t.Fatalf("expected at least 1 driver, got %d", len(drivers))
 	}
-	if drivers[0].ID != dummy.DriverID {
-		t.Fatalf("expected driver %q, got %q", dummy.DriverID, drivers[0].ID)
+
+	found := false
+	for _, d := range drivers {
+		if d.ID == dummy.DriverID {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Fatalf("expected dummy driver to be registered")
 	}
 }
 

@@ -60,7 +60,8 @@ func (d *RemoteDriver) Capabilities() []capability.Type { return d.info.Capabili
 
 func (d *RemoteDriver) GenerateText(ctx context.Context, req driver.TextRequest) (*driver.TextResponse, error) {
 	resp, err := d.client.GenerateText(ctx, &wujiv1.GenerateTextRequest{
-		Prompt: req.Prompt, MaxTokens: int32(req.MaxTokens), Temperature: req.Temperature,
+		Prompt: req.Prompt, Model: req.Model,
+		MaxTokens: int32(req.MaxTokens), Temperature: req.Temperature,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("remote generate text: %w", err)

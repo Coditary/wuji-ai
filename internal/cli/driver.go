@@ -16,7 +16,23 @@ func newDriverCmd(app *App) *cobra.Command {
 		Short: "Manage AI backends (drivers)",
 	}
 
+	connectCmd := &cobra.Command{
+		Use:   "connect [endpoint]",
+		Short: "Connect to a remote driver via gRPC",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			persist, _ := cmd.Flags().GetBool("save")
+			if err := app.Core.ConnectRemote(cmd.Context(), args[0], persist); err != nil {
+				return err
+			}
+			fmt.Fprintf(os.Stdout, "Connected to driver at %s\n", args[0])
+			return nil
+		},
+	}
+	connectCmd.Flags().Bool("save", true, "persist endpoint in .wuji/drivers.yaml")
+
 	cmd.AddCommand(
+		connectCmd,
 		&cobra.Command{
 			Use:   "list",
 			Short: "List registered drivers",

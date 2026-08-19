@@ -3,32 +3,53 @@ package core
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/coditary/wuji/internal/capability"
+	"github.com/coditary/wuji/internal/config"
 	"github.com/coditary/wuji/internal/driver"
 	"github.com/coditary/wuji/internal/driver/dummy"
+	grpcdriver "github.com/coditary/wuji/internal/driver/grpc"
 )
 
 // Config holds core initialization options.
 type Config struct {
 	DefaultDriverID string
+	AppConfig       *config.Config
 }
 
 // Core is the central orchestrator for all driver operations.
 type Core struct {
 	registry      *driver.Registry
 	defaultDriver string
+	appConfig     *config.Config
 }
 
 // New creates a Core instance with built-in drivers registered.
 func New(cfg Config) (*Core, error) {
+	appCfg := cfg.AppConfig
+	if appCfg == nil {
+		var err error
+		appCfg, err = config.Load()
+		if err != nil {
+			return nil, fmt.Errorf("load config: %w", err)
+		}
+	}
+
 	c := &Core{
 		registry:      driver.NewRegistry(),
 		defaultDriver: cfg.DefaultDriverID,
+		appConfig:     appCfg,
 	}
 
 	if err := c.registry.Register(dummy.New()); err != nil {
 		return nil, fmt.Errorf("register dummy driver: %w", err)
+	}
+
+	for _, endpoint := range appCfg.DriverEndpoints {
+		if err := c.ConnectRemote(context.Background(), endpoint, false); err != nil {
+			fmt.Fprintf(os.Stderr, "warning: could not connect to driver at %s: %v\n", endpoint, err)
+		}
 	}
 
 	if c.defaultDriver == "" {
@@ -40,6 +61,29 @@ func New(cfg Config) (*Core, error) {
 	}
 
 	return c, nil
+}
+
+// ConnectRemote connects to a driver at the given gRPC endpoint and registers it.
+func (c *Core) ConnectRemote(ctx context.Context, endpoint string, persist bool) error {
+	remote, err := grpcdriver.Connect(ctx, endpoint)
+	if err != nil {
+		return err
+	}
+
+	if err := c.registry.Register(remote); err != nil {
+		_ = remote.Close()
+		return err
+	}
+
+	if persist {
+		return config.SaveDriverEndpoint(c.appConfig.Root, endpoint)
+	}
+	return nil
+}
+
+// AppConfig returns the application configuration.
+func (c *Core) AppConfig() *config.Config {
+	return c.appConfig
 }
 
 func (c *Core) resolve(driverID string) (driver.Driver, error) {

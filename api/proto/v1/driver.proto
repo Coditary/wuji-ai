@@ -68,6 +68,7 @@ message GenerateTextRequest {
   string prompt = 1;
   int32 max_tokens = 2;
   float temperature = 3;
+  string model = 4;
 }
 
 message GenerateTextResponse {

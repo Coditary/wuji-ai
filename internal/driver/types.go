@@ -3,6 +3,7 @@ package driver
 // TextRequest is the input for text generation.
 type TextRequest struct {
 	Prompt      string
+	Model       string
 	MaxTokens   int
 	Temperature float32
 }

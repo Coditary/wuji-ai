@@ -30,8 +30,7 @@ func New() (*App, error) {
 		Short: "Unified CLI for AI backends and APIs",
 		Long: `Wuji is a unified command-line interface for AI workloads.
 
-It provides a pluggable driver architecture where backends like llama.cpp,
-image generators, TTS/STT engines, and training pipelines can be swapped
+It provides a pluggable driver architecture where backends can be swapped
 without changing how you interact with the tool.`,
 		Version: fmt.Sprintf("%s (commit: %s, built: %s)", version.Version, version.Commit, version.BuildDate),
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {

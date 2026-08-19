@@ -19,8 +19,8 @@ func newServeCmd(app *App) *cobra.Command {
 		Short: "Start the Wuji core gRPC server for remote drivers",
 		Long: `Start the Wuji core gRPC server.
 
-Remote drivers (e.g. llama.cpp, image generators) connect to this server
-to register themselves and expose their capabilities to the CLI.`,
+Remote drivers connect to this server to register themselves
+and expose their capabilities to the CLI.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			srv, err := grpcserver.NewServer(app.Core, addr)
 			if err != nil {

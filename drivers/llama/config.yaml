@@ -1,0 +1,7 @@
+server_bin: vendor/llama/llama-server
+models_dir: models
+inference_host: 127.0.0.1
+inference_port: 8080
+grpc_addr: 127.0.0.1:50052
+ollama_api: http://127.0.0.1:11434
+ollama_think: false

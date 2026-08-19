@@ -1,11 +1,11 @@
-.PHONY: build proto tidy test run install-tools
-
-PROTO_DIR := api/proto/v1
-GEN_DIR := api/proto/v1
+.PHONY: build proto tidy test run install-tools build-drivers
 
 build:
 	go build -o bin/wuji ./cmd/wuji
 	go build -o bin/wuji-driver-dummy ./cmd/wuji-driver-dummy
+
+build-drivers:
+	$(MAKE) -C drivers/llama build
 
 proto:
 	buf generate
