@@ -48,30 +48,94 @@ func (d *Driver) Capabilities() []capability.Type {
 
 func (d *Driver) GenerateText(_ context.Context, req driver.TextRequest) (*driver.TextResponse, error) {
 	text := fmt.Sprintf(
-		"[dummy:text] %q (max_tokens=%d, temperature=%.1f)",
+		"[dummy:text] %q (max_tokens=%d, temperature=%.1f, top_p=%.2f, top_k=%d, min_p=%.2f, freq_pen=%.2f, pres_pen=%.2f, rep_pen=%.2f, stops=%d, seed=%s, ctx=%d)",
 		req.Prompt, req.MaxTokens, req.Temperature,
+		req.TopP, req.TopK, req.MinP,
+		req.FrequencyPenalty, req.PresencePenalty, req.RepetitionPenalty,
+		len(req.StopSequences), formatSeed(req.Seed), req.ContextWindow,
 	)
+	if req.SystemPrompt != "" {
+		text = fmt.Sprintf("[dummy:system] %q\n%s", req.SystemPrompt, text)
+	}
 	return &driver.TextResponse{Text: text, TokensUsed: len(text) / 4, FinishReason: "stop"}, nil
 }
 
+func formatSeed(seed *int) string {
+	if seed == nil {
+		return "random"
+	}
+	return fmt.Sprintf("%d", *seed)
+}
+
 func (d *Driver) GenerateImage(_ context.Context, req driver.ImageRequest) (*driver.ImageResponse, error) {
+	total := req.BatchCount
+	if total <= 0 {
+		total = 1
+	}
+	batchSize := req.BatchSize
+	if batchSize <= 0 {
+		batchSize = 1
+	}
+
+	paths := make([]string, 0, total*batchSize)
+	for b := 0; b < total; b++ {
+		for i := 0; i < batchSize; i++ {
+			idx := b*batchSize + i
+			paths = append(paths, fmt.Sprintf(
+				"/tmp/wuji/dummy-image-%dx%d-%d.png",
+				req.Width, req.Height, idx,
+			))
+		}
+	}
+
 	return &driver.ImageResponse{
-		Path:   fmt.Sprintf("/tmp/wuji/dummy-image-%dx%d.png", req.Width, req.Height),
+		Path:   paths[0],
+		Paths:  paths,
 		Format: "png",
 	}, nil
 }
 
 func (d *Driver) GenerateVideo(_ context.Context, req driver.VideoRequest) (*driver.VideoResponse, error) {
+	frames := req.Frames
+	fps := req.FPS
+	if fps <= 0 {
+		fps = 24
+	}
+	if frames <= 0 && req.Duration > 0 {
+		frames = int(req.Duration * float32(fps))
+	}
+	if frames <= 0 {
+		frames = fps * 5
+	}
+
+	duration := req.EffectiveDuration()
+	if duration <= 0 {
+		duration = float32(frames) / float32(fps)
+	}
+
 	return &driver.VideoResponse{
-		Path:     fmt.Sprintf("/tmp/wuji/dummy-video-%.0fs.mp4", req.Duration),
-		Duration: req.Duration,
+		Path:     fmt.Sprintf("/tmp/wuji/dummy-video-%dfr-%dfps.mp4", frames, fps),
+		Duration: duration,
+		Frames:   frames,
+		FPS:      fps,
 	}, nil
 }
 
 func (d *Driver) GenerateAudio(_ context.Context, req driver.AudioRequest) (*driver.AudioResponse, error) {
+	duration := req.Duration
+	if duration <= 0 {
+		duration = 10
+	}
+	sampleRate := req.SampleRate
+	if sampleRate <= 0 {
+		sampleRate = 44100
+	}
+
 	return &driver.AudioResponse{
-		Path:     fmt.Sprintf("/tmp/wuji/dummy-audio-%.0fs.wav", req.Duration),
-		Duration: req.Duration,
+		Path:       fmt.Sprintf("/tmp/wuji/dummy-audio-%.0fs-%dhz.wav", duration, sampleRate),
+		Duration:   duration,
+		SampleRate: sampleRate,
+		Format:     "wav",
 	}, nil
 }
 
@@ -87,31 +151,96 @@ func (d *Driver) Generate3D(_ context.Context, req driver.Asset3DRequest) (*driv
 }
 
 func (d *Driver) Synthesize(_ context.Context, req driver.TTSRequest) (*driver.TTSResponse, error) {
+	voice := req.Voice
+	if voice == "" {
+		voice = "default"
+	}
+	speed := req.Speed
+	if speed <= 0 {
+		speed = 1.0
+	}
+	duration := float32(len(req.Text)) * 0.05 / speed
 	return &driver.TTSResponse{
-		Path:     fmt.Sprintf("/tmp/wuji/dummy-tts-%s.wav", req.Voice),
-		Duration: float32(len(req.Text)) * 0.05,
+		Path:       fmt.Sprintf("/tmp/wuji/dummy-tts-%s.wav", voice),
+		Duration:   duration,
+		SampleRate: 22050,
+		Format:     "wav",
 	}, nil
 }
 
 func (d *Driver) Transcribe(_ context.Context, req driver.STTRequest) (*driver.STTResponse, error) {
-	return &driver.STTResponse{
-		Text:       fmt.Sprintf("[dummy:stt] transcribed from %q", req.AudioPath),
+	text := fmt.Sprintf("[dummy:stt] transcribed from %q", req.AudioPath)
+	resp := &driver.STTResponse{
+		Text:       text,
 		Confidence: 0.99,
-	}, nil
+	}
+	if req.WordTimestamps {
+		resp.Words = []driver.WordTimestamp{
+			{Word: "[dummy:stt]", Start: 0, End: 0.4},
+			{Word: "transcribed", Start: 0.4, End: 1.0},
+			{Word: "from", Start: 1.0, End: 1.2},
+		}
+	}
+	return resp, nil
 }
 
 func (d *Driver) CloneVoice(_ context.Context, req driver.VoiceRequest) (*driver.VoiceResponse, error) {
-	return &driver.VoiceResponse{
+	resp := &driver.VoiceResponse{
 		VoiceID: fmt.Sprintf("voice-%s", req.Name),
 		Name:    req.Name,
-	}, nil
+	}
+	if req.Mode == driver.VoiceCloneModeConversion && req.SourcePath != "" {
+		resp.OutputPath = fmt.Sprintf("/tmp/wuji/dummy-vc-%s.wav", req.Name)
+	}
+	return resp, nil
 }
 
-func (d *Driver) Train(_ context.Context, req driver.TrainRequest) (*driver.TrainResponse, error) {
+func (d *Driver) makeTrainResp(cap capability.Type, name, dataset, suffix string, epochs int, output string) *driver.TrainResponse {
+	if output == "" && name != "" {
+		output = fmt.Sprintf("/tmp/wuji/trained-%s-%s", cap, name)
+	}
 	return &driver.TrainResponse{
-		JobID:  fmt.Sprintf("job-%s-%s", req.DatasetID, req.ModelType),
-		Status: fmt.Sprintf("queued (%d epochs)", req.Epochs),
-	}, nil
+		JobID:      fmt.Sprintf("job-%s-%s-%s", cap, dataset, suffix),
+		Status:     fmt.Sprintf("queued %s training (%d epochs)", cap, epochs),
+		Capability: cap,
+		OutputPath: output,
+	}
+}
+
+func (d *Driver) TrainText(_ context.Context, req driver.TextTrainRequest) (*driver.TrainResponse, error) {
+	return d.makeTrainResp(capability.TextGeneration, req.Name, req.DatasetID, req.BaseModel, req.Epochs, req.OutputPath), nil
+}
+
+func (d *Driver) TrainImage(_ context.Context, req driver.ImageTrainRequest) (*driver.TrainResponse, error) {
+	return d.makeTrainResp(capability.ImageGeneration, req.Name, req.DatasetID, req.BaseModel, req.Epochs, req.OutputPath), nil
+}
+
+func (d *Driver) TrainVideo(_ context.Context, req driver.VideoTrainRequest) (*driver.TrainResponse, error) {
+	return d.makeTrainResp(capability.VideoGeneration, req.Name, req.DatasetID, req.BaseModel, req.Epochs, req.OutputPath), nil
+}
+
+func (d *Driver) TrainAudio(_ context.Context, req driver.AudioTrainRequest) (*driver.TrainResponse, error) {
+	return d.makeTrainResp(capability.AudioGeneration, req.Name, req.DatasetID, req.BaseModel, req.Epochs, req.OutputPath), nil
+}
+
+func (d *Driver) Train3D(_ context.Context, req driver.Asset3DTrainRequest) (*driver.TrainResponse, error) {
+	return d.makeTrainResp(capability.Asset3D, req.Name, req.DatasetID, req.BaseModel, req.Epochs, req.OutputPath), nil
+}
+
+func (d *Driver) TrainTTS(_ context.Context, req driver.TTSTrainRequest) (*driver.TrainResponse, error) {
+	return d.makeTrainResp(capability.TTS, req.Name, req.DatasetID, req.BaseModel, req.Epochs, req.OutputPath), nil
+}
+
+func (d *Driver) TrainSTT(_ context.Context, req driver.STTTrainRequest) (*driver.TrainResponse, error) {
+	return d.makeTrainResp(capability.STT, req.Name, req.DatasetID, req.BaseModel, req.Epochs, req.OutputPath), nil
+}
+
+func (d *Driver) TrainVoice(_ context.Context, req driver.VoiceTrainRequest) (*driver.TrainResponse, error) {
+	suffix := req.PretrainedModel
+	if suffix == "" {
+		suffix = "rvc"
+	}
+	return d.makeTrainResp(capability.VoiceCloning, req.Name, req.DatasetID, suffix, req.Epochs, req.OutputPath), nil
 }
 
 func (d *Driver) ManageDataset(_ context.Context, req driver.DatasetRequest) (*driver.DatasetResponse, error) {

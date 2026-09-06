@@ -204,18 +204,6 @@ func (c *Core) CloneVoice(ctx context.Context, driverID string, req driver.Voice
 	return gen.CloneVoice(ctx, req)
 }
 
-func (c *Core) Train(ctx context.Context, driverID string, req driver.TrainRequest) (*driver.TrainResponse, error) {
-	d, err := c.resolve(driverID)
-	if err != nil {
-		return nil, err
-	}
-	gen, err := driver.As[driver.Trainer](d, capability.Training)
-	if err != nil {
-		return nil, err
-	}
-	return gen.Train(ctx, req)
-}
-
 func (c *Core) ManageDataset(ctx context.Context, driverID string, req driver.DatasetRequest) (*driver.DatasetResponse, error) {
 	d, err := c.resolve(driverID)
 	if err != nil {

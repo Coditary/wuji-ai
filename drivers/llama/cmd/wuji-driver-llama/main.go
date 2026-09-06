@@ -38,10 +38,7 @@ func (s *grpcServer) GetInfo(_ context.Context, _ *wujiv1.GetInfoRequest) (*wuji
 }
 
 func (s *grpcServer) GenerateText(ctx context.Context, req *wujiv1.GenerateTextRequest) (*wujiv1.GenerateTextResponse, error) {
-	resp, err := s.drv.GenerateText(ctx, driver.TextRequest{
-		Prompt: req.GetPrompt(), Model: req.GetModel(),
-		MaxTokens: int(req.GetMaxTokens()), Temperature: req.GetTemperature(),
-	})
+	resp, err := s.drv.GenerateText(ctx, driver.TextRequestFromProto(req))
 	if err != nil {
 		return nil, err
 	}

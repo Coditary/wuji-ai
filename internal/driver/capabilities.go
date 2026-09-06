@@ -42,9 +42,44 @@ type VoiceCloner interface {
 	CloneVoice(ctx context.Context, req VoiceRequest) (*VoiceResponse, error)
 }
 
-// Trainer runs model training jobs.
-type Trainer interface {
-	Train(ctx context.Context, req TrainRequest) (*TrainResponse, error)
+// TextTrainer fine-tunes text generation models.
+type TextTrainer interface {
+	TrainText(ctx context.Context, req TextTrainRequest) (*TrainResponse, error)
+}
+
+// ImageTrainer fine-tunes image generation models.
+type ImageTrainer interface {
+	TrainImage(ctx context.Context, req ImageTrainRequest) (*TrainResponse, error)
+}
+
+// VideoTrainer fine-tunes video generation models.
+type VideoTrainer interface {
+	TrainVideo(ctx context.Context, req VideoTrainRequest) (*TrainResponse, error)
+}
+
+// AudioTrainer fine-tunes audio generation models.
+type AudioTrainer interface {
+	TrainAudio(ctx context.Context, req AudioTrainRequest) (*TrainResponse, error)
+}
+
+// Asset3DTrainer fine-tunes 3D asset models.
+type Asset3DTrainer interface {
+	Train3D(ctx context.Context, req Asset3DTrainRequest) (*TrainResponse, error)
+}
+
+// TTSTrainer fine-tunes text-to-speech models.
+type TTSTrainer interface {
+	TrainTTS(ctx context.Context, req TTSTrainRequest) (*TrainResponse, error)
+}
+
+// STTTrainer fine-tunes speech-to-text models.
+type STTTrainer interface {
+	TrainSTT(ctx context.Context, req STTTrainRequest) (*TrainResponse, error)
+}
+
+// VoiceTrainer fine-tunes voice cloning models.
+type VoiceTrainer interface {
+	TrainVoice(ctx context.Context, req VoiceTrainRequest) (*TrainResponse, error)
 }
 
 // DatasetManager manages datasets.

@@ -83,7 +83,8 @@ func (d *Driver) GenerateText(ctx context.Context, req driver.TextRequest) (*dri
 		}
 		isThink := strings.Contains(strings.ToLower(ollamaName), "think")
 		maxTokens := normalizeMaxTokens(req.MaxTokens, isThink)
-		resp, err := d.ollama.Generate(ctx, ollamaName, req.Prompt, maxTokens, temperature, d.cfg.OllamaThink)
+		params := toGenerationParams(req, maxTokens, temperature)
+		resp, err := d.ollama.Generate(ctx, ollamaName, params, d.cfg.OllamaThink)
 		if err != nil {
 			return nil, err
 		}
@@ -105,13 +106,14 @@ func (d *Driver) GenerateText(ctx context.Context, req driver.TextRequest) (*dri
 	}
 
 	maxTokens := normalizeMaxTokens(req.MaxTokens, false)
+	params := toGenerationParams(req, maxTokens, temperature)
 
 	c := d.server.Client()
 	if c == nil {
 		return nil, fmt.Errorf("inference client not ready")
 	}
 
-	resp, err := c.Complete(ctx, req.Prompt, maxTokens, temperature)
+	resp, err := c.Complete(ctx, params)
 	if err != nil {
 		return nil, err
 	}

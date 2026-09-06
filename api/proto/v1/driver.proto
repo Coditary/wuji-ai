@@ -20,7 +20,14 @@ service DriverService {
   rpc Synthesize(SynthesizeRequest) returns (SynthesizeResponse);
   rpc Transcribe(TranscribeRequest) returns (TranscribeResponse);
   rpc CloneVoice(CloneVoiceRequest) returns (CloneVoiceResponse);
-  rpc Train(TrainRequest) returns (TrainResponse);
+  rpc TrainText(TrainTextRequest) returns (TrainResponse);
+  rpc TrainImage(TrainImageRequest) returns (TrainResponse);
+  rpc TrainVideo(TrainVideoRequest) returns (TrainResponse);
+  rpc TrainAudio(TrainAudioRequest) returns (TrainResponse);
+  rpc Train3D(Train3DRequest) returns (TrainResponse);
+  rpc TrainTTS(TrainTTSRequest) returns (TrainResponse);
+  rpc TrainSTT(TrainSTTRequest) returns (TrainResponse);
+  rpc TrainVoice(TrainVoiceRequest) returns (TrainResponse);
   rpc ManageDataset(ManageDatasetRequest) returns (ManageDatasetResponse);
 }
 
@@ -69,6 +76,16 @@ message GenerateTextRequest {
   int32 max_tokens = 2;
   float temperature = 3;
   string model = 4;
+  float top_p = 5;
+  int32 top_k = 6;
+  float min_p = 7;
+  float frequency_penalty = 8;
+  float presence_penalty = 9;
+  float repetition_penalty = 10;
+  repeated string stop_sequences = 11;
+  optional int32 seed = 12;
+  string system_prompt = 13;
+  int32 context_window = 14;
 }
 
 message GenerateTextResponse {
@@ -82,32 +99,72 @@ message GenerateImageRequest {
   int32 width = 2;
   int32 height = 3;
   int32 steps = 4;
+  string negative_prompt = 5;
+  string model = 6;
+  string sampler = 7;
+  float cfg_scale = 8;
+  int32 batch_size = 9;
+  int32 batch_count = 10;
+  optional int32 seed = 11;
+  float denoising_strength = 12;
+  string init_image_path = 13;
+  repeated string loras = 14;
 }
 
 message GenerateImageResponse {
   string path = 1;
   string format = 2;
+  repeated string paths = 3;
 }
 
 message GenerateVideoRequest {
   string prompt = 1;
   float duration = 2;
   int32 fps = 3;
+  int32 frames = 4;
+  float motion_strength = 5;
+  int32 context_length = 6;
+  string sampler = 7;
+  string scheduler = 8;
+  bool interpolate = 9;
+  float interpolation_strength = 10;
+  string mode = 11;
+  string init_image_path = 12;
+  string camera_control = 13;
+  string negative_prompt = 14;
+  string model = 15;
+  optional int32 seed = 16;
 }
 
 message GenerateVideoResponse {
   string path = 1;
   float duration = 2;
+  int32 frames = 3;
+  int32 fps = 4;
 }
 
 message GenerateAudioRequest {
   string prompt = 1;
   float duration = 2;
+  string lyrics = 3;
+  string negative_prompt = 4;
+  string model = 5;
+  float overlap = 6;
+  float temperature = 7;
+  float cfg_scale = 8;
+  float top_p = 9;
+  int32 top_k = 10;
+  int32 sample_rate = 11;
+  string task_type = 12;
+  string reference_path = 13;
+  optional int32 seed = 14;
 }
 
 message GenerateAudioResponse {
   string path = 1;
   float duration = 2;
+  int32 sample_rate = 3;
+  string format = 4;
 }
 
 message Generate3DRequest {
@@ -120,45 +177,170 @@ message Generate3DResponse {
   string format = 2;
 }
 
+message WordTimestamp {
+  string word = 1;
+  float start = 2;
+  float end = 3;
+}
+
 message SynthesizeRequest {
   string text = 1;
   string voice = 2;
+  string voice_sample_path = 3;
+  string language = 4;
+  float speed = 5;
+  string emotion = 6;
+  float temperature = 7;
+  float repetition_penalty = 8;
+  string model = 9;
+  optional int32 seed = 10;
 }
 
 message SynthesizeResponse {
   string path = 1;
   float duration = 2;
+  int32 sample_rate = 3;
+  string format = 4;
 }
 
 message TranscribeRequest {
   string audio_path = 1;
   string language = 2;
+  string model = 3;
+  string task = 4;
+  int32 beam_size = 5;
+  bool word_timestamps = 6;
+  bool vad_enabled = 7;
+  float vad_threshold = 8;
 }
 
 message TranscribeResponse {
   string text = 1;
   float confidence = 2;
+  repeated WordTimestamp words = 3;
 }
 
 message CloneVoiceRequest {
   string sample_path = 1;
   string name = 2;
+  string target_model = 3;
+  string source_path = 4;
+  string mode = 5;
+  int32 pitch_shift = 6;
+  float index_rate = 7;
+  float protect = 8;
+  string vocoder = 9;
+  bool denoise = 10;
+  float denoise_strength = 11;
+  int32 chunk_size = 12;
+  float crossfade = 13;
 }
 
 message CloneVoiceResponse {
   string voice_id = 1;
   string name = 2;
+  string output_path = 3;
 }
 
-message TrainRequest {
-  string dataset_id = 1;
-  string model_type = 2;
-  int32 epochs = 3;
+message TrainTextRequest {
+  string name = 1;
+  string dataset_id = 2;
+  string base_model = 3;
+  string output_path = 4;
+  int32 epochs = 5;
+  float learning_rate = 6;
+  int32 lora_rank = 7;
+  int32 context_length = 8;
+  int32 batch_size = 9;
+}
+
+message TrainImageRequest {
+  string name = 1;
+  string dataset_id = 2;
+  string base_model = 3;
+  string output_path = 4;
+  int32 epochs = 5;
+  float learning_rate = 6;
+  int32 lora_rank = 7;
+  int32 width = 8;
+  int32 height = 9;
+  string class_token = 10;
+}
+
+message TrainVideoRequest {
+  string name = 1;
+  string dataset_id = 2;
+  string base_model = 3;
+  string output_path = 4;
+  int32 epochs = 5;
+  float learning_rate = 6;
+  int32 frames = 7;
+  int32 fps = 8;
+  int32 context_length = 9;
+}
+
+message TrainAudioRequest {
+  string name = 1;
+  string dataset_id = 2;
+  string base_model = 3;
+  string output_path = 4;
+  int32 epochs = 5;
+  float learning_rate = 6;
+  int32 sample_rate = 7;
+  string task_type = 8;
+}
+
+message Train3DRequest {
+  string name = 1;
+  string dataset_id = 2;
+  string base_model = 3;
+  string output_path = 4;
+  int32 epochs = 5;
+  float learning_rate = 6;
+  string format = 7;
+}
+
+message TrainTTSRequest {
+  string name = 1;
+  string dataset_id = 2;
+  string base_model = 3;
+  string output_path = 4;
+  int32 epochs = 5;
+  float learning_rate = 6;
+  string language = 7;
+  string reference_sample = 8;
+}
+
+message TrainSTTRequest {
+  string name = 1;
+  string dataset_id = 2;
+  string base_model = 3;
+  string output_path = 4;
+  int32 epochs = 5;
+  float learning_rate = 6;
+  string language = 7;
+  string model_size = 8;
+  bool freeze_encoder = 9;
+}
+
+message TrainVoiceRequest {
+  string name = 1;
+  string dataset_id = 2;
+  string output_path = 3;
+  int32 epochs = 4;
+  string sample_path = 5;
+  string pretrained_model = 6;
+  int32 pitch_shift = 7;
+  float index_rate = 8;
+  int32 batch_size = 9;
+  int32 save_every_epoch = 10;
 }
 
 message TrainResponse {
   string job_id = 1;
   string status = 2;
+  string capability = 3;
+  string output_path = 4;
 }
 
 message DatasetEntry {

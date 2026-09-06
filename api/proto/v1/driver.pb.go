@@ -458,13 +458,23 @@ func (x *GetInfoResponse) GetMetadata() *DriverMetadata {
 }
 
 type GenerateTextRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Prompt        string                 `protobuf:"bytes,1,opt,name=prompt,proto3" json:"prompt,omitempty"`
-	MaxTokens     int32                  `protobuf:"varint,2,opt,name=max_tokens,json=maxTokens,proto3" json:"max_tokens,omitempty"`
-	Temperature   float32                `protobuf:"fixed32,3,opt,name=temperature,proto3" json:"temperature,omitempty"`
-	Model         string                 `protobuf:"bytes,4,opt,name=model,proto3" json:"model,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Prompt            string                 `protobuf:"bytes,1,opt,name=prompt,proto3" json:"prompt,omitempty"`
+	MaxTokens         int32                  `protobuf:"varint,2,opt,name=max_tokens,json=maxTokens,proto3" json:"max_tokens,omitempty"`
+	Temperature       float32                `protobuf:"fixed32,3,opt,name=temperature,proto3" json:"temperature,omitempty"`
+	Model             string                 `protobuf:"bytes,4,opt,name=model,proto3" json:"model,omitempty"`
+	TopP              float32                `protobuf:"fixed32,5,opt,name=top_p,json=topP,proto3" json:"top_p,omitempty"`
+	TopK              int32                  `protobuf:"varint,6,opt,name=top_k,json=topK,proto3" json:"top_k,omitempty"`
+	MinP              float32                `protobuf:"fixed32,7,opt,name=min_p,json=minP,proto3" json:"min_p,omitempty"`
+	FrequencyPenalty  float32                `protobuf:"fixed32,8,opt,name=frequency_penalty,json=frequencyPenalty,proto3" json:"frequency_penalty,omitempty"`
+	PresencePenalty   float32                `protobuf:"fixed32,9,opt,name=presence_penalty,json=presencePenalty,proto3" json:"presence_penalty,omitempty"`
+	RepetitionPenalty float32                `protobuf:"fixed32,10,opt,name=repetition_penalty,json=repetitionPenalty,proto3" json:"repetition_penalty,omitempty"`
+	StopSequences     []string               `protobuf:"bytes,11,rep,name=stop_sequences,json=stopSequences,proto3" json:"stop_sequences,omitempty"`
+	Seed              *int32                 `protobuf:"varint,12,opt,name=seed,proto3,oneof" json:"seed,omitempty"`
+	SystemPrompt      string                 `protobuf:"bytes,13,opt,name=system_prompt,json=systemPrompt,proto3" json:"system_prompt,omitempty"`
+	ContextWindow     int32                  `protobuf:"varint,14,opt,name=context_window,json=contextWindow,proto3" json:"context_window,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *GenerateTextRequest) Reset() {
@@ -523,6 +533,76 @@ func (x *GenerateTextRequest) GetModel() string {
 		return x.Model
 	}
 	return ""
+}
+
+func (x *GenerateTextRequest) GetTopP() float32 {
+	if x != nil {
+		return x.TopP
+	}
+	return 0
+}
+
+func (x *GenerateTextRequest) GetTopK() int32 {
+	if x != nil {
+		return x.TopK
+	}
+	return 0
+}
+
+func (x *GenerateTextRequest) GetMinP() float32 {
+	if x != nil {
+		return x.MinP
+	}
+	return 0
+}
+
+func (x *GenerateTextRequest) GetFrequencyPenalty() float32 {
+	if x != nil {
+		return x.FrequencyPenalty
+	}
+	return 0
+}
+
+func (x *GenerateTextRequest) GetPresencePenalty() float32 {
+	if x != nil {
+		return x.PresencePenalty
+	}
+	return 0
+}
+
+func (x *GenerateTextRequest) GetRepetitionPenalty() float32 {
+	if x != nil {
+		return x.RepetitionPenalty
+	}
+	return 0
+}
+
+func (x *GenerateTextRequest) GetStopSequences() []string {
+	if x != nil {
+		return x.StopSequences
+	}
+	return nil
+}
+
+func (x *GenerateTextRequest) GetSeed() int32 {
+	if x != nil && x.Seed != nil {
+		return *x.Seed
+	}
+	return 0
+}
+
+func (x *GenerateTextRequest) GetSystemPrompt() string {
+	if x != nil {
+		return x.SystemPrompt
+	}
+	return ""
+}
+
+func (x *GenerateTextRequest) GetContextWindow() int32 {
+	if x != nil {
+		return x.ContextWindow
+	}
+	return 0
 }
 
 type GenerateTextResponse struct {
@@ -586,13 +666,23 @@ func (x *GenerateTextResponse) GetFinishReason() string {
 }
 
 type GenerateImageRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Prompt        string                 `protobuf:"bytes,1,opt,name=prompt,proto3" json:"prompt,omitempty"`
-	Width         int32                  `protobuf:"varint,2,opt,name=width,proto3" json:"width,omitempty"`
-	Height        int32                  `protobuf:"varint,3,opt,name=height,proto3" json:"height,omitempty"`
-	Steps         int32                  `protobuf:"varint,4,opt,name=steps,proto3" json:"steps,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Prompt            string                 `protobuf:"bytes,1,opt,name=prompt,proto3" json:"prompt,omitempty"`
+	Width             int32                  `protobuf:"varint,2,opt,name=width,proto3" json:"width,omitempty"`
+	Height            int32                  `protobuf:"varint,3,opt,name=height,proto3" json:"height,omitempty"`
+	Steps             int32                  `protobuf:"varint,4,opt,name=steps,proto3" json:"steps,omitempty"`
+	NegativePrompt    string                 `protobuf:"bytes,5,opt,name=negative_prompt,json=negativePrompt,proto3" json:"negative_prompt,omitempty"`
+	Model             string                 `protobuf:"bytes,6,opt,name=model,proto3" json:"model,omitempty"`
+	Sampler           string                 `protobuf:"bytes,7,opt,name=sampler,proto3" json:"sampler,omitempty"`
+	CfgScale          float32                `protobuf:"fixed32,8,opt,name=cfg_scale,json=cfgScale,proto3" json:"cfg_scale,omitempty"`
+	BatchSize         int32                  `protobuf:"varint,9,opt,name=batch_size,json=batchSize,proto3" json:"batch_size,omitempty"`
+	BatchCount        int32                  `protobuf:"varint,10,opt,name=batch_count,json=batchCount,proto3" json:"batch_count,omitempty"`
+	Seed              *int32                 `protobuf:"varint,11,opt,name=seed,proto3,oneof" json:"seed,omitempty"`
+	DenoisingStrength float32                `protobuf:"fixed32,12,opt,name=denoising_strength,json=denoisingStrength,proto3" json:"denoising_strength,omitempty"`
+	InitImagePath     string                 `protobuf:"bytes,13,opt,name=init_image_path,json=initImagePath,proto3" json:"init_image_path,omitempty"`
+	Loras             []string               `protobuf:"bytes,14,rep,name=loras,proto3" json:"loras,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *GenerateImageRequest) Reset() {
@@ -653,10 +743,81 @@ func (x *GenerateImageRequest) GetSteps() int32 {
 	return 0
 }
 
+func (x *GenerateImageRequest) GetNegativePrompt() string {
+	if x != nil {
+		return x.NegativePrompt
+	}
+	return ""
+}
+
+func (x *GenerateImageRequest) GetModel() string {
+	if x != nil {
+		return x.Model
+	}
+	return ""
+}
+
+func (x *GenerateImageRequest) GetSampler() string {
+	if x != nil {
+		return x.Sampler
+	}
+	return ""
+}
+
+func (x *GenerateImageRequest) GetCfgScale() float32 {
+	if x != nil {
+		return x.CfgScale
+	}
+	return 0
+}
+
+func (x *GenerateImageRequest) GetBatchSize() int32 {
+	if x != nil {
+		return x.BatchSize
+	}
+	return 0
+}
+
+func (x *GenerateImageRequest) GetBatchCount() int32 {
+	if x != nil {
+		return x.BatchCount
+	}
+	return 0
+}
+
+func (x *GenerateImageRequest) GetSeed() int32 {
+	if x != nil && x.Seed != nil {
+		return *x.Seed
+	}
+	return 0
+}
+
+func (x *GenerateImageRequest) GetDenoisingStrength() float32 {
+	if x != nil {
+		return x.DenoisingStrength
+	}
+	return 0
+}
+
+func (x *GenerateImageRequest) GetInitImagePath() string {
+	if x != nil {
+		return x.InitImagePath
+	}
+	return ""
+}
+
+func (x *GenerateImageRequest) GetLoras() []string {
+	if x != nil {
+		return x.Loras
+	}
+	return nil
+}
+
 type GenerateImageResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Path          string                 `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
 	Format        string                 `protobuf:"bytes,2,opt,name=format,proto3" json:"format,omitempty"`
+	Paths         []string               `protobuf:"bytes,3,rep,name=paths,proto3" json:"paths,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -705,13 +866,33 @@ func (x *GenerateImageResponse) GetFormat() string {
 	return ""
 }
 
+func (x *GenerateImageResponse) GetPaths() []string {
+	if x != nil {
+		return x.Paths
+	}
+	return nil
+}
+
 type GenerateVideoRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Prompt        string                 `protobuf:"bytes,1,opt,name=prompt,proto3" json:"prompt,omitempty"`
-	Duration      float32                `protobuf:"fixed32,2,opt,name=duration,proto3" json:"duration,omitempty"`
-	Fps           int32                  `protobuf:"varint,3,opt,name=fps,proto3" json:"fps,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                 protoimpl.MessageState `protogen:"open.v1"`
+	Prompt                string                 `protobuf:"bytes,1,opt,name=prompt,proto3" json:"prompt,omitempty"`
+	Duration              float32                `protobuf:"fixed32,2,opt,name=duration,proto3" json:"duration,omitempty"`
+	Fps                   int32                  `protobuf:"varint,3,opt,name=fps,proto3" json:"fps,omitempty"`
+	Frames                int32                  `protobuf:"varint,4,opt,name=frames,proto3" json:"frames,omitempty"`
+	MotionStrength        float32                `protobuf:"fixed32,5,opt,name=motion_strength,json=motionStrength,proto3" json:"motion_strength,omitempty"`
+	ContextLength         int32                  `protobuf:"varint,6,opt,name=context_length,json=contextLength,proto3" json:"context_length,omitempty"`
+	Sampler               string                 `protobuf:"bytes,7,opt,name=sampler,proto3" json:"sampler,omitempty"`
+	Scheduler             string                 `protobuf:"bytes,8,opt,name=scheduler,proto3" json:"scheduler,omitempty"`
+	Interpolate           bool                   `protobuf:"varint,9,opt,name=interpolate,proto3" json:"interpolate,omitempty"`
+	InterpolationStrength float32                `protobuf:"fixed32,10,opt,name=interpolation_strength,json=interpolationStrength,proto3" json:"interpolation_strength,omitempty"`
+	Mode                  string                 `protobuf:"bytes,11,opt,name=mode,proto3" json:"mode,omitempty"`
+	InitImagePath         string                 `protobuf:"bytes,12,opt,name=init_image_path,json=initImagePath,proto3" json:"init_image_path,omitempty"`
+	CameraControl         string                 `protobuf:"bytes,13,opt,name=camera_control,json=cameraControl,proto3" json:"camera_control,omitempty"`
+	NegativePrompt        string                 `protobuf:"bytes,14,opt,name=negative_prompt,json=negativePrompt,proto3" json:"negative_prompt,omitempty"`
+	Model                 string                 `protobuf:"bytes,15,opt,name=model,proto3" json:"model,omitempty"`
+	Seed                  *int32                 `protobuf:"varint,16,opt,name=seed,proto3,oneof" json:"seed,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *GenerateVideoRequest) Reset() {
@@ -765,10 +946,103 @@ func (x *GenerateVideoRequest) GetFps() int32 {
 	return 0
 }
 
+func (x *GenerateVideoRequest) GetFrames() int32 {
+	if x != nil {
+		return x.Frames
+	}
+	return 0
+}
+
+func (x *GenerateVideoRequest) GetMotionStrength() float32 {
+	if x != nil {
+		return x.MotionStrength
+	}
+	return 0
+}
+
+func (x *GenerateVideoRequest) GetContextLength() int32 {
+	if x != nil {
+		return x.ContextLength
+	}
+	return 0
+}
+
+func (x *GenerateVideoRequest) GetSampler() string {
+	if x != nil {
+		return x.Sampler
+	}
+	return ""
+}
+
+func (x *GenerateVideoRequest) GetScheduler() string {
+	if x != nil {
+		return x.Scheduler
+	}
+	return ""
+}
+
+func (x *GenerateVideoRequest) GetInterpolate() bool {
+	if x != nil {
+		return x.Interpolate
+	}
+	return false
+}
+
+func (x *GenerateVideoRequest) GetInterpolationStrength() float32 {
+	if x != nil {
+		return x.InterpolationStrength
+	}
+	return 0
+}
+
+func (x *GenerateVideoRequest) GetMode() string {
+	if x != nil {
+		return x.Mode
+	}
+	return ""
+}
+
+func (x *GenerateVideoRequest) GetInitImagePath() string {
+	if x != nil {
+		return x.InitImagePath
+	}
+	return ""
+}
+
+func (x *GenerateVideoRequest) GetCameraControl() string {
+	if x != nil {
+		return x.CameraControl
+	}
+	return ""
+}
+
+func (x *GenerateVideoRequest) GetNegativePrompt() string {
+	if x != nil {
+		return x.NegativePrompt
+	}
+	return ""
+}
+
+func (x *GenerateVideoRequest) GetModel() string {
+	if x != nil {
+		return x.Model
+	}
+	return ""
+}
+
+func (x *GenerateVideoRequest) GetSeed() int32 {
+	if x != nil && x.Seed != nil {
+		return *x.Seed
+	}
+	return 0
+}
+
 type GenerateVideoResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Path          string                 `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
 	Duration      float32                `protobuf:"fixed32,2,opt,name=duration,proto3" json:"duration,omitempty"`
+	Frames        int32                  `protobuf:"varint,3,opt,name=frames,proto3" json:"frames,omitempty"`
+	Fps           int32                  `protobuf:"varint,4,opt,name=fps,proto3" json:"fps,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -817,12 +1091,38 @@ func (x *GenerateVideoResponse) GetDuration() float32 {
 	return 0
 }
 
+func (x *GenerateVideoResponse) GetFrames() int32 {
+	if x != nil {
+		return x.Frames
+	}
+	return 0
+}
+
+func (x *GenerateVideoResponse) GetFps() int32 {
+	if x != nil {
+		return x.Fps
+	}
+	return 0
+}
+
 type GenerateAudioRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Prompt        string                 `protobuf:"bytes,1,opt,name=prompt,proto3" json:"prompt,omitempty"`
-	Duration      float32                `protobuf:"fixed32,2,opt,name=duration,proto3" json:"duration,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Prompt         string                 `protobuf:"bytes,1,opt,name=prompt,proto3" json:"prompt,omitempty"`
+	Duration       float32                `protobuf:"fixed32,2,opt,name=duration,proto3" json:"duration,omitempty"`
+	Lyrics         string                 `protobuf:"bytes,3,opt,name=lyrics,proto3" json:"lyrics,omitempty"`
+	NegativePrompt string                 `protobuf:"bytes,4,opt,name=negative_prompt,json=negativePrompt,proto3" json:"negative_prompt,omitempty"`
+	Model          string                 `protobuf:"bytes,5,opt,name=model,proto3" json:"model,omitempty"`
+	Overlap        float32                `protobuf:"fixed32,6,opt,name=overlap,proto3" json:"overlap,omitempty"`
+	Temperature    float32                `protobuf:"fixed32,7,opt,name=temperature,proto3" json:"temperature,omitempty"`
+	CfgScale       float32                `protobuf:"fixed32,8,opt,name=cfg_scale,json=cfgScale,proto3" json:"cfg_scale,omitempty"`
+	TopP           float32                `protobuf:"fixed32,9,opt,name=top_p,json=topP,proto3" json:"top_p,omitempty"`
+	TopK           int32                  `protobuf:"varint,10,opt,name=top_k,json=topK,proto3" json:"top_k,omitempty"`
+	SampleRate     int32                  `protobuf:"varint,11,opt,name=sample_rate,json=sampleRate,proto3" json:"sample_rate,omitempty"`
+	TaskType       string                 `protobuf:"bytes,12,opt,name=task_type,json=taskType,proto3" json:"task_type,omitempty"`
+	ReferencePath  string                 `protobuf:"bytes,13,opt,name=reference_path,json=referencePath,proto3" json:"reference_path,omitempty"`
+	Seed           *int32                 `protobuf:"varint,14,opt,name=seed,proto3,oneof" json:"seed,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *GenerateAudioRequest) Reset() {
@@ -869,10 +1169,96 @@ func (x *GenerateAudioRequest) GetDuration() float32 {
 	return 0
 }
 
+func (x *GenerateAudioRequest) GetLyrics() string {
+	if x != nil {
+		return x.Lyrics
+	}
+	return ""
+}
+
+func (x *GenerateAudioRequest) GetNegativePrompt() string {
+	if x != nil {
+		return x.NegativePrompt
+	}
+	return ""
+}
+
+func (x *GenerateAudioRequest) GetModel() string {
+	if x != nil {
+		return x.Model
+	}
+	return ""
+}
+
+func (x *GenerateAudioRequest) GetOverlap() float32 {
+	if x != nil {
+		return x.Overlap
+	}
+	return 0
+}
+
+func (x *GenerateAudioRequest) GetTemperature() float32 {
+	if x != nil {
+		return x.Temperature
+	}
+	return 0
+}
+
+func (x *GenerateAudioRequest) GetCfgScale() float32 {
+	if x != nil {
+		return x.CfgScale
+	}
+	return 0
+}
+
+func (x *GenerateAudioRequest) GetTopP() float32 {
+	if x != nil {
+		return x.TopP
+	}
+	return 0
+}
+
+func (x *GenerateAudioRequest) GetTopK() int32 {
+	if x != nil {
+		return x.TopK
+	}
+	return 0
+}
+
+func (x *GenerateAudioRequest) GetSampleRate() int32 {
+	if x != nil {
+		return x.SampleRate
+	}
+	return 0
+}
+
+func (x *GenerateAudioRequest) GetTaskType() string {
+	if x != nil {
+		return x.TaskType
+	}
+	return ""
+}
+
+func (x *GenerateAudioRequest) GetReferencePath() string {
+	if x != nil {
+		return x.ReferencePath
+	}
+	return ""
+}
+
+func (x *GenerateAudioRequest) GetSeed() int32 {
+	if x != nil && x.Seed != nil {
+		return *x.Seed
+	}
+	return 0
+}
+
 type GenerateAudioResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Path          string                 `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
 	Duration      float32                `protobuf:"fixed32,2,opt,name=duration,proto3" json:"duration,omitempty"`
+	SampleRate    int32                  `protobuf:"varint,3,opt,name=sample_rate,json=sampleRate,proto3" json:"sample_rate,omitempty"`
+	Format        string                 `protobuf:"bytes,4,opt,name=format,proto3" json:"format,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -919,6 +1305,20 @@ func (x *GenerateAudioResponse) GetDuration() float32 {
 		return x.Duration
 	}
 	return 0
+}
+
+func (x *GenerateAudioResponse) GetSampleRate() int32 {
+	if x != nil {
+		return x.SampleRate
+	}
+	return 0
+}
+
+func (x *GenerateAudioResponse) GetFormat() string {
+	if x != nil {
+		return x.Format
+	}
+	return ""
 }
 
 type Generate3DRequest struct {
@@ -1025,17 +1425,85 @@ func (x *Generate3DResponse) GetFormat() string {
 	return ""
 }
 
-type SynthesizeRequest struct {
+type WordTimestamp struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Text          string                 `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
-	Voice         string                 `protobuf:"bytes,2,opt,name=voice,proto3" json:"voice,omitempty"`
+	Word          string                 `protobuf:"bytes,1,opt,name=word,proto3" json:"word,omitempty"`
+	Start         float32                `protobuf:"fixed32,2,opt,name=start,proto3" json:"start,omitempty"`
+	End           float32                `protobuf:"fixed32,3,opt,name=end,proto3" json:"end,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
+func (x *WordTimestamp) Reset() {
+	*x = WordTimestamp{}
+	mi := &file_driver_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WordTimestamp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WordTimestamp) ProtoMessage() {}
+
+func (x *WordTimestamp) ProtoReflect() protoreflect.Message {
+	mi := &file_driver_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WordTimestamp.ProtoReflect.Descriptor instead.
+func (*WordTimestamp) Descriptor() ([]byte, []int) {
+	return file_driver_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *WordTimestamp) GetWord() string {
+	if x != nil {
+		return x.Word
+	}
+	return ""
+}
+
+func (x *WordTimestamp) GetStart() float32 {
+	if x != nil {
+		return x.Start
+	}
+	return 0
+}
+
+func (x *WordTimestamp) GetEnd() float32 {
+	if x != nil {
+		return x.End
+	}
+	return 0
+}
+
+type SynthesizeRequest struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Text              string                 `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
+	Voice             string                 `protobuf:"bytes,2,opt,name=voice,proto3" json:"voice,omitempty"`
+	VoiceSamplePath   string                 `protobuf:"bytes,3,opt,name=voice_sample_path,json=voiceSamplePath,proto3" json:"voice_sample_path,omitempty"`
+	Language          string                 `protobuf:"bytes,4,opt,name=language,proto3" json:"language,omitempty"`
+	Speed             float32                `protobuf:"fixed32,5,opt,name=speed,proto3" json:"speed,omitempty"`
+	Emotion           string                 `protobuf:"bytes,6,opt,name=emotion,proto3" json:"emotion,omitempty"`
+	Temperature       float32                `protobuf:"fixed32,7,opt,name=temperature,proto3" json:"temperature,omitempty"`
+	RepetitionPenalty float32                `protobuf:"fixed32,8,opt,name=repetition_penalty,json=repetitionPenalty,proto3" json:"repetition_penalty,omitempty"`
+	Model             string                 `protobuf:"bytes,9,opt,name=model,proto3" json:"model,omitempty"`
+	Seed              *int32                 `protobuf:"varint,10,opt,name=seed,proto3,oneof" json:"seed,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
 func (x *SynthesizeRequest) Reset() {
 	*x = SynthesizeRequest{}
-	mi := &file_driver_proto_msgTypes[19]
+	mi := &file_driver_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1047,7 +1515,7 @@ func (x *SynthesizeRequest) String() string {
 func (*SynthesizeRequest) ProtoMessage() {}
 
 func (x *SynthesizeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_driver_proto_msgTypes[19]
+	mi := &file_driver_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1060,7 +1528,7 @@ func (x *SynthesizeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SynthesizeRequest.ProtoReflect.Descriptor instead.
 func (*SynthesizeRequest) Descriptor() ([]byte, []int) {
-	return file_driver_proto_rawDescGZIP(), []int{19}
+	return file_driver_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *SynthesizeRequest) GetText() string {
@@ -1077,17 +1545,75 @@ func (x *SynthesizeRequest) GetVoice() string {
 	return ""
 }
 
+func (x *SynthesizeRequest) GetVoiceSamplePath() string {
+	if x != nil {
+		return x.VoiceSamplePath
+	}
+	return ""
+}
+
+func (x *SynthesizeRequest) GetLanguage() string {
+	if x != nil {
+		return x.Language
+	}
+	return ""
+}
+
+func (x *SynthesizeRequest) GetSpeed() float32 {
+	if x != nil {
+		return x.Speed
+	}
+	return 0
+}
+
+func (x *SynthesizeRequest) GetEmotion() string {
+	if x != nil {
+		return x.Emotion
+	}
+	return ""
+}
+
+func (x *SynthesizeRequest) GetTemperature() float32 {
+	if x != nil {
+		return x.Temperature
+	}
+	return 0
+}
+
+func (x *SynthesizeRequest) GetRepetitionPenalty() float32 {
+	if x != nil {
+		return x.RepetitionPenalty
+	}
+	return 0
+}
+
+func (x *SynthesizeRequest) GetModel() string {
+	if x != nil {
+		return x.Model
+	}
+	return ""
+}
+
+func (x *SynthesizeRequest) GetSeed() int32 {
+	if x != nil && x.Seed != nil {
+		return *x.Seed
+	}
+	return 0
+}
+
 type SynthesizeResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Path          string                 `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
 	Duration      float32                `protobuf:"fixed32,2,opt,name=duration,proto3" json:"duration,omitempty"`
+	SampleRate    int32                  `protobuf:"varint,3,opt,name=sample_rate,json=sampleRate,proto3" json:"sample_rate,omitempty"`
+	Format        string                 `protobuf:"bytes,4,opt,name=format,proto3" json:"format,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *SynthesizeResponse) Reset() {
 	*x = SynthesizeResponse{}
-	mi := &file_driver_proto_msgTypes[20]
+	mi := &file_driver_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1099,7 +1625,7 @@ func (x *SynthesizeResponse) String() string {
 func (*SynthesizeResponse) ProtoMessage() {}
 
 func (x *SynthesizeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_driver_proto_msgTypes[20]
+	mi := &file_driver_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1112,7 +1638,7 @@ func (x *SynthesizeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SynthesizeResponse.ProtoReflect.Descriptor instead.
 func (*SynthesizeResponse) Descriptor() ([]byte, []int) {
-	return file_driver_proto_rawDescGZIP(), []int{20}
+	return file_driver_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *SynthesizeResponse) GetPath() string {
@@ -1129,17 +1655,37 @@ func (x *SynthesizeResponse) GetDuration() float32 {
 	return 0
 }
 
+func (x *SynthesizeResponse) GetSampleRate() int32 {
+	if x != nil {
+		return x.SampleRate
+	}
+	return 0
+}
+
+func (x *SynthesizeResponse) GetFormat() string {
+	if x != nil {
+		return x.Format
+	}
+	return ""
+}
+
 type TranscribeRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	AudioPath     string                 `protobuf:"bytes,1,opt,name=audio_path,json=audioPath,proto3" json:"audio_path,omitempty"`
-	Language      string                 `protobuf:"bytes,2,opt,name=language,proto3" json:"language,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	AudioPath      string                 `protobuf:"bytes,1,opt,name=audio_path,json=audioPath,proto3" json:"audio_path,omitempty"`
+	Language       string                 `protobuf:"bytes,2,opt,name=language,proto3" json:"language,omitempty"`
+	Model          string                 `protobuf:"bytes,3,opt,name=model,proto3" json:"model,omitempty"`
+	Task           string                 `protobuf:"bytes,4,opt,name=task,proto3" json:"task,omitempty"`
+	BeamSize       int32                  `protobuf:"varint,5,opt,name=beam_size,json=beamSize,proto3" json:"beam_size,omitempty"`
+	WordTimestamps bool                   `protobuf:"varint,6,opt,name=word_timestamps,json=wordTimestamps,proto3" json:"word_timestamps,omitempty"`
+	VadEnabled     bool                   `protobuf:"varint,7,opt,name=vad_enabled,json=vadEnabled,proto3" json:"vad_enabled,omitempty"`
+	VadThreshold   float32                `protobuf:"fixed32,8,opt,name=vad_threshold,json=vadThreshold,proto3" json:"vad_threshold,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *TranscribeRequest) Reset() {
 	*x = TranscribeRequest{}
-	mi := &file_driver_proto_msgTypes[21]
+	mi := &file_driver_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1151,7 +1697,7 @@ func (x *TranscribeRequest) String() string {
 func (*TranscribeRequest) ProtoMessage() {}
 
 func (x *TranscribeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_driver_proto_msgTypes[21]
+	mi := &file_driver_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1164,7 +1710,7 @@ func (x *TranscribeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TranscribeRequest.ProtoReflect.Descriptor instead.
 func (*TranscribeRequest) Descriptor() ([]byte, []int) {
-	return file_driver_proto_rawDescGZIP(), []int{21}
+	return file_driver_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *TranscribeRequest) GetAudioPath() string {
@@ -1181,17 +1727,60 @@ func (x *TranscribeRequest) GetLanguage() string {
 	return ""
 }
 
+func (x *TranscribeRequest) GetModel() string {
+	if x != nil {
+		return x.Model
+	}
+	return ""
+}
+
+func (x *TranscribeRequest) GetTask() string {
+	if x != nil {
+		return x.Task
+	}
+	return ""
+}
+
+func (x *TranscribeRequest) GetBeamSize() int32 {
+	if x != nil {
+		return x.BeamSize
+	}
+	return 0
+}
+
+func (x *TranscribeRequest) GetWordTimestamps() bool {
+	if x != nil {
+		return x.WordTimestamps
+	}
+	return false
+}
+
+func (x *TranscribeRequest) GetVadEnabled() bool {
+	if x != nil {
+		return x.VadEnabled
+	}
+	return false
+}
+
+func (x *TranscribeRequest) GetVadThreshold() float32 {
+	if x != nil {
+		return x.VadThreshold
+	}
+	return 0
+}
+
 type TranscribeResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Text          string                 `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
 	Confidence    float32                `protobuf:"fixed32,2,opt,name=confidence,proto3" json:"confidence,omitempty"`
+	Words         []*WordTimestamp       `protobuf:"bytes,3,rep,name=words,proto3" json:"words,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *TranscribeResponse) Reset() {
 	*x = TranscribeResponse{}
-	mi := &file_driver_proto_msgTypes[22]
+	mi := &file_driver_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1203,7 +1792,7 @@ func (x *TranscribeResponse) String() string {
 func (*TranscribeResponse) ProtoMessage() {}
 
 func (x *TranscribeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_driver_proto_msgTypes[22]
+	mi := &file_driver_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1216,7 +1805,7 @@ func (x *TranscribeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TranscribeResponse.ProtoReflect.Descriptor instead.
 func (*TranscribeResponse) Descriptor() ([]byte, []int) {
-	return file_driver_proto_rawDescGZIP(), []int{22}
+	return file_driver_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *TranscribeResponse) GetText() string {
@@ -1233,17 +1822,35 @@ func (x *TranscribeResponse) GetConfidence() float32 {
 	return 0
 }
 
+func (x *TranscribeResponse) GetWords() []*WordTimestamp {
+	if x != nil {
+		return x.Words
+	}
+	return nil
+}
+
 type CloneVoiceRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	SamplePath    string                 `protobuf:"bytes,1,opt,name=sample_path,json=samplePath,proto3" json:"sample_path,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	SamplePath      string                 `protobuf:"bytes,1,opt,name=sample_path,json=samplePath,proto3" json:"sample_path,omitempty"`
+	Name            string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	TargetModel     string                 `protobuf:"bytes,3,opt,name=target_model,json=targetModel,proto3" json:"target_model,omitempty"`
+	SourcePath      string                 `protobuf:"bytes,4,opt,name=source_path,json=sourcePath,proto3" json:"source_path,omitempty"`
+	Mode            string                 `protobuf:"bytes,5,opt,name=mode,proto3" json:"mode,omitempty"`
+	PitchShift      int32                  `protobuf:"varint,6,opt,name=pitch_shift,json=pitchShift,proto3" json:"pitch_shift,omitempty"`
+	IndexRate       float32                `protobuf:"fixed32,7,opt,name=index_rate,json=indexRate,proto3" json:"index_rate,omitempty"`
+	Protect         float32                `protobuf:"fixed32,8,opt,name=protect,proto3" json:"protect,omitempty"`
+	Vocoder         string                 `protobuf:"bytes,9,opt,name=vocoder,proto3" json:"vocoder,omitempty"`
+	Denoise         bool                   `protobuf:"varint,10,opt,name=denoise,proto3" json:"denoise,omitempty"`
+	DenoiseStrength float32                `protobuf:"fixed32,11,opt,name=denoise_strength,json=denoiseStrength,proto3" json:"denoise_strength,omitempty"`
+	ChunkSize       int32                  `protobuf:"varint,12,opt,name=chunk_size,json=chunkSize,proto3" json:"chunk_size,omitempty"`
+	Crossfade       float32                `protobuf:"fixed32,13,opt,name=crossfade,proto3" json:"crossfade,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *CloneVoiceRequest) Reset() {
 	*x = CloneVoiceRequest{}
-	mi := &file_driver_proto_msgTypes[23]
+	mi := &file_driver_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1255,7 +1862,7 @@ func (x *CloneVoiceRequest) String() string {
 func (*CloneVoiceRequest) ProtoMessage() {}
 
 func (x *CloneVoiceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_driver_proto_msgTypes[23]
+	mi := &file_driver_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1268,7 +1875,7 @@ func (x *CloneVoiceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CloneVoiceRequest.ProtoReflect.Descriptor instead.
 func (*CloneVoiceRequest) Descriptor() ([]byte, []int) {
-	return file_driver_proto_rawDescGZIP(), []int{23}
+	return file_driver_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *CloneVoiceRequest) GetSamplePath() string {
@@ -1285,17 +1892,95 @@ func (x *CloneVoiceRequest) GetName() string {
 	return ""
 }
 
+func (x *CloneVoiceRequest) GetTargetModel() string {
+	if x != nil {
+		return x.TargetModel
+	}
+	return ""
+}
+
+func (x *CloneVoiceRequest) GetSourcePath() string {
+	if x != nil {
+		return x.SourcePath
+	}
+	return ""
+}
+
+func (x *CloneVoiceRequest) GetMode() string {
+	if x != nil {
+		return x.Mode
+	}
+	return ""
+}
+
+func (x *CloneVoiceRequest) GetPitchShift() int32 {
+	if x != nil {
+		return x.PitchShift
+	}
+	return 0
+}
+
+func (x *CloneVoiceRequest) GetIndexRate() float32 {
+	if x != nil {
+		return x.IndexRate
+	}
+	return 0
+}
+
+func (x *CloneVoiceRequest) GetProtect() float32 {
+	if x != nil {
+		return x.Protect
+	}
+	return 0
+}
+
+func (x *CloneVoiceRequest) GetVocoder() string {
+	if x != nil {
+		return x.Vocoder
+	}
+	return ""
+}
+
+func (x *CloneVoiceRequest) GetDenoise() bool {
+	if x != nil {
+		return x.Denoise
+	}
+	return false
+}
+
+func (x *CloneVoiceRequest) GetDenoiseStrength() float32 {
+	if x != nil {
+		return x.DenoiseStrength
+	}
+	return 0
+}
+
+func (x *CloneVoiceRequest) GetChunkSize() int32 {
+	if x != nil {
+		return x.ChunkSize
+	}
+	return 0
+}
+
+func (x *CloneVoiceRequest) GetCrossfade() float32 {
+	if x != nil {
+		return x.Crossfade
+	}
+	return 0
+}
+
 type CloneVoiceResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	VoiceId       string                 `protobuf:"bytes,1,opt,name=voice_id,json=voiceId,proto3" json:"voice_id,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	OutputPath    string                 `protobuf:"bytes,3,opt,name=output_path,json=outputPath,proto3" json:"output_path,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *CloneVoiceResponse) Reset() {
 	*x = CloneVoiceResponse{}
-	mi := &file_driver_proto_msgTypes[24]
+	mi := &file_driver_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1307,7 +1992,7 @@ func (x *CloneVoiceResponse) String() string {
 func (*CloneVoiceResponse) ProtoMessage() {}
 
 func (x *CloneVoiceResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_driver_proto_msgTypes[24]
+	mi := &file_driver_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1320,7 +2005,7 @@ func (x *CloneVoiceResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CloneVoiceResponse.ProtoReflect.Descriptor instead.
 func (*CloneVoiceResponse) Descriptor() ([]byte, []int) {
-	return file_driver_proto_rawDescGZIP(), []int{24}
+	return file_driver_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *CloneVoiceResponse) GetVoiceId() string {
@@ -1337,30 +2022,43 @@ func (x *CloneVoiceResponse) GetName() string {
 	return ""
 }
 
-type TrainRequest struct {
+func (x *CloneVoiceResponse) GetOutputPath() string {
+	if x != nil {
+		return x.OutputPath
+	}
+	return ""
+}
+
+type TrainTextRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	DatasetId     string                 `protobuf:"bytes,1,opt,name=dataset_id,json=datasetId,proto3" json:"dataset_id,omitempty"`
-	ModelType     string                 `protobuf:"bytes,2,opt,name=model_type,json=modelType,proto3" json:"model_type,omitempty"`
-	Epochs        int32                  `protobuf:"varint,3,opt,name=epochs,proto3" json:"epochs,omitempty"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	DatasetId     string                 `protobuf:"bytes,2,opt,name=dataset_id,json=datasetId,proto3" json:"dataset_id,omitempty"`
+	BaseModel     string                 `protobuf:"bytes,3,opt,name=base_model,json=baseModel,proto3" json:"base_model,omitempty"`
+	OutputPath    string                 `protobuf:"bytes,4,opt,name=output_path,json=outputPath,proto3" json:"output_path,omitempty"`
+	Epochs        int32                  `protobuf:"varint,5,opt,name=epochs,proto3" json:"epochs,omitempty"`
+	LearningRate  float32                `protobuf:"fixed32,6,opt,name=learning_rate,json=learningRate,proto3" json:"learning_rate,omitempty"`
+	LoraRank      int32                  `protobuf:"varint,7,opt,name=lora_rank,json=loraRank,proto3" json:"lora_rank,omitempty"`
+	ContextLength int32                  `protobuf:"varint,8,opt,name=context_length,json=contextLength,proto3" json:"context_length,omitempty"`
+	BatchSize     int32                  `protobuf:"varint,9,opt,name=batch_size,json=batchSize,proto3" json:"batch_size,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *TrainRequest) Reset() {
-	*x = TrainRequest{}
-	mi := &file_driver_proto_msgTypes[25]
+func (x *TrainTextRequest) Reset() {
+	*x = TrainTextRequest{}
+	mi := &file_driver_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *TrainRequest) String() string {
+func (x *TrainTextRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*TrainRequest) ProtoMessage() {}
+func (*TrainTextRequest) ProtoMessage() {}
 
-func (x *TrainRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_driver_proto_msgTypes[25]
+func (x *TrainTextRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_driver_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1371,28 +2069,810 @@ func (x *TrainRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use TrainRequest.ProtoReflect.Descriptor instead.
-func (*TrainRequest) Descriptor() ([]byte, []int) {
-	return file_driver_proto_rawDescGZIP(), []int{25}
+// Deprecated: Use TrainTextRequest.ProtoReflect.Descriptor instead.
+func (*TrainTextRequest) Descriptor() ([]byte, []int) {
+	return file_driver_proto_rawDescGZIP(), []int{26}
 }
 
-func (x *TrainRequest) GetDatasetId() string {
+func (x *TrainTextRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *TrainTextRequest) GetDatasetId() string {
 	if x != nil {
 		return x.DatasetId
 	}
 	return ""
 }
 
-func (x *TrainRequest) GetModelType() string {
+func (x *TrainTextRequest) GetBaseModel() string {
 	if x != nil {
-		return x.ModelType
+		return x.BaseModel
 	}
 	return ""
 }
 
-func (x *TrainRequest) GetEpochs() int32 {
+func (x *TrainTextRequest) GetOutputPath() string {
+	if x != nil {
+		return x.OutputPath
+	}
+	return ""
+}
+
+func (x *TrainTextRequest) GetEpochs() int32 {
 	if x != nil {
 		return x.Epochs
+	}
+	return 0
+}
+
+func (x *TrainTextRequest) GetLearningRate() float32 {
+	if x != nil {
+		return x.LearningRate
+	}
+	return 0
+}
+
+func (x *TrainTextRequest) GetLoraRank() int32 {
+	if x != nil {
+		return x.LoraRank
+	}
+	return 0
+}
+
+func (x *TrainTextRequest) GetContextLength() int32 {
+	if x != nil {
+		return x.ContextLength
+	}
+	return 0
+}
+
+func (x *TrainTextRequest) GetBatchSize() int32 {
+	if x != nil {
+		return x.BatchSize
+	}
+	return 0
+}
+
+type TrainImageRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	DatasetId     string                 `protobuf:"bytes,2,opt,name=dataset_id,json=datasetId,proto3" json:"dataset_id,omitempty"`
+	BaseModel     string                 `protobuf:"bytes,3,opt,name=base_model,json=baseModel,proto3" json:"base_model,omitempty"`
+	OutputPath    string                 `protobuf:"bytes,4,opt,name=output_path,json=outputPath,proto3" json:"output_path,omitempty"`
+	Epochs        int32                  `protobuf:"varint,5,opt,name=epochs,proto3" json:"epochs,omitempty"`
+	LearningRate  float32                `protobuf:"fixed32,6,opt,name=learning_rate,json=learningRate,proto3" json:"learning_rate,omitempty"`
+	LoraRank      int32                  `protobuf:"varint,7,opt,name=lora_rank,json=loraRank,proto3" json:"lora_rank,omitempty"`
+	Width         int32                  `protobuf:"varint,8,opt,name=width,proto3" json:"width,omitempty"`
+	Height        int32                  `protobuf:"varint,9,opt,name=height,proto3" json:"height,omitempty"`
+	ClassToken    string                 `protobuf:"bytes,10,opt,name=class_token,json=classToken,proto3" json:"class_token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TrainImageRequest) Reset() {
+	*x = TrainImageRequest{}
+	mi := &file_driver_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TrainImageRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TrainImageRequest) ProtoMessage() {}
+
+func (x *TrainImageRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_driver_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TrainImageRequest.ProtoReflect.Descriptor instead.
+func (*TrainImageRequest) Descriptor() ([]byte, []int) {
+	return file_driver_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *TrainImageRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *TrainImageRequest) GetDatasetId() string {
+	if x != nil {
+		return x.DatasetId
+	}
+	return ""
+}
+
+func (x *TrainImageRequest) GetBaseModel() string {
+	if x != nil {
+		return x.BaseModel
+	}
+	return ""
+}
+
+func (x *TrainImageRequest) GetOutputPath() string {
+	if x != nil {
+		return x.OutputPath
+	}
+	return ""
+}
+
+func (x *TrainImageRequest) GetEpochs() int32 {
+	if x != nil {
+		return x.Epochs
+	}
+	return 0
+}
+
+func (x *TrainImageRequest) GetLearningRate() float32 {
+	if x != nil {
+		return x.LearningRate
+	}
+	return 0
+}
+
+func (x *TrainImageRequest) GetLoraRank() int32 {
+	if x != nil {
+		return x.LoraRank
+	}
+	return 0
+}
+
+func (x *TrainImageRequest) GetWidth() int32 {
+	if x != nil {
+		return x.Width
+	}
+	return 0
+}
+
+func (x *TrainImageRequest) GetHeight() int32 {
+	if x != nil {
+		return x.Height
+	}
+	return 0
+}
+
+func (x *TrainImageRequest) GetClassToken() string {
+	if x != nil {
+		return x.ClassToken
+	}
+	return ""
+}
+
+type TrainVideoRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	DatasetId     string                 `protobuf:"bytes,2,opt,name=dataset_id,json=datasetId,proto3" json:"dataset_id,omitempty"`
+	BaseModel     string                 `protobuf:"bytes,3,opt,name=base_model,json=baseModel,proto3" json:"base_model,omitempty"`
+	OutputPath    string                 `protobuf:"bytes,4,opt,name=output_path,json=outputPath,proto3" json:"output_path,omitempty"`
+	Epochs        int32                  `protobuf:"varint,5,opt,name=epochs,proto3" json:"epochs,omitempty"`
+	LearningRate  float32                `protobuf:"fixed32,6,opt,name=learning_rate,json=learningRate,proto3" json:"learning_rate,omitempty"`
+	Frames        int32                  `protobuf:"varint,7,opt,name=frames,proto3" json:"frames,omitempty"`
+	Fps           int32                  `protobuf:"varint,8,opt,name=fps,proto3" json:"fps,omitempty"`
+	ContextLength int32                  `protobuf:"varint,9,opt,name=context_length,json=contextLength,proto3" json:"context_length,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TrainVideoRequest) Reset() {
+	*x = TrainVideoRequest{}
+	mi := &file_driver_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TrainVideoRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TrainVideoRequest) ProtoMessage() {}
+
+func (x *TrainVideoRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_driver_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TrainVideoRequest.ProtoReflect.Descriptor instead.
+func (*TrainVideoRequest) Descriptor() ([]byte, []int) {
+	return file_driver_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *TrainVideoRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *TrainVideoRequest) GetDatasetId() string {
+	if x != nil {
+		return x.DatasetId
+	}
+	return ""
+}
+
+func (x *TrainVideoRequest) GetBaseModel() string {
+	if x != nil {
+		return x.BaseModel
+	}
+	return ""
+}
+
+func (x *TrainVideoRequest) GetOutputPath() string {
+	if x != nil {
+		return x.OutputPath
+	}
+	return ""
+}
+
+func (x *TrainVideoRequest) GetEpochs() int32 {
+	if x != nil {
+		return x.Epochs
+	}
+	return 0
+}
+
+func (x *TrainVideoRequest) GetLearningRate() float32 {
+	if x != nil {
+		return x.LearningRate
+	}
+	return 0
+}
+
+func (x *TrainVideoRequest) GetFrames() int32 {
+	if x != nil {
+		return x.Frames
+	}
+	return 0
+}
+
+func (x *TrainVideoRequest) GetFps() int32 {
+	if x != nil {
+		return x.Fps
+	}
+	return 0
+}
+
+func (x *TrainVideoRequest) GetContextLength() int32 {
+	if x != nil {
+		return x.ContextLength
+	}
+	return 0
+}
+
+type TrainAudioRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	DatasetId     string                 `protobuf:"bytes,2,opt,name=dataset_id,json=datasetId,proto3" json:"dataset_id,omitempty"`
+	BaseModel     string                 `protobuf:"bytes,3,opt,name=base_model,json=baseModel,proto3" json:"base_model,omitempty"`
+	OutputPath    string                 `protobuf:"bytes,4,opt,name=output_path,json=outputPath,proto3" json:"output_path,omitempty"`
+	Epochs        int32                  `protobuf:"varint,5,opt,name=epochs,proto3" json:"epochs,omitempty"`
+	LearningRate  float32                `protobuf:"fixed32,6,opt,name=learning_rate,json=learningRate,proto3" json:"learning_rate,omitempty"`
+	SampleRate    int32                  `protobuf:"varint,7,opt,name=sample_rate,json=sampleRate,proto3" json:"sample_rate,omitempty"`
+	TaskType      string                 `protobuf:"bytes,8,opt,name=task_type,json=taskType,proto3" json:"task_type,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TrainAudioRequest) Reset() {
+	*x = TrainAudioRequest{}
+	mi := &file_driver_proto_msgTypes[29]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TrainAudioRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TrainAudioRequest) ProtoMessage() {}
+
+func (x *TrainAudioRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_driver_proto_msgTypes[29]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TrainAudioRequest.ProtoReflect.Descriptor instead.
+func (*TrainAudioRequest) Descriptor() ([]byte, []int) {
+	return file_driver_proto_rawDescGZIP(), []int{29}
+}
+
+func (x *TrainAudioRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *TrainAudioRequest) GetDatasetId() string {
+	if x != nil {
+		return x.DatasetId
+	}
+	return ""
+}
+
+func (x *TrainAudioRequest) GetBaseModel() string {
+	if x != nil {
+		return x.BaseModel
+	}
+	return ""
+}
+
+func (x *TrainAudioRequest) GetOutputPath() string {
+	if x != nil {
+		return x.OutputPath
+	}
+	return ""
+}
+
+func (x *TrainAudioRequest) GetEpochs() int32 {
+	if x != nil {
+		return x.Epochs
+	}
+	return 0
+}
+
+func (x *TrainAudioRequest) GetLearningRate() float32 {
+	if x != nil {
+		return x.LearningRate
+	}
+	return 0
+}
+
+func (x *TrainAudioRequest) GetSampleRate() int32 {
+	if x != nil {
+		return x.SampleRate
+	}
+	return 0
+}
+
+func (x *TrainAudioRequest) GetTaskType() string {
+	if x != nil {
+		return x.TaskType
+	}
+	return ""
+}
+
+type Train3DRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	DatasetId     string                 `protobuf:"bytes,2,opt,name=dataset_id,json=datasetId,proto3" json:"dataset_id,omitempty"`
+	BaseModel     string                 `protobuf:"bytes,3,opt,name=base_model,json=baseModel,proto3" json:"base_model,omitempty"`
+	OutputPath    string                 `protobuf:"bytes,4,opt,name=output_path,json=outputPath,proto3" json:"output_path,omitempty"`
+	Epochs        int32                  `protobuf:"varint,5,opt,name=epochs,proto3" json:"epochs,omitempty"`
+	LearningRate  float32                `protobuf:"fixed32,6,opt,name=learning_rate,json=learningRate,proto3" json:"learning_rate,omitempty"`
+	Format        string                 `protobuf:"bytes,7,opt,name=format,proto3" json:"format,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Train3DRequest) Reset() {
+	*x = Train3DRequest{}
+	mi := &file_driver_proto_msgTypes[30]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Train3DRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Train3DRequest) ProtoMessage() {}
+
+func (x *Train3DRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_driver_proto_msgTypes[30]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Train3DRequest.ProtoReflect.Descriptor instead.
+func (*Train3DRequest) Descriptor() ([]byte, []int) {
+	return file_driver_proto_rawDescGZIP(), []int{30}
+}
+
+func (x *Train3DRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Train3DRequest) GetDatasetId() string {
+	if x != nil {
+		return x.DatasetId
+	}
+	return ""
+}
+
+func (x *Train3DRequest) GetBaseModel() string {
+	if x != nil {
+		return x.BaseModel
+	}
+	return ""
+}
+
+func (x *Train3DRequest) GetOutputPath() string {
+	if x != nil {
+		return x.OutputPath
+	}
+	return ""
+}
+
+func (x *Train3DRequest) GetEpochs() int32 {
+	if x != nil {
+		return x.Epochs
+	}
+	return 0
+}
+
+func (x *Train3DRequest) GetLearningRate() float32 {
+	if x != nil {
+		return x.LearningRate
+	}
+	return 0
+}
+
+func (x *Train3DRequest) GetFormat() string {
+	if x != nil {
+		return x.Format
+	}
+	return ""
+}
+
+type TrainTTSRequest struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Name            string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	DatasetId       string                 `protobuf:"bytes,2,opt,name=dataset_id,json=datasetId,proto3" json:"dataset_id,omitempty"`
+	BaseModel       string                 `protobuf:"bytes,3,opt,name=base_model,json=baseModel,proto3" json:"base_model,omitempty"`
+	OutputPath      string                 `protobuf:"bytes,4,opt,name=output_path,json=outputPath,proto3" json:"output_path,omitempty"`
+	Epochs          int32                  `protobuf:"varint,5,opt,name=epochs,proto3" json:"epochs,omitempty"`
+	LearningRate    float32                `protobuf:"fixed32,6,opt,name=learning_rate,json=learningRate,proto3" json:"learning_rate,omitempty"`
+	Language        string                 `protobuf:"bytes,7,opt,name=language,proto3" json:"language,omitempty"`
+	ReferenceSample string                 `protobuf:"bytes,8,opt,name=reference_sample,json=referenceSample,proto3" json:"reference_sample,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *TrainTTSRequest) Reset() {
+	*x = TrainTTSRequest{}
+	mi := &file_driver_proto_msgTypes[31]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TrainTTSRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TrainTTSRequest) ProtoMessage() {}
+
+func (x *TrainTTSRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_driver_proto_msgTypes[31]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TrainTTSRequest.ProtoReflect.Descriptor instead.
+func (*TrainTTSRequest) Descriptor() ([]byte, []int) {
+	return file_driver_proto_rawDescGZIP(), []int{31}
+}
+
+func (x *TrainTTSRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *TrainTTSRequest) GetDatasetId() string {
+	if x != nil {
+		return x.DatasetId
+	}
+	return ""
+}
+
+func (x *TrainTTSRequest) GetBaseModel() string {
+	if x != nil {
+		return x.BaseModel
+	}
+	return ""
+}
+
+func (x *TrainTTSRequest) GetOutputPath() string {
+	if x != nil {
+		return x.OutputPath
+	}
+	return ""
+}
+
+func (x *TrainTTSRequest) GetEpochs() int32 {
+	if x != nil {
+		return x.Epochs
+	}
+	return 0
+}
+
+func (x *TrainTTSRequest) GetLearningRate() float32 {
+	if x != nil {
+		return x.LearningRate
+	}
+	return 0
+}
+
+func (x *TrainTTSRequest) GetLanguage() string {
+	if x != nil {
+		return x.Language
+	}
+	return ""
+}
+
+func (x *TrainTTSRequest) GetReferenceSample() string {
+	if x != nil {
+		return x.ReferenceSample
+	}
+	return ""
+}
+
+type TrainSTTRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	DatasetId     string                 `protobuf:"bytes,2,opt,name=dataset_id,json=datasetId,proto3" json:"dataset_id,omitempty"`
+	BaseModel     string                 `protobuf:"bytes,3,opt,name=base_model,json=baseModel,proto3" json:"base_model,omitempty"`
+	OutputPath    string                 `protobuf:"bytes,4,opt,name=output_path,json=outputPath,proto3" json:"output_path,omitempty"`
+	Epochs        int32                  `protobuf:"varint,5,opt,name=epochs,proto3" json:"epochs,omitempty"`
+	LearningRate  float32                `protobuf:"fixed32,6,opt,name=learning_rate,json=learningRate,proto3" json:"learning_rate,omitempty"`
+	Language      string                 `protobuf:"bytes,7,opt,name=language,proto3" json:"language,omitempty"`
+	ModelSize     string                 `protobuf:"bytes,8,opt,name=model_size,json=modelSize,proto3" json:"model_size,omitempty"`
+	FreezeEncoder bool                   `protobuf:"varint,9,opt,name=freeze_encoder,json=freezeEncoder,proto3" json:"freeze_encoder,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TrainSTTRequest) Reset() {
+	*x = TrainSTTRequest{}
+	mi := &file_driver_proto_msgTypes[32]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TrainSTTRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TrainSTTRequest) ProtoMessage() {}
+
+func (x *TrainSTTRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_driver_proto_msgTypes[32]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TrainSTTRequest.ProtoReflect.Descriptor instead.
+func (*TrainSTTRequest) Descriptor() ([]byte, []int) {
+	return file_driver_proto_rawDescGZIP(), []int{32}
+}
+
+func (x *TrainSTTRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *TrainSTTRequest) GetDatasetId() string {
+	if x != nil {
+		return x.DatasetId
+	}
+	return ""
+}
+
+func (x *TrainSTTRequest) GetBaseModel() string {
+	if x != nil {
+		return x.BaseModel
+	}
+	return ""
+}
+
+func (x *TrainSTTRequest) GetOutputPath() string {
+	if x != nil {
+		return x.OutputPath
+	}
+	return ""
+}
+
+func (x *TrainSTTRequest) GetEpochs() int32 {
+	if x != nil {
+		return x.Epochs
+	}
+	return 0
+}
+
+func (x *TrainSTTRequest) GetLearningRate() float32 {
+	if x != nil {
+		return x.LearningRate
+	}
+	return 0
+}
+
+func (x *TrainSTTRequest) GetLanguage() string {
+	if x != nil {
+		return x.Language
+	}
+	return ""
+}
+
+func (x *TrainSTTRequest) GetModelSize() string {
+	if x != nil {
+		return x.ModelSize
+	}
+	return ""
+}
+
+func (x *TrainSTTRequest) GetFreezeEncoder() bool {
+	if x != nil {
+		return x.FreezeEncoder
+	}
+	return false
+}
+
+type TrainVoiceRequest struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Name            string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	DatasetId       string                 `protobuf:"bytes,2,opt,name=dataset_id,json=datasetId,proto3" json:"dataset_id,omitempty"`
+	OutputPath      string                 `protobuf:"bytes,3,opt,name=output_path,json=outputPath,proto3" json:"output_path,omitempty"`
+	Epochs          int32                  `protobuf:"varint,4,opt,name=epochs,proto3" json:"epochs,omitempty"`
+	SamplePath      string                 `protobuf:"bytes,5,opt,name=sample_path,json=samplePath,proto3" json:"sample_path,omitempty"`
+	PretrainedModel string                 `protobuf:"bytes,6,opt,name=pretrained_model,json=pretrainedModel,proto3" json:"pretrained_model,omitempty"`
+	PitchShift      int32                  `protobuf:"varint,7,opt,name=pitch_shift,json=pitchShift,proto3" json:"pitch_shift,omitempty"`
+	IndexRate       float32                `protobuf:"fixed32,8,opt,name=index_rate,json=indexRate,proto3" json:"index_rate,omitempty"`
+	BatchSize       int32                  `protobuf:"varint,9,opt,name=batch_size,json=batchSize,proto3" json:"batch_size,omitempty"`
+	SaveEveryEpoch  int32                  `protobuf:"varint,10,opt,name=save_every_epoch,json=saveEveryEpoch,proto3" json:"save_every_epoch,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *TrainVoiceRequest) Reset() {
+	*x = TrainVoiceRequest{}
+	mi := &file_driver_proto_msgTypes[33]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TrainVoiceRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TrainVoiceRequest) ProtoMessage() {}
+
+func (x *TrainVoiceRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_driver_proto_msgTypes[33]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TrainVoiceRequest.ProtoReflect.Descriptor instead.
+func (*TrainVoiceRequest) Descriptor() ([]byte, []int) {
+	return file_driver_proto_rawDescGZIP(), []int{33}
+}
+
+func (x *TrainVoiceRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *TrainVoiceRequest) GetDatasetId() string {
+	if x != nil {
+		return x.DatasetId
+	}
+	return ""
+}
+
+func (x *TrainVoiceRequest) GetOutputPath() string {
+	if x != nil {
+		return x.OutputPath
+	}
+	return ""
+}
+
+func (x *TrainVoiceRequest) GetEpochs() int32 {
+	if x != nil {
+		return x.Epochs
+	}
+	return 0
+}
+
+func (x *TrainVoiceRequest) GetSamplePath() string {
+	if x != nil {
+		return x.SamplePath
+	}
+	return ""
+}
+
+func (x *TrainVoiceRequest) GetPretrainedModel() string {
+	if x != nil {
+		return x.PretrainedModel
+	}
+	return ""
+}
+
+func (x *TrainVoiceRequest) GetPitchShift() int32 {
+	if x != nil {
+		return x.PitchShift
+	}
+	return 0
+}
+
+func (x *TrainVoiceRequest) GetIndexRate() float32 {
+	if x != nil {
+		return x.IndexRate
+	}
+	return 0
+}
+
+func (x *TrainVoiceRequest) GetBatchSize() int32 {
+	if x != nil {
+		return x.BatchSize
+	}
+	return 0
+}
+
+func (x *TrainVoiceRequest) GetSaveEveryEpoch() int32 {
+	if x != nil {
+		return x.SaveEveryEpoch
 	}
 	return 0
 }
@@ -1401,13 +2881,15 @@ type TrainResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	JobId         string                 `protobuf:"bytes,1,opt,name=job_id,json=jobId,proto3" json:"job_id,omitempty"`
 	Status        string                 `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
+	Capability    string                 `protobuf:"bytes,3,opt,name=capability,proto3" json:"capability,omitempty"`
+	OutputPath    string                 `protobuf:"bytes,4,opt,name=output_path,json=outputPath,proto3" json:"output_path,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *TrainResponse) Reset() {
 	*x = TrainResponse{}
-	mi := &file_driver_proto_msgTypes[26]
+	mi := &file_driver_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1419,7 +2901,7 @@ func (x *TrainResponse) String() string {
 func (*TrainResponse) ProtoMessage() {}
 
 func (x *TrainResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_driver_proto_msgTypes[26]
+	mi := &file_driver_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1432,7 +2914,7 @@ func (x *TrainResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TrainResponse.ProtoReflect.Descriptor instead.
 func (*TrainResponse) Descriptor() ([]byte, []int) {
-	return file_driver_proto_rawDescGZIP(), []int{26}
+	return file_driver_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *TrainResponse) GetJobId() string {
@@ -1449,6 +2931,20 @@ func (x *TrainResponse) GetStatus() string {
 	return ""
 }
 
+func (x *TrainResponse) GetCapability() string {
+	if x != nil {
+		return x.Capability
+	}
+	return ""
+}
+
+func (x *TrainResponse) GetOutputPath() string {
+	if x != nil {
+		return x.OutputPath
+	}
+	return ""
+}
+
 type DatasetEntry struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -1461,7 +2957,7 @@ type DatasetEntry struct {
 
 func (x *DatasetEntry) Reset() {
 	*x = DatasetEntry{}
-	mi := &file_driver_proto_msgTypes[27]
+	mi := &file_driver_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1473,7 +2969,7 @@ func (x *DatasetEntry) String() string {
 func (*DatasetEntry) ProtoMessage() {}
 
 func (x *DatasetEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_driver_proto_msgTypes[27]
+	mi := &file_driver_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1486,7 +2982,7 @@ func (x *DatasetEntry) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DatasetEntry.ProtoReflect.Descriptor instead.
 func (*DatasetEntry) Descriptor() ([]byte, []int) {
-	return file_driver_proto_rawDescGZIP(), []int{27}
+	return file_driver_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *DatasetEntry) GetId() string {
@@ -1528,7 +3024,7 @@ type ManageDatasetRequest struct {
 
 func (x *ManageDatasetRequest) Reset() {
 	*x = ManageDatasetRequest{}
-	mi := &file_driver_proto_msgTypes[28]
+	mi := &file_driver_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1540,7 +3036,7 @@ func (x *ManageDatasetRequest) String() string {
 func (*ManageDatasetRequest) ProtoMessage() {}
 
 func (x *ManageDatasetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_driver_proto_msgTypes[28]
+	mi := &file_driver_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1553,7 +3049,7 @@ func (x *ManageDatasetRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ManageDatasetRequest.ProtoReflect.Descriptor instead.
 func (*ManageDatasetRequest) Descriptor() ([]byte, []int) {
-	return file_driver_proto_rawDescGZIP(), []int{28}
+	return file_driver_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *ManageDatasetRequest) GetAction() string {
@@ -1587,7 +3083,7 @@ type ManageDatasetResponse struct {
 
 func (x *ManageDatasetResponse) Reset() {
 	*x = ManageDatasetResponse{}
-	mi := &file_driver_proto_msgTypes[29]
+	mi := &file_driver_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1599,7 +3095,7 @@ func (x *ManageDatasetResponse) String() string {
 func (*ManageDatasetResponse) ProtoMessage() {}
 
 func (x *ManageDatasetResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_driver_proto_msgTypes[29]
+	mi := &file_driver_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1612,7 +3108,7 @@ func (x *ManageDatasetResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ManageDatasetResponse.ProtoReflect.Descriptor instead.
 func (*ManageDatasetResponse) Descriptor() ([]byte, []int) {
-	return file_driver_proto_rawDescGZIP(), []int{29}
+	return file_driver_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *ManageDatasetResponse) GetDatasets() []*DatasetEntry {
@@ -1656,76 +3152,291 @@ const file_driver_proto_rawDesc = "" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\"\x10\n" +
 	"\x0eGetInfoRequest\"F\n" +
 	"\x0fGetInfoResponse\x123\n" +
-	"\bmetadata\x18\x01 \x01(\v2\x17.wuji.v1.DriverMetadataR\bmetadata\"\x84\x01\n" +
+	"\bmetadata\x18\x01 \x01(\v2\x17.wuji.v1.DriverMetadataR\bmetadata\"\xdf\x03\n" +
 	"\x13GenerateTextRequest\x12\x16\n" +
 	"\x06prompt\x18\x01 \x01(\tR\x06prompt\x12\x1d\n" +
 	"\n" +
 	"max_tokens\x18\x02 \x01(\x05R\tmaxTokens\x12 \n" +
 	"\vtemperature\x18\x03 \x01(\x02R\vtemperature\x12\x14\n" +
-	"\x05model\x18\x04 \x01(\tR\x05model\"p\n" +
+	"\x05model\x18\x04 \x01(\tR\x05model\x12\x13\n" +
+	"\x05top_p\x18\x05 \x01(\x02R\x04topP\x12\x13\n" +
+	"\x05top_k\x18\x06 \x01(\x05R\x04topK\x12\x13\n" +
+	"\x05min_p\x18\a \x01(\x02R\x04minP\x12+\n" +
+	"\x11frequency_penalty\x18\b \x01(\x02R\x10frequencyPenalty\x12)\n" +
+	"\x10presence_penalty\x18\t \x01(\x02R\x0fpresencePenalty\x12-\n" +
+	"\x12repetition_penalty\x18\n" +
+	" \x01(\x02R\x11repetitionPenalty\x12%\n" +
+	"\x0estop_sequences\x18\v \x03(\tR\rstopSequences\x12\x17\n" +
+	"\x04seed\x18\f \x01(\x05H\x00R\x04seed\x88\x01\x01\x12#\n" +
+	"\rsystem_prompt\x18\r \x01(\tR\fsystemPrompt\x12%\n" +
+	"\x0econtext_window\x18\x0e \x01(\x05R\rcontextWindowB\a\n" +
+	"\x05_seed\"p\n" +
 	"\x14GenerateTextResponse\x12\x12\n" +
 	"\x04text\x18\x01 \x01(\tR\x04text\x12\x1f\n" +
 	"\vtokens_used\x18\x02 \x01(\x05R\n" +
 	"tokensUsed\x12#\n" +
-	"\rfinish_reason\x18\x03 \x01(\tR\ffinishReason\"r\n" +
+	"\rfinish_reason\x18\x03 \x01(\tR\ffinishReason\"\xb7\x03\n" +
 	"\x14GenerateImageRequest\x12\x16\n" +
 	"\x06prompt\x18\x01 \x01(\tR\x06prompt\x12\x14\n" +
 	"\x05width\x18\x02 \x01(\x05R\x05width\x12\x16\n" +
 	"\x06height\x18\x03 \x01(\x05R\x06height\x12\x14\n" +
-	"\x05steps\x18\x04 \x01(\x05R\x05steps\"C\n" +
+	"\x05steps\x18\x04 \x01(\x05R\x05steps\x12'\n" +
+	"\x0fnegative_prompt\x18\x05 \x01(\tR\x0enegativePrompt\x12\x14\n" +
+	"\x05model\x18\x06 \x01(\tR\x05model\x12\x18\n" +
+	"\asampler\x18\a \x01(\tR\asampler\x12\x1b\n" +
+	"\tcfg_scale\x18\b \x01(\x02R\bcfgScale\x12\x1d\n" +
+	"\n" +
+	"batch_size\x18\t \x01(\x05R\tbatchSize\x12\x1f\n" +
+	"\vbatch_count\x18\n" +
+	" \x01(\x05R\n" +
+	"batchCount\x12\x17\n" +
+	"\x04seed\x18\v \x01(\x05H\x00R\x04seed\x88\x01\x01\x12-\n" +
+	"\x12denoising_strength\x18\f \x01(\x02R\x11denoisingStrength\x12&\n" +
+	"\x0finit_image_path\x18\r \x01(\tR\rinitImagePath\x12\x14\n" +
+	"\x05loras\x18\x0e \x03(\tR\x05lorasB\a\n" +
+	"\x05_seed\"Y\n" +
 	"\x15GenerateImageResponse\x12\x12\n" +
 	"\x04path\x18\x01 \x01(\tR\x04path\x12\x16\n" +
-	"\x06format\x18\x02 \x01(\tR\x06format\"\\\n" +
+	"\x06format\x18\x02 \x01(\tR\x06format\x12\x14\n" +
+	"\x05paths\x18\x03 \x03(\tR\x05paths\"\x99\x04\n" +
 	"\x14GenerateVideoRequest\x12\x16\n" +
 	"\x06prompt\x18\x01 \x01(\tR\x06prompt\x12\x1a\n" +
 	"\bduration\x18\x02 \x01(\x02R\bduration\x12\x10\n" +
-	"\x03fps\x18\x03 \x01(\x05R\x03fps\"G\n" +
+	"\x03fps\x18\x03 \x01(\x05R\x03fps\x12\x16\n" +
+	"\x06frames\x18\x04 \x01(\x05R\x06frames\x12'\n" +
+	"\x0fmotion_strength\x18\x05 \x01(\x02R\x0emotionStrength\x12%\n" +
+	"\x0econtext_length\x18\x06 \x01(\x05R\rcontextLength\x12\x18\n" +
+	"\asampler\x18\a \x01(\tR\asampler\x12\x1c\n" +
+	"\tscheduler\x18\b \x01(\tR\tscheduler\x12 \n" +
+	"\vinterpolate\x18\t \x01(\bR\vinterpolate\x125\n" +
+	"\x16interpolation_strength\x18\n" +
+	" \x01(\x02R\x15interpolationStrength\x12\x12\n" +
+	"\x04mode\x18\v \x01(\tR\x04mode\x12&\n" +
+	"\x0finit_image_path\x18\f \x01(\tR\rinitImagePath\x12%\n" +
+	"\x0ecamera_control\x18\r \x01(\tR\rcameraControl\x12'\n" +
+	"\x0fnegative_prompt\x18\x0e \x01(\tR\x0enegativePrompt\x12\x14\n" +
+	"\x05model\x18\x0f \x01(\tR\x05model\x12\x17\n" +
+	"\x04seed\x18\x10 \x01(\x05H\x00R\x04seed\x88\x01\x01B\a\n" +
+	"\x05_seed\"q\n" +
 	"\x15GenerateVideoResponse\x12\x12\n" +
 	"\x04path\x18\x01 \x01(\tR\x04path\x12\x1a\n" +
-	"\bduration\x18\x02 \x01(\x02R\bduration\"J\n" +
+	"\bduration\x18\x02 \x01(\x02R\bduration\x12\x16\n" +
+	"\x06frames\x18\x03 \x01(\x05R\x06frames\x12\x10\n" +
+	"\x03fps\x18\x04 \x01(\x05R\x03fps\"\xab\x03\n" +
 	"\x14GenerateAudioRequest\x12\x16\n" +
 	"\x06prompt\x18\x01 \x01(\tR\x06prompt\x12\x1a\n" +
-	"\bduration\x18\x02 \x01(\x02R\bduration\"G\n" +
+	"\bduration\x18\x02 \x01(\x02R\bduration\x12\x16\n" +
+	"\x06lyrics\x18\x03 \x01(\tR\x06lyrics\x12'\n" +
+	"\x0fnegative_prompt\x18\x04 \x01(\tR\x0enegativePrompt\x12\x14\n" +
+	"\x05model\x18\x05 \x01(\tR\x05model\x12\x18\n" +
+	"\aoverlap\x18\x06 \x01(\x02R\aoverlap\x12 \n" +
+	"\vtemperature\x18\a \x01(\x02R\vtemperature\x12\x1b\n" +
+	"\tcfg_scale\x18\b \x01(\x02R\bcfgScale\x12\x13\n" +
+	"\x05top_p\x18\t \x01(\x02R\x04topP\x12\x13\n" +
+	"\x05top_k\x18\n" +
+	" \x01(\x05R\x04topK\x12\x1f\n" +
+	"\vsample_rate\x18\v \x01(\x05R\n" +
+	"sampleRate\x12\x1b\n" +
+	"\ttask_type\x18\f \x01(\tR\btaskType\x12%\n" +
+	"\x0ereference_path\x18\r \x01(\tR\rreferencePath\x12\x17\n" +
+	"\x04seed\x18\x0e \x01(\x05H\x00R\x04seed\x88\x01\x01B\a\n" +
+	"\x05_seed\"\x80\x01\n" +
 	"\x15GenerateAudioResponse\x12\x12\n" +
 	"\x04path\x18\x01 \x01(\tR\x04path\x12\x1a\n" +
-	"\bduration\x18\x02 \x01(\x02R\bduration\"C\n" +
+	"\bduration\x18\x02 \x01(\x02R\bduration\x12\x1f\n" +
+	"\vsample_rate\x18\x03 \x01(\x05R\n" +
+	"sampleRate\x12\x16\n" +
+	"\x06format\x18\x04 \x01(\tR\x06format\"C\n" +
 	"\x11Generate3DRequest\x12\x16\n" +
 	"\x06prompt\x18\x01 \x01(\tR\x06prompt\x12\x16\n" +
 	"\x06format\x18\x02 \x01(\tR\x06format\"@\n" +
 	"\x12Generate3DResponse\x12\x12\n" +
 	"\x04path\x18\x01 \x01(\tR\x04path\x12\x16\n" +
-	"\x06format\x18\x02 \x01(\tR\x06format\"=\n" +
+	"\x06format\x18\x02 \x01(\tR\x06format\"K\n" +
+	"\rWordTimestamp\x12\x12\n" +
+	"\x04word\x18\x01 \x01(\tR\x04word\x12\x14\n" +
+	"\x05start\x18\x02 \x01(\x02R\x05start\x12\x10\n" +
+	"\x03end\x18\x03 \x01(\x02R\x03end\"\xbe\x02\n" +
 	"\x11SynthesizeRequest\x12\x12\n" +
 	"\x04text\x18\x01 \x01(\tR\x04text\x12\x14\n" +
-	"\x05voice\x18\x02 \x01(\tR\x05voice\"D\n" +
+	"\x05voice\x18\x02 \x01(\tR\x05voice\x12*\n" +
+	"\x11voice_sample_path\x18\x03 \x01(\tR\x0fvoiceSamplePath\x12\x1a\n" +
+	"\blanguage\x18\x04 \x01(\tR\blanguage\x12\x14\n" +
+	"\x05speed\x18\x05 \x01(\x02R\x05speed\x12\x18\n" +
+	"\aemotion\x18\x06 \x01(\tR\aemotion\x12 \n" +
+	"\vtemperature\x18\a \x01(\x02R\vtemperature\x12-\n" +
+	"\x12repetition_penalty\x18\b \x01(\x02R\x11repetitionPenalty\x12\x14\n" +
+	"\x05model\x18\t \x01(\tR\x05model\x12\x17\n" +
+	"\x04seed\x18\n" +
+	" \x01(\x05H\x00R\x04seed\x88\x01\x01B\a\n" +
+	"\x05_seed\"}\n" +
 	"\x12SynthesizeResponse\x12\x12\n" +
 	"\x04path\x18\x01 \x01(\tR\x04path\x12\x1a\n" +
-	"\bduration\x18\x02 \x01(\x02R\bduration\"N\n" +
+	"\bduration\x18\x02 \x01(\x02R\bduration\x12\x1f\n" +
+	"\vsample_rate\x18\x03 \x01(\x05R\n" +
+	"sampleRate\x12\x16\n" +
+	"\x06format\x18\x04 \x01(\tR\x06format\"\x84\x02\n" +
 	"\x11TranscribeRequest\x12\x1d\n" +
 	"\n" +
 	"audio_path\x18\x01 \x01(\tR\taudioPath\x12\x1a\n" +
-	"\blanguage\x18\x02 \x01(\tR\blanguage\"H\n" +
+	"\blanguage\x18\x02 \x01(\tR\blanguage\x12\x14\n" +
+	"\x05model\x18\x03 \x01(\tR\x05model\x12\x12\n" +
+	"\x04task\x18\x04 \x01(\tR\x04task\x12\x1b\n" +
+	"\tbeam_size\x18\x05 \x01(\x05R\bbeamSize\x12'\n" +
+	"\x0fword_timestamps\x18\x06 \x01(\bR\x0ewordTimestamps\x12\x1f\n" +
+	"\vvad_enabled\x18\a \x01(\bR\n" +
+	"vadEnabled\x12#\n" +
+	"\rvad_threshold\x18\b \x01(\x02R\fvadThreshold\"v\n" +
 	"\x12TranscribeResponse\x12\x12\n" +
 	"\x04text\x18\x01 \x01(\tR\x04text\x12\x1e\n" +
 	"\n" +
 	"confidence\x18\x02 \x01(\x02R\n" +
-	"confidence\"H\n" +
+	"confidence\x12,\n" +
+	"\x05words\x18\x03 \x03(\v2\x16.wuji.v1.WordTimestampR\x05words\"\x96\x03\n" +
 	"\x11CloneVoiceRequest\x12\x1f\n" +
 	"\vsample_path\x18\x01 \x01(\tR\n" +
 	"samplePath\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\"C\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12!\n" +
+	"\ftarget_model\x18\x03 \x01(\tR\vtargetModel\x12\x1f\n" +
+	"\vsource_path\x18\x04 \x01(\tR\n" +
+	"sourcePath\x12\x12\n" +
+	"\x04mode\x18\x05 \x01(\tR\x04mode\x12\x1f\n" +
+	"\vpitch_shift\x18\x06 \x01(\x05R\n" +
+	"pitchShift\x12\x1d\n" +
+	"\n" +
+	"index_rate\x18\a \x01(\x02R\tindexRate\x12\x18\n" +
+	"\aprotect\x18\b \x01(\x02R\aprotect\x12\x18\n" +
+	"\avocoder\x18\t \x01(\tR\avocoder\x12\x18\n" +
+	"\adenoise\x18\n" +
+	" \x01(\bR\adenoise\x12)\n" +
+	"\x10denoise_strength\x18\v \x01(\x02R\x0fdenoiseStrength\x12\x1d\n" +
+	"\n" +
+	"chunk_size\x18\f \x01(\x05R\tchunkSize\x12\x1c\n" +
+	"\tcrossfade\x18\r \x01(\x02R\tcrossfade\"d\n" +
 	"\x12CloneVoiceResponse\x12\x19\n" +
 	"\bvoice_id\x18\x01 \x01(\tR\avoiceId\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\"d\n" +
-	"\fTrainRequest\x12\x1d\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1f\n" +
+	"\voutput_path\x18\x03 \x01(\tR\n" +
+	"outputPath\"\xa5\x02\n" +
+	"\x10TrainTextRequest\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1d\n" +
 	"\n" +
-	"dataset_id\x18\x01 \x01(\tR\tdatasetId\x12\x1d\n" +
+	"dataset_id\x18\x02 \x01(\tR\tdatasetId\x12\x1d\n" +
 	"\n" +
-	"model_type\x18\x02 \x01(\tR\tmodelType\x12\x16\n" +
-	"\x06epochs\x18\x03 \x01(\x05R\x06epochs\">\n" +
+	"base_model\x18\x03 \x01(\tR\tbaseModel\x12\x1f\n" +
+	"\voutput_path\x18\x04 \x01(\tR\n" +
+	"outputPath\x12\x16\n" +
+	"\x06epochs\x18\x05 \x01(\x05R\x06epochs\x12#\n" +
+	"\rlearning_rate\x18\x06 \x01(\x02R\flearningRate\x12\x1b\n" +
+	"\tlora_rank\x18\a \x01(\x05R\bloraRank\x12%\n" +
+	"\x0econtext_length\x18\b \x01(\x05R\rcontextLength\x12\x1d\n" +
+	"\n" +
+	"batch_size\x18\t \x01(\x05R\tbatchSize\"\xaf\x02\n" +
+	"\x11TrainImageRequest\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1d\n" +
+	"\n" +
+	"dataset_id\x18\x02 \x01(\tR\tdatasetId\x12\x1d\n" +
+	"\n" +
+	"base_model\x18\x03 \x01(\tR\tbaseModel\x12\x1f\n" +
+	"\voutput_path\x18\x04 \x01(\tR\n" +
+	"outputPath\x12\x16\n" +
+	"\x06epochs\x18\x05 \x01(\x05R\x06epochs\x12#\n" +
+	"\rlearning_rate\x18\x06 \x01(\x02R\flearningRate\x12\x1b\n" +
+	"\tlora_rank\x18\a \x01(\x05R\bloraRank\x12\x14\n" +
+	"\x05width\x18\b \x01(\x05R\x05width\x12\x16\n" +
+	"\x06height\x18\t \x01(\x05R\x06height\x12\x1f\n" +
+	"\vclass_token\x18\n" +
+	" \x01(\tR\n" +
+	"classToken\"\x94\x02\n" +
+	"\x11TrainVideoRequest\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1d\n" +
+	"\n" +
+	"dataset_id\x18\x02 \x01(\tR\tdatasetId\x12\x1d\n" +
+	"\n" +
+	"base_model\x18\x03 \x01(\tR\tbaseModel\x12\x1f\n" +
+	"\voutput_path\x18\x04 \x01(\tR\n" +
+	"outputPath\x12\x16\n" +
+	"\x06epochs\x18\x05 \x01(\x05R\x06epochs\x12#\n" +
+	"\rlearning_rate\x18\x06 \x01(\x02R\flearningRate\x12\x16\n" +
+	"\x06frames\x18\a \x01(\x05R\x06frames\x12\x10\n" +
+	"\x03fps\x18\b \x01(\x05R\x03fps\x12%\n" +
+	"\x0econtext_length\x18\t \x01(\x05R\rcontextLength\"\x81\x02\n" +
+	"\x11TrainAudioRequest\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1d\n" +
+	"\n" +
+	"dataset_id\x18\x02 \x01(\tR\tdatasetId\x12\x1d\n" +
+	"\n" +
+	"base_model\x18\x03 \x01(\tR\tbaseModel\x12\x1f\n" +
+	"\voutput_path\x18\x04 \x01(\tR\n" +
+	"outputPath\x12\x16\n" +
+	"\x06epochs\x18\x05 \x01(\x05R\x06epochs\x12#\n" +
+	"\rlearning_rate\x18\x06 \x01(\x02R\flearningRate\x12\x1f\n" +
+	"\vsample_rate\x18\a \x01(\x05R\n" +
+	"sampleRate\x12\x1b\n" +
+	"\ttask_type\x18\b \x01(\tR\btaskType\"\xd8\x01\n" +
+	"\x0eTrain3DRequest\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1d\n" +
+	"\n" +
+	"dataset_id\x18\x02 \x01(\tR\tdatasetId\x12\x1d\n" +
+	"\n" +
+	"base_model\x18\x03 \x01(\tR\tbaseModel\x12\x1f\n" +
+	"\voutput_path\x18\x04 \x01(\tR\n" +
+	"outputPath\x12\x16\n" +
+	"\x06epochs\x18\x05 \x01(\x05R\x06epochs\x12#\n" +
+	"\rlearning_rate\x18\x06 \x01(\x02R\flearningRate\x12\x16\n" +
+	"\x06format\x18\a \x01(\tR\x06format\"\x88\x02\n" +
+	"\x0fTrainTTSRequest\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1d\n" +
+	"\n" +
+	"dataset_id\x18\x02 \x01(\tR\tdatasetId\x12\x1d\n" +
+	"\n" +
+	"base_model\x18\x03 \x01(\tR\tbaseModel\x12\x1f\n" +
+	"\voutput_path\x18\x04 \x01(\tR\n" +
+	"outputPath\x12\x16\n" +
+	"\x06epochs\x18\x05 \x01(\x05R\x06epochs\x12#\n" +
+	"\rlearning_rate\x18\x06 \x01(\x02R\flearningRate\x12\x1a\n" +
+	"\blanguage\x18\a \x01(\tR\blanguage\x12)\n" +
+	"\x10reference_sample\x18\b \x01(\tR\x0freferenceSample\"\xa3\x02\n" +
+	"\x0fTrainSTTRequest\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1d\n" +
+	"\n" +
+	"dataset_id\x18\x02 \x01(\tR\tdatasetId\x12\x1d\n" +
+	"\n" +
+	"base_model\x18\x03 \x01(\tR\tbaseModel\x12\x1f\n" +
+	"\voutput_path\x18\x04 \x01(\tR\n" +
+	"outputPath\x12\x16\n" +
+	"\x06epochs\x18\x05 \x01(\x05R\x06epochs\x12#\n" +
+	"\rlearning_rate\x18\x06 \x01(\x02R\flearningRate\x12\x1a\n" +
+	"\blanguage\x18\a \x01(\tR\blanguage\x12\x1d\n" +
+	"\n" +
+	"model_size\x18\b \x01(\tR\tmodelSize\x12%\n" +
+	"\x0efreeze_encoder\x18\t \x01(\bR\rfreezeEncoder\"\xd4\x02\n" +
+	"\x11TrainVoiceRequest\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1d\n" +
+	"\n" +
+	"dataset_id\x18\x02 \x01(\tR\tdatasetId\x12\x1f\n" +
+	"\voutput_path\x18\x03 \x01(\tR\n" +
+	"outputPath\x12\x16\n" +
+	"\x06epochs\x18\x04 \x01(\x05R\x06epochs\x12\x1f\n" +
+	"\vsample_path\x18\x05 \x01(\tR\n" +
+	"samplePath\x12)\n" +
+	"\x10pretrained_model\x18\x06 \x01(\tR\x0fpretrainedModel\x12\x1f\n" +
+	"\vpitch_shift\x18\a \x01(\x05R\n" +
+	"pitchShift\x12\x1d\n" +
+	"\n" +
+	"index_rate\x18\b \x01(\x02R\tindexRate\x12\x1d\n" +
+	"\n" +
+	"batch_size\x18\t \x01(\x05R\tbatchSize\x12(\n" +
+	"\x10save_every_epoch\x18\n" +
+	" \x01(\x05R\x0esaveEveryEpoch\"\x7f\n" +
 	"\rTrainResponse\x12\x15\n" +
 	"\x06job_id\x18\x01 \x01(\tR\x05jobId\x12\x16\n" +
-	"\x06status\x18\x02 \x01(\tR\x06status\"Z\n" +
+	"\x06status\x18\x02 \x01(\tR\x06status\x12\x1e\n" +
+	"\n" +
+	"capability\x18\x03 \x01(\tR\n" +
+	"capability\x12\x1f\n" +
+	"\voutput_path\x18\x04 \x01(\tR\n" +
+	"outputPath\"Z\n" +
 	"\fDatasetEntry\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x12\n" +
@@ -1742,7 +3453,7 @@ const file_driver_proto_rawDesc = "" +
 	"\bRegister\x12\x18.wuji.v1.RegisterRequest\x1a\x19.wuji.v1.RegisterResponse\x12B\n" +
 	"\tHeartbeat\x12\x19.wuji.v1.HeartbeatRequest\x1a\x1a.wuji.v1.HeartbeatResponse\x12E\n" +
 	"\n" +
-	"Unregister\x12\x1a.wuji.v1.UnregisterRequest\x1a\x1b.wuji.v1.UnregisterResponse2\xae\x06\n" +
+	"Unregister\x12\x1a.wuji.v1.UnregisterRequest\x1a\x1b.wuji.v1.UnregisterResponse2\xf6\t\n" +
 	"\rDriverService\x12<\n" +
 	"\aGetInfo\x12\x17.wuji.v1.GetInfoRequest\x1a\x18.wuji.v1.GetInfoResponse\x12K\n" +
 	"\fGenerateText\x12\x1c.wuji.v1.GenerateTextRequest\x1a\x1d.wuji.v1.GenerateTextResponse\x12N\n" +
@@ -1756,8 +3467,19 @@ const file_driver_proto_rawDesc = "" +
 	"\n" +
 	"Transcribe\x12\x1a.wuji.v1.TranscribeRequest\x1a\x1b.wuji.v1.TranscribeResponse\x12E\n" +
 	"\n" +
-	"CloneVoice\x12\x1a.wuji.v1.CloneVoiceRequest\x1a\x1b.wuji.v1.CloneVoiceResponse\x126\n" +
-	"\x05Train\x12\x15.wuji.v1.TrainRequest\x1a\x16.wuji.v1.TrainResponse\x12N\n" +
+	"CloneVoice\x12\x1a.wuji.v1.CloneVoiceRequest\x1a\x1b.wuji.v1.CloneVoiceResponse\x12>\n" +
+	"\tTrainText\x12\x19.wuji.v1.TrainTextRequest\x1a\x16.wuji.v1.TrainResponse\x12@\n" +
+	"\n" +
+	"TrainImage\x12\x1a.wuji.v1.TrainImageRequest\x1a\x16.wuji.v1.TrainResponse\x12@\n" +
+	"\n" +
+	"TrainVideo\x12\x1a.wuji.v1.TrainVideoRequest\x1a\x16.wuji.v1.TrainResponse\x12@\n" +
+	"\n" +
+	"TrainAudio\x12\x1a.wuji.v1.TrainAudioRequest\x1a\x16.wuji.v1.TrainResponse\x12:\n" +
+	"\aTrain3D\x12\x17.wuji.v1.Train3DRequest\x1a\x16.wuji.v1.TrainResponse\x12<\n" +
+	"\bTrainTTS\x12\x18.wuji.v1.TrainTTSRequest\x1a\x16.wuji.v1.TrainResponse\x12<\n" +
+	"\bTrainSTT\x12\x18.wuji.v1.TrainSTTRequest\x1a\x16.wuji.v1.TrainResponse\x12@\n" +
+	"\n" +
+	"TrainVoice\x12\x1a.wuji.v1.TrainVoiceRequest\x1a\x16.wuji.v1.TrainResponse\x12N\n" +
 	"\rManageDataset\x12\x1d.wuji.v1.ManageDatasetRequest\x1a\x1e.wuji.v1.ManageDatasetResponseB.Z,github.com/coditary/wuji/api/proto/v1;wujiv1b\x06proto3"
 
 var (
@@ -1772,7 +3494,7 @@ func file_driver_proto_rawDescGZIP() []byte {
 	return file_driver_proto_rawDescData
 }
 
-var file_driver_proto_msgTypes = make([]protoimpl.MessageInfo, 30)
+var file_driver_proto_msgTypes = make([]protoimpl.MessageInfo, 38)
 var file_driver_proto_goTypes = []any{
 	(*DriverMetadata)(nil),        // 0: wuji.v1.DriverMetadata
 	(*RegisterRequest)(nil),       // 1: wuji.v1.RegisterRequest
@@ -1793,55 +3515,78 @@ var file_driver_proto_goTypes = []any{
 	(*GenerateAudioResponse)(nil), // 16: wuji.v1.GenerateAudioResponse
 	(*Generate3DRequest)(nil),     // 17: wuji.v1.Generate3DRequest
 	(*Generate3DResponse)(nil),    // 18: wuji.v1.Generate3DResponse
-	(*SynthesizeRequest)(nil),     // 19: wuji.v1.SynthesizeRequest
-	(*SynthesizeResponse)(nil),    // 20: wuji.v1.SynthesizeResponse
-	(*TranscribeRequest)(nil),     // 21: wuji.v1.TranscribeRequest
-	(*TranscribeResponse)(nil),    // 22: wuji.v1.TranscribeResponse
-	(*CloneVoiceRequest)(nil),     // 23: wuji.v1.CloneVoiceRequest
-	(*CloneVoiceResponse)(nil),    // 24: wuji.v1.CloneVoiceResponse
-	(*TrainRequest)(nil),          // 25: wuji.v1.TrainRequest
-	(*TrainResponse)(nil),         // 26: wuji.v1.TrainResponse
-	(*DatasetEntry)(nil),          // 27: wuji.v1.DatasetEntry
-	(*ManageDatasetRequest)(nil),  // 28: wuji.v1.ManageDatasetRequest
-	(*ManageDatasetResponse)(nil), // 29: wuji.v1.ManageDatasetResponse
+	(*WordTimestamp)(nil),         // 19: wuji.v1.WordTimestamp
+	(*SynthesizeRequest)(nil),     // 20: wuji.v1.SynthesizeRequest
+	(*SynthesizeResponse)(nil),    // 21: wuji.v1.SynthesizeResponse
+	(*TranscribeRequest)(nil),     // 22: wuji.v1.TranscribeRequest
+	(*TranscribeResponse)(nil),    // 23: wuji.v1.TranscribeResponse
+	(*CloneVoiceRequest)(nil),     // 24: wuji.v1.CloneVoiceRequest
+	(*CloneVoiceResponse)(nil),    // 25: wuji.v1.CloneVoiceResponse
+	(*TrainTextRequest)(nil),      // 26: wuji.v1.TrainTextRequest
+	(*TrainImageRequest)(nil),     // 27: wuji.v1.TrainImageRequest
+	(*TrainVideoRequest)(nil),     // 28: wuji.v1.TrainVideoRequest
+	(*TrainAudioRequest)(nil),     // 29: wuji.v1.TrainAudioRequest
+	(*Train3DRequest)(nil),        // 30: wuji.v1.Train3DRequest
+	(*TrainTTSRequest)(nil),       // 31: wuji.v1.TrainTTSRequest
+	(*TrainSTTRequest)(nil),       // 32: wuji.v1.TrainSTTRequest
+	(*TrainVoiceRequest)(nil),     // 33: wuji.v1.TrainVoiceRequest
+	(*TrainResponse)(nil),         // 34: wuji.v1.TrainResponse
+	(*DatasetEntry)(nil),          // 35: wuji.v1.DatasetEntry
+	(*ManageDatasetRequest)(nil),  // 36: wuji.v1.ManageDatasetRequest
+	(*ManageDatasetResponse)(nil), // 37: wuji.v1.ManageDatasetResponse
 }
 var file_driver_proto_depIdxs = []int32{
 	0,  // 0: wuji.v1.RegisterRequest.metadata:type_name -> wuji.v1.DriverMetadata
 	0,  // 1: wuji.v1.GetInfoResponse.metadata:type_name -> wuji.v1.DriverMetadata
-	27, // 2: wuji.v1.ManageDatasetResponse.datasets:type_name -> wuji.v1.DatasetEntry
-	1,  // 3: wuji.v1.DriverRegistry.Register:input_type -> wuji.v1.RegisterRequest
-	3,  // 4: wuji.v1.DriverRegistry.Heartbeat:input_type -> wuji.v1.HeartbeatRequest
-	5,  // 5: wuji.v1.DriverRegistry.Unregister:input_type -> wuji.v1.UnregisterRequest
-	7,  // 6: wuji.v1.DriverService.GetInfo:input_type -> wuji.v1.GetInfoRequest
-	9,  // 7: wuji.v1.DriverService.GenerateText:input_type -> wuji.v1.GenerateTextRequest
-	11, // 8: wuji.v1.DriverService.GenerateImage:input_type -> wuji.v1.GenerateImageRequest
-	13, // 9: wuji.v1.DriverService.GenerateVideo:input_type -> wuji.v1.GenerateVideoRequest
-	15, // 10: wuji.v1.DriverService.GenerateAudio:input_type -> wuji.v1.GenerateAudioRequest
-	17, // 11: wuji.v1.DriverService.Generate3D:input_type -> wuji.v1.Generate3DRequest
-	19, // 12: wuji.v1.DriverService.Synthesize:input_type -> wuji.v1.SynthesizeRequest
-	21, // 13: wuji.v1.DriverService.Transcribe:input_type -> wuji.v1.TranscribeRequest
-	23, // 14: wuji.v1.DriverService.CloneVoice:input_type -> wuji.v1.CloneVoiceRequest
-	25, // 15: wuji.v1.DriverService.Train:input_type -> wuji.v1.TrainRequest
-	28, // 16: wuji.v1.DriverService.ManageDataset:input_type -> wuji.v1.ManageDatasetRequest
-	2,  // 17: wuji.v1.DriverRegistry.Register:output_type -> wuji.v1.RegisterResponse
-	4,  // 18: wuji.v1.DriverRegistry.Heartbeat:output_type -> wuji.v1.HeartbeatResponse
-	6,  // 19: wuji.v1.DriverRegistry.Unregister:output_type -> wuji.v1.UnregisterResponse
-	8,  // 20: wuji.v1.DriverService.GetInfo:output_type -> wuji.v1.GetInfoResponse
-	10, // 21: wuji.v1.DriverService.GenerateText:output_type -> wuji.v1.GenerateTextResponse
-	12, // 22: wuji.v1.DriverService.GenerateImage:output_type -> wuji.v1.GenerateImageResponse
-	14, // 23: wuji.v1.DriverService.GenerateVideo:output_type -> wuji.v1.GenerateVideoResponse
-	16, // 24: wuji.v1.DriverService.GenerateAudio:output_type -> wuji.v1.GenerateAudioResponse
-	18, // 25: wuji.v1.DriverService.Generate3D:output_type -> wuji.v1.Generate3DResponse
-	20, // 26: wuji.v1.DriverService.Synthesize:output_type -> wuji.v1.SynthesizeResponse
-	22, // 27: wuji.v1.DriverService.Transcribe:output_type -> wuji.v1.TranscribeResponse
-	24, // 28: wuji.v1.DriverService.CloneVoice:output_type -> wuji.v1.CloneVoiceResponse
-	26, // 29: wuji.v1.DriverService.Train:output_type -> wuji.v1.TrainResponse
-	29, // 30: wuji.v1.DriverService.ManageDataset:output_type -> wuji.v1.ManageDatasetResponse
-	17, // [17:31] is the sub-list for method output_type
-	3,  // [3:17] is the sub-list for method input_type
-	3,  // [3:3] is the sub-list for extension type_name
-	3,  // [3:3] is the sub-list for extension extendee
-	0,  // [0:3] is the sub-list for field type_name
+	19, // 2: wuji.v1.TranscribeResponse.words:type_name -> wuji.v1.WordTimestamp
+	35, // 3: wuji.v1.ManageDatasetResponse.datasets:type_name -> wuji.v1.DatasetEntry
+	1,  // 4: wuji.v1.DriverRegistry.Register:input_type -> wuji.v1.RegisterRequest
+	3,  // 5: wuji.v1.DriverRegistry.Heartbeat:input_type -> wuji.v1.HeartbeatRequest
+	5,  // 6: wuji.v1.DriverRegistry.Unregister:input_type -> wuji.v1.UnregisterRequest
+	7,  // 7: wuji.v1.DriverService.GetInfo:input_type -> wuji.v1.GetInfoRequest
+	9,  // 8: wuji.v1.DriverService.GenerateText:input_type -> wuji.v1.GenerateTextRequest
+	11, // 9: wuji.v1.DriverService.GenerateImage:input_type -> wuji.v1.GenerateImageRequest
+	13, // 10: wuji.v1.DriverService.GenerateVideo:input_type -> wuji.v1.GenerateVideoRequest
+	15, // 11: wuji.v1.DriverService.GenerateAudio:input_type -> wuji.v1.GenerateAudioRequest
+	17, // 12: wuji.v1.DriverService.Generate3D:input_type -> wuji.v1.Generate3DRequest
+	20, // 13: wuji.v1.DriverService.Synthesize:input_type -> wuji.v1.SynthesizeRequest
+	22, // 14: wuji.v1.DriverService.Transcribe:input_type -> wuji.v1.TranscribeRequest
+	24, // 15: wuji.v1.DriverService.CloneVoice:input_type -> wuji.v1.CloneVoiceRequest
+	26, // 16: wuji.v1.DriverService.TrainText:input_type -> wuji.v1.TrainTextRequest
+	27, // 17: wuji.v1.DriverService.TrainImage:input_type -> wuji.v1.TrainImageRequest
+	28, // 18: wuji.v1.DriverService.TrainVideo:input_type -> wuji.v1.TrainVideoRequest
+	29, // 19: wuji.v1.DriverService.TrainAudio:input_type -> wuji.v1.TrainAudioRequest
+	30, // 20: wuji.v1.DriverService.Train3D:input_type -> wuji.v1.Train3DRequest
+	31, // 21: wuji.v1.DriverService.TrainTTS:input_type -> wuji.v1.TrainTTSRequest
+	32, // 22: wuji.v1.DriverService.TrainSTT:input_type -> wuji.v1.TrainSTTRequest
+	33, // 23: wuji.v1.DriverService.TrainVoice:input_type -> wuji.v1.TrainVoiceRequest
+	36, // 24: wuji.v1.DriverService.ManageDataset:input_type -> wuji.v1.ManageDatasetRequest
+	2,  // 25: wuji.v1.DriverRegistry.Register:output_type -> wuji.v1.RegisterResponse
+	4,  // 26: wuji.v1.DriverRegistry.Heartbeat:output_type -> wuji.v1.HeartbeatResponse
+	6,  // 27: wuji.v1.DriverRegistry.Unregister:output_type -> wuji.v1.UnregisterResponse
+	8,  // 28: wuji.v1.DriverService.GetInfo:output_type -> wuji.v1.GetInfoResponse
+	10, // 29: wuji.v1.DriverService.GenerateText:output_type -> wuji.v1.GenerateTextResponse
+	12, // 30: wuji.v1.DriverService.GenerateImage:output_type -> wuji.v1.GenerateImageResponse
+	14, // 31: wuji.v1.DriverService.GenerateVideo:output_type -> wuji.v1.GenerateVideoResponse
+	16, // 32: wuji.v1.DriverService.GenerateAudio:output_type -> wuji.v1.GenerateAudioResponse
+	18, // 33: wuji.v1.DriverService.Generate3D:output_type -> wuji.v1.Generate3DResponse
+	21, // 34: wuji.v1.DriverService.Synthesize:output_type -> wuji.v1.SynthesizeResponse
+	23, // 35: wuji.v1.DriverService.Transcribe:output_type -> wuji.v1.TranscribeResponse
+	25, // 36: wuji.v1.DriverService.CloneVoice:output_type -> wuji.v1.CloneVoiceResponse
+	34, // 37: wuji.v1.DriverService.TrainText:output_type -> wuji.v1.TrainResponse
+	34, // 38: wuji.v1.DriverService.TrainImage:output_type -> wuji.v1.TrainResponse
+	34, // 39: wuji.v1.DriverService.TrainVideo:output_type -> wuji.v1.TrainResponse
+	34, // 40: wuji.v1.DriverService.TrainAudio:output_type -> wuji.v1.TrainResponse
+	34, // 41: wuji.v1.DriverService.Train3D:output_type -> wuji.v1.TrainResponse
+	34, // 42: wuji.v1.DriverService.TrainTTS:output_type -> wuji.v1.TrainResponse
+	34, // 43: wuji.v1.DriverService.TrainSTT:output_type -> wuji.v1.TrainResponse
+	34, // 44: wuji.v1.DriverService.TrainVoice:output_type -> wuji.v1.TrainResponse
+	37, // 45: wuji.v1.DriverService.ManageDataset:output_type -> wuji.v1.ManageDatasetResponse
+	25, // [25:46] is the sub-list for method output_type
+	4,  // [4:25] is the sub-list for method input_type
+	4,  // [4:4] is the sub-list for extension type_name
+	4,  // [4:4] is the sub-list for extension extendee
+	0,  // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_driver_proto_init() }
@@ -1849,13 +3594,18 @@ func file_driver_proto_init() {
 	if File_driver_proto != nil {
 		return
 	}
+	file_driver_proto_msgTypes[9].OneofWrappers = []any{}
+	file_driver_proto_msgTypes[11].OneofWrappers = []any{}
+	file_driver_proto_msgTypes[13].OneofWrappers = []any{}
+	file_driver_proto_msgTypes[15].OneofWrappers = []any{}
+	file_driver_proto_msgTypes[20].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_driver_proto_rawDesc), len(file_driver_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   30,
+			NumMessages:   38,
 			NumExtensions: 0,
 			NumServices:   2,
 		},

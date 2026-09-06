@@ -206,7 +206,14 @@ const (
 	DriverService_Synthesize_FullMethodName    = "/wuji.v1.DriverService/Synthesize"
 	DriverService_Transcribe_FullMethodName    = "/wuji.v1.DriverService/Transcribe"
 	DriverService_CloneVoice_FullMethodName    = "/wuji.v1.DriverService/CloneVoice"
-	DriverService_Train_FullMethodName         = "/wuji.v1.DriverService/Train"
+	DriverService_TrainText_FullMethodName     = "/wuji.v1.DriverService/TrainText"
+	DriverService_TrainImage_FullMethodName    = "/wuji.v1.DriverService/TrainImage"
+	DriverService_TrainVideo_FullMethodName    = "/wuji.v1.DriverService/TrainVideo"
+	DriverService_TrainAudio_FullMethodName    = "/wuji.v1.DriverService/TrainAudio"
+	DriverService_Train3D_FullMethodName       = "/wuji.v1.DriverService/Train3D"
+	DriverService_TrainTTS_FullMethodName      = "/wuji.v1.DriverService/TrainTTS"
+	DriverService_TrainSTT_FullMethodName      = "/wuji.v1.DriverService/TrainSTT"
+	DriverService_TrainVoice_FullMethodName    = "/wuji.v1.DriverService/TrainVoice"
 	DriverService_ManageDataset_FullMethodName = "/wuji.v1.DriverService/ManageDataset"
 )
 
@@ -223,7 +230,14 @@ type DriverServiceClient interface {
 	Synthesize(ctx context.Context, in *SynthesizeRequest, opts ...grpc.CallOption) (*SynthesizeResponse, error)
 	Transcribe(ctx context.Context, in *TranscribeRequest, opts ...grpc.CallOption) (*TranscribeResponse, error)
 	CloneVoice(ctx context.Context, in *CloneVoiceRequest, opts ...grpc.CallOption) (*CloneVoiceResponse, error)
-	Train(ctx context.Context, in *TrainRequest, opts ...grpc.CallOption) (*TrainResponse, error)
+	TrainText(ctx context.Context, in *TrainTextRequest, opts ...grpc.CallOption) (*TrainResponse, error)
+	TrainImage(ctx context.Context, in *TrainImageRequest, opts ...grpc.CallOption) (*TrainResponse, error)
+	TrainVideo(ctx context.Context, in *TrainVideoRequest, opts ...grpc.CallOption) (*TrainResponse, error)
+	TrainAudio(ctx context.Context, in *TrainAudioRequest, opts ...grpc.CallOption) (*TrainResponse, error)
+	Train3D(ctx context.Context, in *Train3DRequest, opts ...grpc.CallOption) (*TrainResponse, error)
+	TrainTTS(ctx context.Context, in *TrainTTSRequest, opts ...grpc.CallOption) (*TrainResponse, error)
+	TrainSTT(ctx context.Context, in *TrainSTTRequest, opts ...grpc.CallOption) (*TrainResponse, error)
+	TrainVoice(ctx context.Context, in *TrainVoiceRequest, opts ...grpc.CallOption) (*TrainResponse, error)
 	ManageDataset(ctx context.Context, in *ManageDatasetRequest, opts ...grpc.CallOption) (*ManageDatasetResponse, error)
 }
 
@@ -325,10 +339,80 @@ func (c *driverServiceClient) CloneVoice(ctx context.Context, in *CloneVoiceRequ
 	return out, nil
 }
 
-func (c *driverServiceClient) Train(ctx context.Context, in *TrainRequest, opts ...grpc.CallOption) (*TrainResponse, error) {
+func (c *driverServiceClient) TrainText(ctx context.Context, in *TrainTextRequest, opts ...grpc.CallOption) (*TrainResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(TrainResponse)
-	err := c.cc.Invoke(ctx, DriverService_Train_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, DriverService_TrainText_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *driverServiceClient) TrainImage(ctx context.Context, in *TrainImageRequest, opts ...grpc.CallOption) (*TrainResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TrainResponse)
+	err := c.cc.Invoke(ctx, DriverService_TrainImage_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *driverServiceClient) TrainVideo(ctx context.Context, in *TrainVideoRequest, opts ...grpc.CallOption) (*TrainResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TrainResponse)
+	err := c.cc.Invoke(ctx, DriverService_TrainVideo_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *driverServiceClient) TrainAudio(ctx context.Context, in *TrainAudioRequest, opts ...grpc.CallOption) (*TrainResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TrainResponse)
+	err := c.cc.Invoke(ctx, DriverService_TrainAudio_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *driverServiceClient) Train3D(ctx context.Context, in *Train3DRequest, opts ...grpc.CallOption) (*TrainResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TrainResponse)
+	err := c.cc.Invoke(ctx, DriverService_Train3D_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *driverServiceClient) TrainTTS(ctx context.Context, in *TrainTTSRequest, opts ...grpc.CallOption) (*TrainResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TrainResponse)
+	err := c.cc.Invoke(ctx, DriverService_TrainTTS_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *driverServiceClient) TrainSTT(ctx context.Context, in *TrainSTTRequest, opts ...grpc.CallOption) (*TrainResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TrainResponse)
+	err := c.cc.Invoke(ctx, DriverService_TrainSTT_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *driverServiceClient) TrainVoice(ctx context.Context, in *TrainVoiceRequest, opts ...grpc.CallOption) (*TrainResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TrainResponse)
+	err := c.cc.Invoke(ctx, DriverService_TrainVoice_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -358,7 +442,14 @@ type DriverServiceServer interface {
 	Synthesize(context.Context, *SynthesizeRequest) (*SynthesizeResponse, error)
 	Transcribe(context.Context, *TranscribeRequest) (*TranscribeResponse, error)
 	CloneVoice(context.Context, *CloneVoiceRequest) (*CloneVoiceResponse, error)
-	Train(context.Context, *TrainRequest) (*TrainResponse, error)
+	TrainText(context.Context, *TrainTextRequest) (*TrainResponse, error)
+	TrainImage(context.Context, *TrainImageRequest) (*TrainResponse, error)
+	TrainVideo(context.Context, *TrainVideoRequest) (*TrainResponse, error)
+	TrainAudio(context.Context, *TrainAudioRequest) (*TrainResponse, error)
+	Train3D(context.Context, *Train3DRequest) (*TrainResponse, error)
+	TrainTTS(context.Context, *TrainTTSRequest) (*TrainResponse, error)
+	TrainSTT(context.Context, *TrainSTTRequest) (*TrainResponse, error)
+	TrainVoice(context.Context, *TrainVoiceRequest) (*TrainResponse, error)
 	ManageDataset(context.Context, *ManageDatasetRequest) (*ManageDatasetResponse, error)
 	mustEmbedUnimplementedDriverServiceServer()
 }
@@ -397,8 +488,29 @@ func (UnimplementedDriverServiceServer) Transcribe(context.Context, *TranscribeR
 func (UnimplementedDriverServiceServer) CloneVoice(context.Context, *CloneVoiceRequest) (*CloneVoiceResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CloneVoice not implemented")
 }
-func (UnimplementedDriverServiceServer) Train(context.Context, *TrainRequest) (*TrainResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method Train not implemented")
+func (UnimplementedDriverServiceServer) TrainText(context.Context, *TrainTextRequest) (*TrainResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method TrainText not implemented")
+}
+func (UnimplementedDriverServiceServer) TrainImage(context.Context, *TrainImageRequest) (*TrainResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method TrainImage not implemented")
+}
+func (UnimplementedDriverServiceServer) TrainVideo(context.Context, *TrainVideoRequest) (*TrainResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method TrainVideo not implemented")
+}
+func (UnimplementedDriverServiceServer) TrainAudio(context.Context, *TrainAudioRequest) (*TrainResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method TrainAudio not implemented")
+}
+func (UnimplementedDriverServiceServer) Train3D(context.Context, *Train3DRequest) (*TrainResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method Train3D not implemented")
+}
+func (UnimplementedDriverServiceServer) TrainTTS(context.Context, *TrainTTSRequest) (*TrainResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method TrainTTS not implemented")
+}
+func (UnimplementedDriverServiceServer) TrainSTT(context.Context, *TrainSTTRequest) (*TrainResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method TrainSTT not implemented")
+}
+func (UnimplementedDriverServiceServer) TrainVoice(context.Context, *TrainVoiceRequest) (*TrainResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method TrainVoice not implemented")
 }
 func (UnimplementedDriverServiceServer) ManageDataset(context.Context, *ManageDatasetRequest) (*ManageDatasetResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ManageDataset not implemented")
@@ -586,20 +698,146 @@ func _DriverService_CloneVoice_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
-func _DriverService_Train_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(TrainRequest)
+func _DriverService_TrainText_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TrainTextRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DriverServiceServer).Train(ctx, in)
+		return srv.(DriverServiceServer).TrainText(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: DriverService_Train_FullMethodName,
+		FullMethod: DriverService_TrainText_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DriverServiceServer).Train(ctx, req.(*TrainRequest))
+		return srv.(DriverServiceServer).TrainText(ctx, req.(*TrainTextRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DriverService_TrainImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TrainImageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DriverServiceServer).TrainImage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DriverService_TrainImage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DriverServiceServer).TrainImage(ctx, req.(*TrainImageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DriverService_TrainVideo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TrainVideoRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DriverServiceServer).TrainVideo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DriverService_TrainVideo_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DriverServiceServer).TrainVideo(ctx, req.(*TrainVideoRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DriverService_TrainAudio_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TrainAudioRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DriverServiceServer).TrainAudio(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DriverService_TrainAudio_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DriverServiceServer).TrainAudio(ctx, req.(*TrainAudioRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DriverService_Train3D_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Train3DRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DriverServiceServer).Train3D(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DriverService_Train3D_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DriverServiceServer).Train3D(ctx, req.(*Train3DRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DriverService_TrainTTS_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TrainTTSRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DriverServiceServer).TrainTTS(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DriverService_TrainTTS_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DriverServiceServer).TrainTTS(ctx, req.(*TrainTTSRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DriverService_TrainSTT_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TrainSTTRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DriverServiceServer).TrainSTT(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DriverService_TrainSTT_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DriverServiceServer).TrainSTT(ctx, req.(*TrainSTTRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DriverService_TrainVoice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TrainVoiceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DriverServiceServer).TrainVoice(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DriverService_TrainVoice_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DriverServiceServer).TrainVoice(ctx, req.(*TrainVoiceRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -666,8 +904,36 @@ var DriverService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _DriverService_CloneVoice_Handler,
 		},
 		{
-			MethodName: "Train",
-			Handler:    _DriverService_Train_Handler,
+			MethodName: "TrainText",
+			Handler:    _DriverService_TrainText_Handler,
+		},
+		{
+			MethodName: "TrainImage",
+			Handler:    _DriverService_TrainImage_Handler,
+		},
+		{
+			MethodName: "TrainVideo",
+			Handler:    _DriverService_TrainVideo_Handler,
+		},
+		{
+			MethodName: "TrainAudio",
+			Handler:    _DriverService_TrainAudio_Handler,
+		},
+		{
+			MethodName: "Train3D",
+			Handler:    _DriverService_Train3D_Handler,
+		},
+		{
+			MethodName: "TrainTTS",
+			Handler:    _DriverService_TrainTTS_Handler,
+		},
+		{
+			MethodName: "TrainSTT",
+			Handler:    _DriverService_TrainSTT_Handler,
+		},
+		{
+			MethodName: "TrainVoice",
+			Handler:    _DriverService_TrainVoice_Handler,
 		},
 		{
 			MethodName: "ManageDataset",

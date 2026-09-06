@@ -37,9 +37,7 @@ func (s *driverServer) GetInfo(_ context.Context, _ *wujiv1.GetInfoRequest) (*wu
 }
 
 func (s *driverServer) GenerateText(ctx context.Context, req *wujiv1.GenerateTextRequest) (*wujiv1.GenerateTextResponse, error) {
-	resp, err := s.dummy.GenerateText(ctx, driver.TextRequest{
-		Prompt: req.GetPrompt(), MaxTokens: int(req.GetMaxTokens()), Temperature: req.GetTemperature(),
-	})
+	resp, err := s.dummy.GenerateText(ctx, driver.TextRequestFromProto(req))
 	if err != nil {
 		return nil, err
 	}
@@ -49,33 +47,27 @@ func (s *driverServer) GenerateText(ctx context.Context, req *wujiv1.GenerateTex
 }
 
 func (s *driverServer) GenerateImage(ctx context.Context, req *wujiv1.GenerateImageRequest) (*wujiv1.GenerateImageResponse, error) {
-	resp, err := s.dummy.GenerateImage(ctx, driver.ImageRequest{
-		Prompt: req.GetPrompt(), Width: int(req.GetWidth()), Height: int(req.GetHeight()), Steps: int(req.GetSteps()),
-	})
+	resp, err := s.dummy.GenerateImage(ctx, driver.ImageRequestFromProto(req))
 	if err != nil {
 		return nil, err
 	}
-	return &wujiv1.GenerateImageResponse{Path: resp.Path, Format: resp.Format}, nil
+	return driver.ImageResponseToProto(resp), nil
 }
 
 func (s *driverServer) GenerateVideo(ctx context.Context, req *wujiv1.GenerateVideoRequest) (*wujiv1.GenerateVideoResponse, error) {
-	resp, err := s.dummy.GenerateVideo(ctx, driver.VideoRequest{
-		Prompt: req.GetPrompt(), Duration: req.GetDuration(), FPS: int(req.GetFps()),
-	})
+	resp, err := s.dummy.GenerateVideo(ctx, driver.VideoRequestFromProto(req))
 	if err != nil {
 		return nil, err
 	}
-	return &wujiv1.GenerateVideoResponse{Path: resp.Path, Duration: resp.Duration}, nil
+	return driver.VideoResponseToProto(resp), nil
 }
 
 func (s *driverServer) GenerateAudio(ctx context.Context, req *wujiv1.GenerateAudioRequest) (*wujiv1.GenerateAudioResponse, error) {
-	resp, err := s.dummy.GenerateAudio(ctx, driver.AudioRequest{
-		Prompt: req.GetPrompt(), Duration: req.GetDuration(),
-	})
+	resp, err := s.dummy.GenerateAudio(ctx, driver.AudioRequestFromProto(req))
 	if err != nil {
 		return nil, err
 	}
-	return &wujiv1.GenerateAudioResponse{Path: resp.Path, Duration: resp.Duration}, nil
+	return driver.AudioResponseToProto(resp), nil
 }
 
 func (s *driverServer) Generate3D(ctx context.Context, req *wujiv1.Generate3DRequest) (*wujiv1.Generate3DResponse, error) {
@@ -89,43 +81,91 @@ func (s *driverServer) Generate3D(ctx context.Context, req *wujiv1.Generate3DReq
 }
 
 func (s *driverServer) Synthesize(ctx context.Context, req *wujiv1.SynthesizeRequest) (*wujiv1.SynthesizeResponse, error) {
-	resp, err := s.dummy.Synthesize(ctx, driver.TTSRequest{
-		Text: req.GetText(), Voice: req.GetVoice(),
-	})
+	resp, err := s.dummy.Synthesize(ctx, driver.TTSRequestFromProto(req))
 	if err != nil {
 		return nil, err
 	}
-	return &wujiv1.SynthesizeResponse{Path: resp.Path, Duration: resp.Duration}, nil
+	return driver.TTSResponseToProto(resp), nil
 }
 
 func (s *driverServer) Transcribe(ctx context.Context, req *wujiv1.TranscribeRequest) (*wujiv1.TranscribeResponse, error) {
-	resp, err := s.dummy.Transcribe(ctx, driver.STTRequest{
-		AudioPath: req.GetAudioPath(), Language: req.GetLanguage(),
-	})
+	resp, err := s.dummy.Transcribe(ctx, driver.STTRequestFromProto(req))
 	if err != nil {
 		return nil, err
 	}
-	return &wujiv1.TranscribeResponse{Text: resp.Text, Confidence: resp.Confidence}, nil
+	return driver.STTResponseToProto(resp), nil
 }
 
 func (s *driverServer) CloneVoice(ctx context.Context, req *wujiv1.CloneVoiceRequest) (*wujiv1.CloneVoiceResponse, error) {
-	resp, err := s.dummy.CloneVoice(ctx, driver.VoiceRequest{
-		SamplePath: req.GetSamplePath(), Name: req.GetName(),
-	})
+	resp, err := s.dummy.CloneVoice(ctx, driver.VoiceRequestFromProto(req))
 	if err != nil {
 		return nil, err
 	}
-	return &wujiv1.CloneVoiceResponse{VoiceId: resp.VoiceID, Name: resp.Name}, nil
+	return driver.VoiceResponseToProto(resp), nil
 }
 
-func (s *driverServer) Train(ctx context.Context, req *wujiv1.TrainRequest) (*wujiv1.TrainResponse, error) {
-	resp, err := s.dummy.Train(ctx, driver.TrainRequest{
-		DatasetID: req.GetDatasetId(), ModelType: req.GetModelType(), Epochs: int(req.GetEpochs()),
-	})
+func (s *driverServer) TrainText(ctx context.Context, req *wujiv1.TrainTextRequest) (*wujiv1.TrainResponse, error) {
+	resp, err := s.dummy.TrainText(ctx, driver.TextTrainRequestFromProto(req))
 	if err != nil {
 		return nil, err
 	}
-	return &wujiv1.TrainResponse{JobId: resp.JobID, Status: resp.Status}, nil
+	return driver.TrainResponseToProto(resp), nil
+}
+
+func (s *driverServer) TrainImage(ctx context.Context, req *wujiv1.TrainImageRequest) (*wujiv1.TrainResponse, error) {
+	resp, err := s.dummy.TrainImage(ctx, driver.ImageTrainRequestFromProto(req))
+	if err != nil {
+		return nil, err
+	}
+	return driver.TrainResponseToProto(resp), nil
+}
+
+func (s *driverServer) TrainVideo(ctx context.Context, req *wujiv1.TrainVideoRequest) (*wujiv1.TrainResponse, error) {
+	resp, err := s.dummy.TrainVideo(ctx, driver.VideoTrainRequestFromProto(req))
+	if err != nil {
+		return nil, err
+	}
+	return driver.TrainResponseToProto(resp), nil
+}
+
+func (s *driverServer) TrainAudio(ctx context.Context, req *wujiv1.TrainAudioRequest) (*wujiv1.TrainResponse, error) {
+	resp, err := s.dummy.TrainAudio(ctx, driver.AudioTrainRequestFromProto(req))
+	if err != nil {
+		return nil, err
+	}
+	return driver.TrainResponseToProto(resp), nil
+}
+
+func (s *driverServer) Train3D(ctx context.Context, req *wujiv1.Train3DRequest) (*wujiv1.TrainResponse, error) {
+	resp, err := s.dummy.Train3D(ctx, driver.Asset3DTrainRequestFromProto(req))
+	if err != nil {
+		return nil, err
+	}
+	return driver.TrainResponseToProto(resp), nil
+}
+
+func (s *driverServer) TrainTTS(ctx context.Context, req *wujiv1.TrainTTSRequest) (*wujiv1.TrainResponse, error) {
+	resp, err := s.dummy.TrainTTS(ctx, driver.TTSTrainRequestFromProto(req))
+	if err != nil {
+		return nil, err
+	}
+	return driver.TrainResponseToProto(resp), nil
+}
+
+func (s *driverServer) TrainSTT(ctx context.Context, req *wujiv1.TrainSTTRequest) (*wujiv1.TrainResponse, error) {
+	resp, err := s.dummy.TrainSTT(ctx, driver.STTTrainRequestFromProto(req))
+	if err != nil {
+		return nil, err
+	}
+	return driver.TrainResponseToProto(resp), nil
+}
+
+func (s *driverServer) TrainVoice(ctx context.Context, req *wujiv1.TrainVoiceRequest) (*wujiv1.TrainResponse, error) {
+	resp, err := s.dummy.TrainVoice(ctx, driver.VoiceTrainRequestFromProto(req))
+	if err != nil {
+		return nil, err
+	}
+	return driver.TrainResponseToProto(resp), nil
 }
 
 func (s *driverServer) ManageDataset(ctx context.Context, req *wujiv1.ManageDatasetRequest) (*wujiv1.ManageDatasetResponse, error) {

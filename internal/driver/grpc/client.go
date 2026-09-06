@@ -59,10 +59,7 @@ func (d *RemoteDriver) Info() driver.Info  { return d.info }
 func (d *RemoteDriver) Capabilities() []capability.Type { return d.info.Capabilities }
 
 func (d *RemoteDriver) GenerateText(ctx context.Context, req driver.TextRequest) (*driver.TextResponse, error) {
-	resp, err := d.client.GenerateText(ctx, &wujiv1.GenerateTextRequest{
-		Prompt: req.Prompt, Model: req.Model,
-		MaxTokens: int32(req.MaxTokens), Temperature: req.Temperature,
-	})
+	resp, err := d.client.GenerateText(ctx, driver.TextRequestToProto(req))
 	if err != nil {
 		return nil, fmt.Errorf("remote generate text: %w", err)
 	}
@@ -72,33 +69,27 @@ func (d *RemoteDriver) GenerateText(ctx context.Context, req driver.TextRequest)
 }
 
 func (d *RemoteDriver) GenerateImage(ctx context.Context, req driver.ImageRequest) (*driver.ImageResponse, error) {
-	resp, err := d.client.GenerateImage(ctx, &wujiv1.GenerateImageRequest{
-		Prompt: req.Prompt, Width: int32(req.Width), Height: int32(req.Height), Steps: int32(req.Steps),
-	})
+	resp, err := d.client.GenerateImage(ctx, driver.ImageRequestToProto(req))
 	if err != nil {
 		return nil, fmt.Errorf("remote generate image: %w", err)
 	}
-	return &driver.ImageResponse{Path: resp.GetPath(), Format: resp.GetFormat()}, nil
+	return driver.ImageResponseFromProto(resp), nil
 }
 
 func (d *RemoteDriver) GenerateVideo(ctx context.Context, req driver.VideoRequest) (*driver.VideoResponse, error) {
-	resp, err := d.client.GenerateVideo(ctx, &wujiv1.GenerateVideoRequest{
-		Prompt: req.Prompt, Duration: req.Duration, Fps: int32(req.FPS),
-	})
+	resp, err := d.client.GenerateVideo(ctx, driver.VideoRequestToProto(req))
 	if err != nil {
 		return nil, fmt.Errorf("remote generate video: %w", err)
 	}
-	return &driver.VideoResponse{Path: resp.GetPath(), Duration: resp.GetDuration()}, nil
+	return driver.VideoResponseFromProto(resp), nil
 }
 
 func (d *RemoteDriver) GenerateAudio(ctx context.Context, req driver.AudioRequest) (*driver.AudioResponse, error) {
-	resp, err := d.client.GenerateAudio(ctx, &wujiv1.GenerateAudioRequest{
-		Prompt: req.Prompt, Duration: req.Duration,
-	})
+	resp, err := d.client.GenerateAudio(ctx, driver.AudioRequestToProto(req))
 	if err != nil {
 		return nil, fmt.Errorf("remote generate audio: %w", err)
 	}
-	return &driver.AudioResponse{Path: resp.GetPath(), Duration: resp.GetDuration()}, nil
+	return driver.AudioResponseFromProto(resp), nil
 }
 
 func (d *RemoteDriver) Generate3D(ctx context.Context, req driver.Asset3DRequest) (*driver.Asset3DResponse, error) {
@@ -112,43 +103,91 @@ func (d *RemoteDriver) Generate3D(ctx context.Context, req driver.Asset3DRequest
 }
 
 func (d *RemoteDriver) Synthesize(ctx context.Context, req driver.TTSRequest) (*driver.TTSResponse, error) {
-	resp, err := d.client.Synthesize(ctx, &wujiv1.SynthesizeRequest{
-		Text: req.Text, Voice: req.Voice,
-	})
+	resp, err := d.client.Synthesize(ctx, driver.TTSRequestToProto(req))
 	if err != nil {
 		return nil, fmt.Errorf("remote synthesize: %w", err)
 	}
-	return &driver.TTSResponse{Path: resp.GetPath(), Duration: resp.GetDuration()}, nil
+	return driver.TTSResponseFromProto(resp), nil
 }
 
 func (d *RemoteDriver) Transcribe(ctx context.Context, req driver.STTRequest) (*driver.STTResponse, error) {
-	resp, err := d.client.Transcribe(ctx, &wujiv1.TranscribeRequest{
-		AudioPath: req.AudioPath, Language: req.Language,
-	})
+	resp, err := d.client.Transcribe(ctx, driver.STTRequestToProto(req))
 	if err != nil {
 		return nil, fmt.Errorf("remote transcribe: %w", err)
 	}
-	return &driver.STTResponse{Text: resp.GetText(), Confidence: resp.GetConfidence()}, nil
+	return driver.STTResponseFromProto(resp), nil
 }
 
 func (d *RemoteDriver) CloneVoice(ctx context.Context, req driver.VoiceRequest) (*driver.VoiceResponse, error) {
-	resp, err := d.client.CloneVoice(ctx, &wujiv1.CloneVoiceRequest{
-		SamplePath: req.SamplePath, Name: req.Name,
-	})
+	resp, err := d.client.CloneVoice(ctx, driver.VoiceRequestToProto(req))
 	if err != nil {
 		return nil, fmt.Errorf("remote clone voice: %w", err)
 	}
-	return &driver.VoiceResponse{VoiceID: resp.GetVoiceId(), Name: resp.GetName()}, nil
+	return driver.VoiceResponseFromProto(resp), nil
 }
 
-func (d *RemoteDriver) Train(ctx context.Context, req driver.TrainRequest) (*driver.TrainResponse, error) {
-	resp, err := d.client.Train(ctx, &wujiv1.TrainRequest{
-		DatasetId: req.DatasetID, ModelType: req.ModelType, Epochs: int32(req.Epochs),
-	})
+func (d *RemoteDriver) TrainText(ctx context.Context, req driver.TextTrainRequest) (*driver.TrainResponse, error) {
+	resp, err := d.client.TrainText(ctx, driver.TextTrainRequestToProto(req))
 	if err != nil {
-		return nil, fmt.Errorf("remote train: %w", err)
+		return nil, fmt.Errorf("remote train text: %w", err)
 	}
-	return &driver.TrainResponse{JobID: resp.GetJobId(), Status: resp.GetStatus()}, nil
+	return driver.TrainResponseFromProto(resp), nil
+}
+
+func (d *RemoteDriver) TrainImage(ctx context.Context, req driver.ImageTrainRequest) (*driver.TrainResponse, error) {
+	resp, err := d.client.TrainImage(ctx, driver.ImageTrainRequestToProto(req))
+	if err != nil {
+		return nil, fmt.Errorf("remote train image: %w", err)
+	}
+	return driver.TrainResponseFromProto(resp), nil
+}
+
+func (d *RemoteDriver) TrainVideo(ctx context.Context, req driver.VideoTrainRequest) (*driver.TrainResponse, error) {
+	resp, err := d.client.TrainVideo(ctx, driver.VideoTrainRequestToProto(req))
+	if err != nil {
+		return nil, fmt.Errorf("remote train video: %w", err)
+	}
+	return driver.TrainResponseFromProto(resp), nil
+}
+
+func (d *RemoteDriver) TrainAudio(ctx context.Context, req driver.AudioTrainRequest) (*driver.TrainResponse, error) {
+	resp, err := d.client.TrainAudio(ctx, driver.AudioTrainRequestToProto(req))
+	if err != nil {
+		return nil, fmt.Errorf("remote train audio: %w", err)
+	}
+	return driver.TrainResponseFromProto(resp), nil
+}
+
+func (d *RemoteDriver) Train3D(ctx context.Context, req driver.Asset3DTrainRequest) (*driver.TrainResponse, error) {
+	resp, err := d.client.Train3D(ctx, driver.Asset3DTrainRequestToProto(req))
+	if err != nil {
+		return nil, fmt.Errorf("remote train 3d: %w", err)
+	}
+	return driver.TrainResponseFromProto(resp), nil
+}
+
+func (d *RemoteDriver) TrainTTS(ctx context.Context, req driver.TTSTrainRequest) (*driver.TrainResponse, error) {
+	resp, err := d.client.TrainTTS(ctx, driver.TTSTrainRequestToProto(req))
+	if err != nil {
+		return nil, fmt.Errorf("remote train tts: %w", err)
+	}
+	return driver.TrainResponseFromProto(resp), nil
+}
+
+func (d *RemoteDriver) TrainSTT(ctx context.Context, req driver.STTTrainRequest) (*driver.TrainResponse, error) {
+	resp, err := d.client.TrainSTT(ctx, driver.STTTrainRequestToProto(req))
+	if err != nil {
+		return nil, fmt.Errorf("remote train stt: %w", err)
+	}
+	return driver.TrainResponseFromProto(resp), nil
+}
+
+func (d *RemoteDriver) TrainVoice(ctx context.Context, req driver.VoiceTrainRequest) (*driver.TrainResponse, error) {
+	resp, err := d.client.TrainVoice(ctx, driver.VoiceTrainRequestToProto(req))
+	if err != nil {
+		return nil, fmt.Errorf("remote train voice: %w", err)
+	}
+	return driver.TrainResponseFromProto(resp), nil
 }
 
 func (d *RemoteDriver) ManageDataset(ctx context.Context, req driver.DatasetRequest) (*driver.DatasetResponse, error) {

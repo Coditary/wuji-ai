@@ -10,13 +10,6 @@ import (
 	"time"
 )
 
-type completionRequest struct {
-	Prompt      string  `json:"prompt"`
-	NPredict    int     `json:"n_predict"`
-	Temperature float32 `json:"temperature"`
-	Stream      bool    `json:"stream"`
-}
-
 type CompletionResponse struct {
 	Content         string `json:"content"`
 	TokensPredicted int    `json:"tokens_predicted"`
@@ -51,10 +44,8 @@ func (c *Client) Healthy(ctx context.Context) bool {
 	return resp.StatusCode == http.StatusOK
 }
 
-func (c *Client) Complete(ctx context.Context, prompt string, maxTokens int, temperature float32) (*CompletionResponse, error) {
-	body, err := json.Marshal(completionRequest{
-		Prompt: prompt, NPredict: maxTokens, Temperature: temperature, Stream: false,
-	})
+func (c *Client) Complete(ctx context.Context, p GenerationParams) (*CompletionResponse, error) {
+	body, err := json.Marshal(buildCompletionRequest(p))
 	if err != nil {
 		return nil, err
 	}
