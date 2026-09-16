@@ -1,6 +1,6 @@
 # wuji-ai
 
-Frontend CLI — talks to **wuji-core** over gRPC.
+Frontend CLI — includes **wuji-core** in-process (single `wuji` binary).
 
 Related repos in `~/Dev/Coditary/`:
 
@@ -16,14 +16,12 @@ make build    # → bin/wuji
 ## Run
 
 ```bash
-# Start core (separate terminal)
-cd ~/Dev/Coditary/core/wuji-core && ./bin/wuji-core
-
-# CLI (auto-finds core when .wuji exists under Coditary layout)
 ./bin/wuji text "hello"
 ```
 
-Override backend location: `export WUJI_ROOT=~/Dev/Coditary/core/wuji-core`
+Config lives in `~/.wuji/config.yaml` (or under `WUJI_ROOT` when set).
+
+For development with a separate daemon: `export WUJI_DAEMON=1`, start `wuji-core`, then run `wuji`.
 
 ## CI
 

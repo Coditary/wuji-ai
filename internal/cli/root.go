@@ -35,7 +35,7 @@ func New() (*App, error) {
 	} else {
 		rt, cleanup, err := core.ConnectRuntime(context.Background(), cfg)
 		if err != nil {
-			return nil, fmt.Errorf("connect to core daemon: %w (run `wuji-core` or set WUJI_CORE_BIN)", err)
+			return nil, fmt.Errorf("start core: %w", err)
 		}
 		app.Core = rt
 		app.cleanup = cleanup
@@ -46,16 +46,18 @@ func New() (*App, error) {
 		Short: "Unified CLI for AI backends and APIs",
 		Long: `Wuji is a unified command-line interface for AI workloads.
 
-Commands connect to the local Wuji core daemon (start it with: wuji-core).
+The wuji binary includes wuji-core and runs it in-process by default.
 Run capability commands directly: wuji text, wuji image, wuji video, …
 Discover drivers, datasets, and MCP servers with: wuji list
 Inspect details with: wuji info
-Use --driver to override the backend for one run, or set per-capability defaults in .wuji/config.yaml.
+Use --driver to override the backend for one run, or set per-capability defaults in ~/.wuji/config.yaml.
 Fine-tune models with: wuji train <capability> [method] [name] --dataset …
 
-Memory (RAM/VRAM) is managed automatically by the core daemon.
+Memory (RAM/VRAM) is managed automatically by the core.
 Preload or free models with: wuji load, wuji unload, wuji kill
-See: wuji resources explain`,
+See: wuji resources explain
+
+For development with a separate daemon: export WUJI_DAEMON=1 and run wuji-core.`,
 		Version: fmt.Sprintf("%s (commit: %s, built: %s)", version.Version, version.Commit, version.BuildDate),
 	}
 
