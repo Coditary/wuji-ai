@@ -57,3 +57,13 @@ Each matrix leg builds the `wuji` binary (version from the tag via `-ldflags`), 
 - `wuji-{version}-{platform}-{arch}.rqp` — ReqPack installable package
 
 The release job uploads all tarballs, `.rqp` files, and a combined `index.json` ReqPack repository index to the GitHub release.
+
+## Install via ReqPack
+
+```bash
+rqp install wuji-ai
+# or via the Wuji driver catalog:
+rqp install wuji wuji-ai
+```
+
+The installed command is `wuji` (not `wuji-ai`).

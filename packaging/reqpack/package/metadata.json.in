@@ -1,7 +1,7 @@
 {
   "formatVersion": 1,
   "name": "wuji",
-  "indexName": "wuji-ai-cli",
+  "indexName": "wuji-ai",
   "version": @VERSION@,
   "release": 1,
   "revision": 0,

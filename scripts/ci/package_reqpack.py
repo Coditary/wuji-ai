@@ -15,7 +15,7 @@ from pathlib import Path, PurePosixPath
 
 
 PRODUCT = "wuji"
-INDEX_NAME = "wuji-ai-cli"
+INDEX_NAME = "wuji-ai"
 GITHUB_REPO = "Coditary/wuji-ai"
 SYSTEM_BY_PLATFORM = {
     "linux": "linux",
