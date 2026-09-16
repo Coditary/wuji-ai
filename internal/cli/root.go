@@ -42,22 +42,8 @@ func New() (*App, error) {
 	}
 
 	root := &cobra.Command{
-		Use:   "wuji",
-		Short: "Unified CLI for AI backends and APIs",
-		Long: `Wuji is a unified command-line interface for AI workloads.
-
-The wuji binary includes wuji-core and runs it in-process by default.
-Run capability commands directly: wuji text, wuji image, wuji video, …
-Discover drivers, datasets, and MCP servers with: wuji list
-Inspect details with: wuji info
-Use --driver to override the backend for one run, or set per-capability defaults in ~/.wuji/config.yaml.
-Fine-tune models with: wuji train <capability> [method] [name] --dataset …
-
-Memory (RAM/VRAM) is managed automatically by the core.
-Preload or free models with: wuji load, wuji unload, wuji kill
-See: wuji resources explain
-
-For development with a separate daemon: export WUJI_DAEMON=1 and run wuji-core.`,
+		Use:     "wuji",
+		Short:   "Unified CLI for AI backends and APIs",
 		Version: fmt.Sprintf("%s (commit: %s, built: %s)", version.Version, version.Commit, version.BuildDate),
 	}
 
