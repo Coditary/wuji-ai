@@ -8,25 +8,16 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/coditary/wuji/internal/driver"
+	"github.com/coditary/wuji-core/pkg/capability"
+	"github.com/coditary/wuji-core/pkg/driver"
 )
 
 func joinArgs(args []string) string {
 	return strings.Join(args, " ")
 }
 
-func addDriverFlag(cmd *cobra.Command, driverID *string) {
-	cmd.Flags().StringVarP(driverID, "driver", "d", "", "driver to use (default: configured default)")
-}
 
-func newGenerateCmd(app *App) *cobra.Command {
-	var driverID string
-
-	cmd := &cobra.Command{
-		Use:   "generate",
-		Short: "Generate content using AI backends",
-	}
-
+func newTextCmd(app *App) *cobra.Command {
 	// text
 	var model string
 	var maxTokens int
@@ -38,35 +29,87 @@ func newGenerateCmd(app *App) *cobra.Command {
 	var seed int
 	var systemPrompt string
 	var contextWindow int
+	var useStdin bool
+	var textFile, messagesFile, imagePath, videoPath, audioPath, documentPath string
+	var translate bool
+	var targetLang, language string
+	var audioInference audioInferenceFields
 	var textTrain textTrainOpts
-	textCmd := &cobra.Command{
+	var loraEntries []string
+	var loraWeight float32
+	var textLoRAState loraFlagState
+	var useStream bool
+	cmd := &cobra.Command{
 		Use:   "text [prompt]",
-		Short: "Generate text from a prompt",
-		Args:  cobra.ArbitraryArgs,
+		Short: "Generate plain text from a prompt or media file",
+		Long: `Produce plain text on stdout from text or media input.
+
+Input (exactly one primary source):
+  wuji text "hello"                  prompt text
+  wuji text --text article.txt       read prompt from file
+  cat article.txt | wuji text        read prompt from stdin (pipe)
+  wuji text --stdin                  read prompt from stdin (explicit)
+  wuji text --image photo.jpg        describe image (optional prompt for questions)
+  wuji text --video clip.mp4         video understanding (driver must support it)
+  wuji text --audio speech.wav       transcribe audio (video files extract audio first)
+  wuji text --document scan.pdf      extract text from document
+
+Modifiers:
+  --translate                        translate text input (prompt, --text, or stdin)
+  --target-lang de                   translation target language (default: English)
+  --lang de                          source language for --audio or --translate
+
+Audio transcription (--audio only):
+  --quality fast|balanced|careful|1-5   speed vs. accuracy
+  --trim-silence                        skip long silent passages
+  --silence-level 0.0-1.0               how aggressively to trim silence
+
+Media flags are mutually exclusive. Multi-step workflows are composed manually via the shell.`,
+		Args: cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := requirePromptUnlessTrain(textTrain.Enabled, args); err != nil {
+			if textTrain.Enabled {
+				if err := requirePromptUnlessTrain(true, args); err != nil {
+					return err
+				}
+				if textTrain.BaseModel == "" {
+					textTrain.BaseModel = model
+				}
+				if textTrain.Seed == -1 {
+					textTrain.Seed = seed
+				}
+				return runTextTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.TextGeneration), textTrain, joinArgs(args), model)
+			}
+			loras, err := resolveLoRAs(cmd, app, loraEntries, loraWeight, textLoRAState)
+			if err != nil {
 				return err
 			}
-			if textTrain.Enabled {
-				return runTextTrain(cmd.Context(), app, driverID, textTrain, joinArgs(args), model)
+			req, err := buildTextRequest(args, false, textRequestFields{
+				useStdin: useStdin,
+				textFile: textFile, messagesFile: messagesFile, imagePath: imagePath, videoPath: videoPath,
+				audioPath: audioPath, documentPath: documentPath,
+				translate: translate, targetLang: targetLang, language: language,
+				quality: audioInference.quality, trimSilence: audioInference.trimSilence,
+				silenceLevel: audioInference.silenceLevel,
+				model: model, systemPrompt: systemPrompt, maxTokens: maxTokens,
+				temperature: temperature, topP: topP, topK: topK, minP: minP,
+				frequencyPenalty: frequencyPenalty, presencePenalty: presencePenalty,
+				repetitionPenalty: repetitionPenalty, stopSequences: stopSequences,
+				seed: seed, contextWindow: contextWindow, loras: loras,
+			})
+			if err != nil {
+				return err
 			}
-			req := driver.TextRequest{
-				Prompt:            joinArgs(args),
-				Model:             model,
-				SystemPrompt:      systemPrompt,
-				MaxTokens:         maxTokens,
-				Temperature:       temperature,
-				TopP:              topP,
-				TopK:              topK,
-				MinP:              minP,
-				FrequencyPenalty:  frequencyPenalty,
-				PresencePenalty:   presencePenalty,
-				RepetitionPenalty: repetitionPenalty,
-				StopSequences:     stopSequences,
-				ContextWindow:     contextWindow,
-			}
-			if seed >= 0 {
-				req.Seed = &seed
+			driverID := app.resolveDriver(cmd, capability.TextGeneration)
+			if useStream {
+				_, err := app.Core.GenerateTextStream(context.Background(), driverID, req, func(delta string) error {
+					_, werr := os.Stdout.WriteString(delta)
+					return werr
+				})
+				if err != nil {
+					return err
+				}
+				fmt.Fprintln(os.Stdout)
+				return nil
 			}
 			resp, err := app.Core.GenerateText(context.Background(), driverID, req)
 			if err != nil {
@@ -76,59 +119,206 @@ func newGenerateCmd(app *App) *cobra.Command {
 			return nil
 		},
 	}
-	textCmd.Flags().IntVar(&maxTokens, "max-tokens", 1024, "maximum tokens to generate (-1 for unlimited)")
-	textCmd.Flags().Float32Var(&temperature, "temperature", 0.7, "sampling temperature (0.0–2.0)")
-	textCmd.Flags().StringVar(&model, "model", "", "model name (driver-specific)")
-	textCmd.Flags().Float32Var(&topP, "top-p", 0, "nucleus sampling (0.0–1.0, 0 = backend default)")
-	textCmd.Flags().IntVar(&topK, "top-k", 0, "top-k sampling (0 = disabled/backend default)")
-	textCmd.Flags().Float32Var(&minP, "min-p", 0, "min-p sampling filter (0.0–1.0, 0 = backend default)")
-	textCmd.Flags().Float32Var(&frequencyPenalty, "frequency-penalty", 0, "frequency penalty (-2.0–2.0, 0 = off)")
-	textCmd.Flags().Float32Var(&presencePenalty, "presence-penalty", 0, "presence penalty (-2.0–2.0, 0 = off)")
-	textCmd.Flags().Float32Var(&repetitionPenalty, "repetition-penalty", 0, "repetition penalty multiplier (1.0 = off, 0 = backend default)")
-	textCmd.Flags().StringSliceVar(&stopSequences, "stop", nil, "stop sequences (repeatable)")
-	textCmd.Flags().IntVar(&seed, "seed", -1, "random seed for reproducible output (-1 = random)")
-	textCmd.Flags().StringVar(&systemPrompt, "system-prompt", "", "system instructions prepended to the request")
-	textCmd.Flags().IntVar(&contextWindow, "context-window", 0, "context window size in tokens (0 = backend default)")
-	addTextTrainFlags(textCmd, &textTrain)
-	addDriverFlag(textCmd, &driverID)
+	cmd.Flags().BoolVar(&useStream, "stream", false, "stream tokens to stdout as they are generated")
+	cmd.Flags().BoolVar(&useStdin, "stdin", false, "read prompt text from stdin (also auto-detected when input is piped)")
+	cmd.Flags().StringVar(&textFile, "text", "", "read prompt text from file (alternative to positional prompt)")
+	cmd.Flags().StringVar(&messagesFile, "messages", "", "read chat messages JSON from file (alternative to prompt; for multi-turn/agent use)")
+	cmd.Flags().StringVar(&imagePath, "image", "", "image file for vision/OCR input")
+	cmd.Flags().StringVar(&videoPath, "video", "", "video file for native video-to-text (no automatic fallback)")
+	cmd.Flags().StringVar(&audioPath, "audio", "", "audio or video file to transcribe to plain text")
+	cmd.Flags().StringVar(&documentPath, "document", "", "document file to extract plain text from")
+	cmd.Flags().BoolVar(&translate, "translate", false, "translate text input to --target-lang (prompt, --text, or stdin)")
+	cmd.Flags().StringVar(&targetLang, "target-lang", "", "translation target language (default: English)")
+	cmd.Flags().StringVar(&language, "lang", "auto", "source language for --audio or --translate (auto, de, en, …)")
+	addAudioInferenceFlags(cmd, &audioInference)
+	cmd.Flags().IntVar(&maxTokens, "max-tokens", 1024, "maximum tokens to generate (-1 for unlimited)")
+	cmd.Flags().Float32Var(&temperature, "temperature", 0.7, "sampling temperature (0.0–2.0)")
+	cmd.Flags().StringVar(&model, "model", "", "model name (driver-specific)")
+	cmd.Flags().Float32Var(&topP, "top-p", 0, "nucleus sampling (0.0–1.0, 0 = backend default)")
+	cmd.Flags().IntVar(&topK, "top-k", 0, "top-k sampling (0 = disabled/backend default)")
+	cmd.Flags().Float32Var(&minP, "min-p", 0, "min-p sampling filter (0.0–1.0, 0 = backend default)")
+	cmd.Flags().Float32Var(&frequencyPenalty, "frequency-penalty", 0, "frequency penalty (-2.0–2.0, 0 = off)")
+	cmd.Flags().Float32Var(&presencePenalty, "presence-penalty", 0, "presence penalty (-2.0–2.0, 0 = off)")
+	cmd.Flags().Float32Var(&repetitionPenalty, "repetition-penalty", 0, "repetition penalty multiplier (1.0 = off, 0 = backend default)")
+	cmd.Flags().StringSliceVar(&stopSequences, "stop", nil, "stop sequences (repeatable)")
+	cmd.Flags().IntVar(&seed, "seed", -1, "random seed for reproducible output (-1 = random)")
+	cmd.Flags().StringVar(&systemPrompt, "system-prompt", "", "system instructions prepended to the request")
+	cmd.Flags().IntVar(&contextWindow, "context-window", 0, "context window size in tokens (0 = backend default)")
+	cmd.Flags().StringSliceVar(&loraEntries, "lora", nil, "LoRA alias or path; bare --lora loads loras.default from config")
+	cmd.Flags().Float32Var(&loraWeight, "lora-weight", 0, "default LoRA strength when weight is omitted (0 = use config default_weight or 1.0)")
+	registerLoRAFlags(cmd, app, &textLoRAState)
+	addTextTrainFlags(cmd, &textTrain, false)
 
-	// image
+	return cmd
+}
+
+func newImageCmd(app *App) *cobra.Command {
 	var width, height, steps int
-	var negativePrompt, imageModel, sampler, initImage string
-	var cfgScale, denoisingStrength float32
-	var batchSize, batchCount, imageSeed int
+	var negativePrompt, imageModel, imageMode, sampler, initImage string
+	var maskImage, controlImage, controlType, styleImage string
+	var cfgScale, denoisingStrength, styleWeight float32
+	var batchTotal, batchSize, batchCount, imageSeed int
+	var frameWidth, frameHeight, columns, rows, frameCount int
+	var scaleInput string
+	var upscale, edit, sprite bool
+	var referenceImage, spriteAction, spriteView string
+	var spriteDirections, spritePadding int
+	var spriteLoop, spriteTransparent bool
 	var loras []string
+	var loraWeight float32
+	var imageLoRAState loraFlagState
 	var imageTrain imageTrainOpts
-	imageCmd := &cobra.Command{
+	var imageControls imageControlOptions
+	cmd := &cobra.Command{
 		Use:   "image [prompt]",
-		Short: "Generate an image from a prompt",
-		Args:  cobra.ArbitraryArgs,
+		Short: "Generate or transform images",
+		Long: `Run image generation and transformation tasks.
+
+The workflow is inferred from your flags (see examples):
+
+  wuji image "sunset" -W 768 -H 512 -s 25
+      → generate (text-to-image)
+
+  wuji image "watercolor" --image photo.png --denoising-strength 0.6
+      → img2img (transform source image)
+
+  wuji image "boat" --image photo.png --mask mask.png
+      → inpaint (fill masked area)
+
+  wuji image "portrait" --style ref.jpg
+      → style-transfer (visual style from reference; not face identity)
+
+  wuji image "person" --pose=full --pose pose.png
+      → controlnet (structure/pose; --openpose is a synonym)
+
+  wuji image "landscape" --depth photo.jpg
+      → depth2img (--depth alone; synonyms: legacy --control-image)
+
+  wuji image "portrait" --image photo.png --pose pose.png --denoising-strength 0.6
+      → img2img + control units
+
+  wuji image --image photo.png
+      → variation (no prompt; ControlNet/batch/steps supported)
+
+  wuji image --image photo.png --pose pose.png
+      → variation + control units (no prompt)
+
+  wuji image "make it winter" --edit --image photo.png
+      → edit (falls back to img2img when driver has no edit backend)
+
+  wuji image "orc walk cycle" --sprite --image hero.png --style pixel-ref.png --reference sheet.png --pose skeleton.png -W 64 -H 64 --columns 4 --rows 2 --action walk --view side --mode pixel
+      → sprite (character + style + sheet reference + pose control)
+
+  wuji image "grass tile" --mode tile
+      → generate with tileset pipeline profile
+
+Short flags: -W width  -H height  -s steps  (-h is help; use --help)
+
+`,
+		Args: cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := requirePromptUnlessTrain(imageTrain.Enabled, args); err != nil {
+			if imageTrain.Enabled {
+				if err := requirePromptUnlessTrain(true, args); err != nil {
+					return err
+				}
+				if imageTrain.BaseModel == "" {
+					imageTrain.BaseModel = imageModel
+				}
+				if imageTrain.Mode == "" {
+					imageTrain.Mode = imageMode
+				}
+				if imageTrain.Width <= 0 {
+					imageTrain.Width = width
+				}
+				if imageTrain.Height <= 0 {
+					imageTrain.Height = height
+				}
+				if imageTrain.Seed == -1 {
+					imageTrain.Seed = imageSeed
+				}
+				if imageTrain.BatchSize <= 0 && batchSize > 0 {
+					imageTrain.BatchSize = batchSize
+				}
+				if imageTrain.ControlType == "" && controlType != "" {
+					imageTrain.ControlType = controlType
+				}
+				if imageTrain.ControlType == "" {
+					units, err := imageControls.buildUnits(cmd)
+					if err != nil {
+						return err
+					}
+					if t := firstControlType(units); t != "" {
+						imageTrain.ControlType = string(t)
+					}
+				}
+				return runImageTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.ImageGeneration), imageTrain, joinArgs(args), imageModel, cmd)
+			}
+
+			loraRefs, err := resolveLoRAs(cmd, app, loras, loraWeight, imageLoRAState)
+			if err != nil {
 				return err
 			}
-			if imageTrain.Enabled {
-				return runImageTrain(cmd.Context(), app, driverID, imageTrain, joinArgs(args), imageModel)
+			upscaleRequested := upscale
+			scale, upscaleRequested, err := parseImageScaleInput(scaleInput, upscaleRequested)
+			if err != nil {
+				return err
 			}
-			req := driver.ImageRequest{
-				Prompt:            joinArgs(args),
-				NegativePrompt:    negativePrompt,
-				Model:             imageModel,
-				Width:             width,
-				Height:            height,
-				Steps:             steps,
-				Sampler:           sampler,
-				CFGScale:          cfgScale,
-				BatchSize:         batchSize,
-				BatchCount:        batchCount,
-				DenoisingStrength: denoisingStrength,
-				InitImagePath:     initImage,
-				LoRAs:             loras,
+			controlUnits, err := imageControls.buildUnits(cmd)
+			if err != nil {
+				return err
 			}
-			if imageSeed >= 0 {
-				req.Seed = &imageSeed
+			controlMode, err := imageControls.controlMode()
+			if err != nil {
+				return err
 			}
-			resp, err := app.Core.GenerateImage(context.Background(), driverID, req)
+			vramMB := app.Core.ResourcesConfig().TotalVRAMMB
+			req, err := buildImageRequest(joinArgs(args), false, imageRequestFields{
+				negativePrompt:       negativePrompt,
+				model:                imageModel,
+				mode:                 imageMode,
+				width:                width,
+				height:               height,
+				steps:                steps,
+				sampler:              sampler,
+				cfgScale:             cfgScale,
+				batchTotal:           batchTotal,
+				batchSize:            batchSize,
+				batchCount:           batchCount,
+				batchSizeSet:         cmd.Flags().Changed("batch-size"),
+				batchCountSet:        cmd.Flags().Changed("batch-count"),
+				availableVRAMMB:      vramMB,
+				seed:                 imageSeed,
+				denoisingStrength:    denoisingStrength,
+				initImage:            initImage,
+				maskImage:            maskImage,
+				controlImage:         controlImage,
+				controlType:          controlType,
+				controlUnits:         controlUnits,
+				controlMode:          controlMode,
+				styleImage:           styleImage,
+				styleWeight:          styleWeight,
+				scale:                scale,
+				upscaleRequested:     upscaleRequested,
+				editRequested:        edit,
+				spriteRequested:      sprite,
+				referenceImage:       referenceImage,
+				spriteAction:         spriteAction,
+				spriteView:           spriteView,
+				spriteDirections:     spriteDirections,
+				spriteLoop:           spriteLoop,
+				spritePadding:        spritePadding,
+				spriteTransparent:    spriteTransparent,
+				frameWidth:           frameWidth,
+				frameHeight:          frameHeight,
+				columns:              columns,
+				rows:                 rows,
+				frameCount:           frameCount,
+				loras:                loraRefs,
+			})
+			if err != nil {
+				return err
+			}
+			resp, err := app.Core.GenerateImage(context.Background(), app.resolveDriver(cmd, capability.ImageGeneration), req)
 			if err != nil {
 				return err
 			}
@@ -142,61 +332,130 @@ func newGenerateCmd(app *App) *cobra.Command {
 			return nil
 		},
 	}
-	imageCmd.Flags().IntVar(&width, "width", 512, "image width in pixels")
-	imageCmd.Flags().IntVar(&height, "height", 512, "image height in pixels")
-	imageCmd.Flags().IntVar(&steps, "steps", 20, "sampling steps (1–150)")
-	imageCmd.Flags().StringVar(&negativePrompt, "negative-prompt", "", "what to avoid in the image")
-	imageCmd.Flags().StringVar(&imageModel, "model", "", "base model (driver-specific, e.g. .safetensors name)")
-	imageCmd.Flags().StringVar(&sampler, "sampler", "", "sampler algorithm (e.g. euler_a, dpm++_2m_karras)")
-	imageCmd.Flags().Float32Var(&cfgScale, "cfg-scale", 0, "classifier-free guidance (1.0–20.0, 0 = backend default)")
-	imageCmd.Flags().IntVar(&batchSize, "batch-size", 0, "images generated in parallel (0 = backend default)")
-	imageCmd.Flags().IntVar(&batchCount, "batch-count", 1, "number of sequential batches")
-	imageCmd.Flags().IntVar(&imageSeed, "seed", -1, "random seed (-1 = random)")
-	imageCmd.Flags().Float32Var(&denoisingStrength, "denoising-strength", 0, "img2img denoising strength (0.0–1.0, 0 = txt2img)")
-	imageCmd.Flags().StringVar(&initImage, "init-image", "", "source image path for img2img or upscaling")
-	imageCmd.Flags().StringSliceVar(&loras, "lora", nil, "LoRA model paths or names (repeatable)")
-	addImageTrainFlags(imageCmd, &imageTrain)
-	addDriverFlag(imageCmd, &driverID)
+	cmd.Flags().IntVarP(&width, "width", "W", 512, "image width in pixels")
+	cmd.Flags().IntVarP(&height, "height", "H", 512, "image height in pixels")
+	cmd.Flags().IntVarP(&steps, "steps", "s", 20, "sampling steps (1–150)")
+	cmd.Flags().StringVar(&negativePrompt, "negative-prompt", "", "what to avoid in the image")
+	cmd.Flags().StringVar(&imageModel, "model", "", "base model (driver-specific, e.g. .safetensors name)")
+	cmd.Flags().StringVar(&imageMode, "mode", "", "pipeline profile: prop, pixel, tile, ui, character, texture, …")
+	cmd.Flags().StringVar(&sampler, "sampler", "", "sampler algorithm (e.g. euler_a, dpm++_2m_karras)")
+	cmd.Flags().Float32Var(&cfgScale, "cfg-scale", 0, "classifier-free guidance (1.0–20.0, 0 = backend default)")
+	cmd.Flags().IntVar(&batchTotal, "batch", 0, "target total image count; splits into --batch-size × --batch-count (heuristic when only this flag is set)")
+	cmd.Flags().IntVar(&batchSize, "batch-size", 0, "images generated in parallel (0 = backend default; with --batch, the other dimension is computed)")
+	cmd.Flags().IntVar(&batchCount, "batch-count", 1, "number of sequential batches (with --batch, the other dimension is computed)")
+	cmd.Flags().IntVar(&imageSeed, "seed", -1, "random seed (-1 = random)")
+	cmd.Flags().Float32Var(&denoisingStrength, "denoising-strength", 0, "img2img/edit strength (0.0–1.0, 0 = backend default)")
+	cmd.Flags().BoolVar(&edit, "edit", false, "instruction edit of --image (uses img2img when driver has no edit backend)")
+	cmd.Flags().BoolVar(&sprite, "sprite", false, "generate a sprite sheet atlas")
+	cmd.Flags().BoolVar(&sprite, "spritesheet", false, "alias for --sprite")
+	cmd.Flags().IntVar(&frameWidth, "frame-width", 0, "sprite frame width (defaults to -W with --sprite)")
+	cmd.Flags().IntVar(&frameHeight, "frame-height", 0, "sprite frame height (defaults to -H with --sprite)")
+	cmd.Flags().IntVar(&columns, "columns", 0, "sprite sheet columns")
+	cmd.Flags().IntVar(&rows, "rows", 0, "sprite sheet rows")
+	cmd.Flags().IntVar(&frameCount, "frames", 0, "total animation frames (alternative to --columns/--rows)")
+	cmd.Flags().StringVar(&referenceImage, "reference", "", "reference sprite sheet for layout/style consistency")
+	cmd.Flags().StringVar(&referenceImage, "reference-sheet", "", "alias for --reference")
+	cmd.Flags().StringVar(&spriteAction, "action", "", "animation preset: idle, walk, run, attack, jump, cast, death")
+	cmd.Flags().StringVar(&spriteView, "view", "", "camera preset: side, front, back, top, isometric, three-quarter")
+	cmd.Flags().IntVar(&spriteDirections, "directions", 0, "directional frame count: 4 or 8")
+	cmd.Flags().BoolVar(&spriteLoop, "loop", false, "generate a loopable animation")
+	cmd.Flags().IntVar(&spritePadding, "padding", 0, "padding between frames in the atlas (pixels)")
+	cmd.Flags().BoolVar(&spriteTransparent, "transparent", false, "use transparent background")
+	cmd.Flags().StringVar(&initImage, "init-image", "", "source image (img2img, inpaint, upscale, edit, variation, sprite character reference)")
+	cmd.Flags().StringVar(&initImage, "image", "", "alias for --init-image")
+	cmd.Flags().StringVar(&maskImage, "mask", "", "inpaint mask image (white = replace)")
+	cmd.Flags().StringVar(&controlImage, "control-image", "", "deprecated: use typed control flags (e.g. --depth, --pose)")
+	cmd.Flags().StringVar(&controlType, "control-type", "", "deprecated: use typed control flags (e.g. --pose=full)")
+	registerImageControlFlags(cmd, &imageControls)
+	cmd.Flags().StringVar(&styleImage, "style", "", "reference style image (style-transfer, IP-Adapter, or --sprite)")
+	cmd.Flags().StringVar(&styleImage, "style-image", "", "alias for --style")
+	cmd.Flags().Float32Var(&styleWeight, "style-weight", 0, "style/IP-Adapter strength (0 = backend default, typically 1.0)")
+	cmd.Flags().BoolVar(&upscale, "upscale", false, "scale --image (default 4×; combine with --scale)")
+	cmd.Flags().StringVar(&scaleInput, "scale", "", "scale factor: 2, 2.5, 50%, 300% (decimal '.', with --image)")
+	cmd.Flags().StringSliceVar(&loras, "lora", nil, "LoRA alias or path; bare --lora loads loras.default from config")
+	cmd.Flags().Float32Var(&loraWeight, "lora-weight", 0, "default LoRA strength when weight is omitted (0 = use config default_weight or 1.0)")
+	registerLoRAFlags(cmd, app, &imageLoRAState)
+	addImageTrainFlags(cmd, &imageTrain, false)
+	return cmd
+}
 
+func newVideoCmd(app *App) *cobra.Command {
 	// video
 	var duration float32
 	var videoFPS, videoFrames, contextLength, videoSeed int
-	var motionStrength, interpolationStrength float32
-	var videoNegativePrompt, videoModel, videoSampler, videoScheduler, videoMode, initVideoImage, cameraControl string
-	var interpolate bool
+	var scaleInput string
+	var motionStrength float32
+	var videoNegativePrompt, videoModel, videoSampler, videoScheduler, imagePath, videoPath, cameraControl string
 	var videoTrain videoTrainOpts
-	videoCmd := &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "video [prompt]",
-		Short: "Generate a video from a prompt",
-		Args:  cobra.ArbitraryArgs,
+		Short: "Generate or transform video",
+		Long: `Generate or transform video files.
+
+The workflow is inferred from your flags:
+
+  wuji video "ocean waves at sunset"
+      → generate (text-to-video)
+
+  wuji video "gentle zoom" --image frame.png
+      → i2v (animate a still image)
+
+  wuji video --video clip.mp4 --fps 60
+      → interpolate (raise frame rate to target fps)
+
+  wuji video --video clip.mp4 --scale 4
+      → scale (2, 2.5, 50%, 300%, …)
+
+Generation tuning (generate / i2v; 0 or empty = backend default):
+  --duration, --fps, --frames       length and timing
+  --motion-strength                 how much movement in the scene
+  --context-length                  temporal window for longer clips
+  --sampler, --scheduler            diffusion sampling (like wuji image)
+  --negative-prompt, --model, --seed
+
+  --camera zoom_in|pan_left|…       camera motion preset (driver-dependent; not a prompt rewrite)
+
+`,
+		Args: cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := requirePromptUnlessTrain(videoTrain.Enabled, args); err != nil {
+			if videoTrain.Enabled {
+				if err := requirePromptUnlessTrain(true, args); err != nil {
+					return err
+				}
+				if videoTrain.BaseModel == "" {
+					videoTrain.BaseModel = videoModel
+				}
+				if videoTrain.Seed == -1 {
+					videoTrain.Seed = videoSeed
+				}
+				if videoTrain.ContextLength <= 0 && contextLength > 0 {
+					videoTrain.ContextLength = contextLength
+				}
+				if videoTrain.FPS <= 0 && videoFPS > 0 {
+					videoTrain.FPS = videoFPS
+				}
+				if videoTrain.Frames <= 0 && videoFrames > 0 {
+					videoTrain.Frames = videoFrames
+				}
+				return runVideoTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.VideoGeneration), videoTrain, joinArgs(args), videoModel)
+			}
+			scaleRequested := cmd.Flags().Changed("scale")
+			scale, scaleRequested, err := parseImageScaleInput(scaleInput, scaleRequested)
+			if err != nil {
 				return err
 			}
-			if videoTrain.Enabled {
-				return runVideoTrain(cmd.Context(), app, driverID, videoTrain, joinArgs(args), videoModel)
+			req, err := buildVideoRequest(joinArgs(args), false, videoRequestFields{
+				duration: duration, fps: videoFPS, frames: videoFrames, fpsSet: cmd.Flags().Changed("fps"),
+				motionStrength: motionStrength, contextLength: contextLength, sampler: videoSampler,
+				scheduler: videoScheduler,
+				imagePath: imagePath, videoPath: videoPath, cameraControl: cameraControl,
+				negativePrompt: videoNegativePrompt, model: videoModel, seed: videoSeed,
+				scale: scale, scaleSet: scaleRequested,
+			})
+			if err != nil {
+				return err
 			}
-			req := driver.VideoRequest{
-				Prompt:                joinArgs(args),
-				Duration:              duration,
-				FPS:                   videoFPS,
-				Frames:                videoFrames,
-				MotionStrength:        motionStrength,
-				ContextLength:         contextLength,
-				Sampler:               videoSampler,
-				Scheduler:             videoScheduler,
-				Interpolate:           interpolate,
-				InterpolationStrength: interpolationStrength,
-				Mode:                  driver.VideoMode(videoMode),
-				InitImagePath:         initVideoImage,
-				CameraControl:         driver.CameraControl(cameraControl),
-				NegativePrompt:        videoNegativePrompt,
-				Model:                 videoModel,
-			}
-			if videoSeed >= 0 {
-				req.Seed = &videoSeed
-			}
-			resp, err := app.Core.GenerateVideo(context.Background(), driverID, req)
+			resp, err := app.Core.GenerateVideo(context.Background(), app.resolveDriver(cmd, capability.VideoGeneration), req)
 			if err != nil {
 				return err
 			}
@@ -208,150 +467,100 @@ func newGenerateCmd(app *App) *cobra.Command {
 			return nil
 		},
 	}
-	videoCmd.Flags().IntVar(&videoFrames, "frames", 0, "total number of frames (0 = derive from duration × fps)")
-	videoCmd.Flags().IntVar(&videoFPS, "fps", 24, "playback frame rate (e.g. 8, 16, 24)")
-	videoCmd.Flags().Float32Var(&duration, "duration", 5, "target duration in seconds (used when --frames is 0)")
-	videoCmd.Flags().Float32Var(&motionStrength, "motion-strength", 0, "motion amount / motion bucket (0 = backend default)")
-	videoCmd.Flags().IntVar(&contextLength, "context-length", 0, "AnimateDiff context window in frames (0 = backend default)")
-	videoCmd.Flags().StringVar(&videoSampler, "sampler", "", "video sampler (e.g. euler, lcm)")
-	videoCmd.Flags().StringVar(&videoScheduler, "scheduler", "", "scheduler for temporal consistency")
-	videoCmd.Flags().BoolVar(&interpolate, "interpolate", false, "enable frame interpolation (RIFE etc.)")
-	videoCmd.Flags().Float32Var(&interpolationStrength, "interpolation-strength", 0, "interpolation blend strength (0 = backend default)")
-	videoCmd.Flags().StringVar(&videoMode, "mode", "t2v", "generation mode: t2v (text-to-video) or i2v (image-to-video)")
-	videoCmd.Flags().StringVar(&initVideoImage, "init-image", "", "first frame image path (required for i2v)")
-	videoCmd.Flags().StringVar(&cameraControl, "camera", "", "camera preset: zoom_in, zoom_out, pan_left, pan_right, pan_up, pan_down")
-	videoCmd.Flags().StringVar(&videoNegativePrompt, "negative-prompt", "", "what to avoid in the video")
-	videoCmd.Flags().StringVar(&videoModel, "model", "", "video model (driver-specific)")
-	videoCmd.Flags().IntVar(&videoSeed, "seed", -1, "random seed (-1 = random)")
-	addVideoTrainFlags(videoCmd, &videoTrain)
-	addDriverFlag(videoCmd, &driverID)
+	cmd.Flags().StringVar(&imagePath, "image", "", "source image for image-to-video")
+	cmd.Flags().StringVar(&videoPath, "video", "", "input video for interpolation or scaling")
+	cmd.Flags().IntVar(&videoFrames, "frames", 0, "total number of frames (0 = derive from duration × fps)")
+	cmd.Flags().IntVar(&videoFPS, "fps", 24, "playback frame rate; with --video and no --scale, sets interpolation target fps")
+	cmd.Flags().Float32Var(&duration, "duration", 5, "target duration in seconds (used when --frames is 0)")
+	cmd.Flags().Float32Var(&motionStrength, "motion-strength", 0, "how much movement in the scene (0 = backend default)")
+	cmd.Flags().IntVar(&contextLength, "context-length", 0, "temporal window in frames for long clips (0 = backend default)")
+	cmd.Flags().StringVar(&videoSampler, "sampler", "", "noise removal algorithm (e.g. euler, dpm++; 0 = backend default)")
+	cmd.Flags().StringVar(&videoScheduler, "scheduler", "", "step schedule for sampling (e.g. karras; backend default if empty)")
+	cmd.Flags().StringVar(&cameraControl, "camera", "", "camera motion preset: zoom_in, zoom_out, pan_left, pan_right, pan_up, pan_down")
+	cmd.Flags().StringVar(&scaleInput, "scale", "", "scale factor with --video: 2, 2.5, 50%, 300% (decimal '.')")
+	cmd.Flags().StringVar(&videoNegativePrompt, "negative-prompt", "", "what to avoid in the video")
+	cmd.Flags().StringVar(&videoModel, "model", "", "video model (driver-specific)")
+	cmd.Flags().IntVar(&videoSeed, "seed", -1, "random seed (-1 = random)")
+	addVideoTrainFlags(cmd, &videoTrain, false)
+	return cmd
+}
 
+func newAudioCmd(app *App) *cobra.Command {
 	// audio
 	var audioDuration, overlap, audioTemperature, audioCFGScale, audioTopP float32
 	var audioTopK, audioSampleRate, audioSeed int
-	var lyrics, audioNegativePrompt, audioModel, taskType, referencePath string
+	var lyrics, audioNegativePrompt, audioModel, referencePath, audioFormat, voiceName, audioLang string
+	var audioEmotion, audioStyle string
+	var audioSpeed, audioEnergy float32
+	var audioPitch int
+	var sfx, speech bool
 	var audioTrain audioTrainOpts
-	audioCmd := &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "audio [prompt]",
 		Short: "Generate audio from a prompt",
-		Args:  cobra.ArbitraryArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := requirePromptUnlessTrain(audioTrain.Enabled, args); err != nil {
-				return err
-			}
-			if audioTrain.Enabled {
-				return runAudioTrain(cmd.Context(), app, driverID, audioTrain, joinArgs(args), audioModel)
-			}
-			req := driver.AudioRequest{
-				Prompt:         joinArgs(args),
-				Lyrics:         lyrics,
-				NegativePrompt: audioNegativePrompt,
-				Model:          audioModel,
-				Duration:       audioDuration,
-				Overlap:        overlap,
-				Temperature:    audioTemperature,
-				CFGScale:       audioCFGScale,
-				TopP:           audioTopP,
-				TopK:           audioTopK,
-				SampleRate:     audioSampleRate,
-				TaskType:       driver.AudioTaskType(taskType),
-				ReferencePath:  referencePath,
-			}
-			if audioSeed >= 0 {
-				req.Seed = &audioSeed
-			}
-			resp, err := app.Core.GenerateAudio(context.Background(), driverID, req)
-			if err != nil {
-				return err
-			}
-			if resp.SampleRate > 0 {
-				fmt.Fprintf(os.Stdout, "%s (%.1fs, %d Hz, %s)\n", resp.Path, resp.Duration, resp.SampleRate, resp.Format)
-				return nil
-			}
-			fmt.Fprintf(os.Stdout, "%s (%.1fs)\n", resp.Path, resp.Duration)
-			return nil
-		},
-	}
-	audioCmd.Flags().Float32Var(&audioDuration, "duration", 10, "audio length in seconds")
-	audioCmd.Flags().StringVar(&lyrics, "lyrics", "", "song lyrics with optional tags like [Verse], [Chorus]")
-	audioCmd.Flags().StringVar(&audioNegativePrompt, "negative-prompt", "", "sounds to avoid (e.g. distortion, clipping)")
-	audioCmd.Flags().StringVar(&audioModel, "model", "", "audio model (driver-specific)")
-	audioCmd.Flags().Float32Var(&overlap, "overlap", 0, "continuation overlap in seconds for longer tracks (0 = backend default)")
-	audioCmd.Flags().Float32Var(&audioTemperature, "temperature", 0, "creativity (0.7–1.2 typical, 0 = backend default)")
-	audioCmd.Flags().Float32Var(&audioCFGScale, "cfg-scale", 0, "guidance scale (3.0–15.0, 0 = backend default)")
-	audioCmd.Flags().Float32Var(&audioTopP, "top-p", 0, "nucleus sampling on audio tokens (0 = backend default)")
-	audioCmd.Flags().IntVar(&audioTopK, "top-k", 0, "top-k sampling on audio tokens (0 = disabled)")
-	audioCmd.Flags().IntVar(&audioSampleRate, "sample-rate", 0, "output sample rate in Hz (e.g. 44100, 0 = backend default)")
-	audioCmd.Flags().StringVar(&taskType, "task", "text-to-music", "task type: text-to-music, melody-to-music, text-to-sfx, tts")
-	audioCmd.Flags().StringVar(&referencePath, "reference", "", "reference melody/audio/MIDI path (for melody-to-music)")
-	audioCmd.Flags().IntVar(&audioSeed, "seed", -1, "random seed (-1 = random)")
-	addAudioTrainFlags(audioCmd, &audioTrain)
-	addDriverFlag(audioCmd, &driverID)
+		Long: `Generate music or sound effects from a text prompt.
 
-	// 3d
-	var format string
-	var asset3dTrain asset3DTrainOpts
-	asset3dCmd := &cobra.Command{
-		Use:   "3d [prompt]",
-		Short: "Generate a 3D asset from a prompt",
-		Args:  cobra.ArbitraryArgs,
+The workflow is inferred from your flags:
+
+  wuji audio "lofi hip hop beat"
+      → text-to-music
+
+  wuji audio "epic orchestral theme" --reference melody.mid
+      → melody-to-music
+
+  wuji audio "thunder and rain" --sfx
+      → text-to-sfx
+
+  wuji audio "Guten Morgen" --voice myvoice
+      → text-to-speech (cloned voice profile)
+
+  wuji audio "Hello world" --speech
+      → text-to-speech (generic voice)
+
+Generation tuning (0 or empty = backend default):
+  --duration, --overlap             total length; overlap stitches 10s chunks for longer music
+  --format wav|mp3|flac|ogg|opus    output format (transcoded via ffmpeg when needed)
+  --voice, --speech                 speak text (--voice uses a cloned profile)
+  --lang, --speed, --pitch          speech language, rate, and pitch (text-to-speech only)
+  --emotion, --style, --energy      speech expression (text-to-speech only)
+  --lyrics                          song lyrics with tags like [Verse], [Chorus]
+  --temperature, --cfg-scale        sampling and guidance (music/sfx)
+  --top-p, --top-k                  token sampling (music/sfx)
+  --negative-prompt, --model, --seed, --sample-rate
+
+`,
+		Args: cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := requirePromptUnlessTrain(asset3dTrain.Enabled, args); err != nil {
-				return err
+			if audioTrain.Enabled {
+				if err := requirePromptUnlessTrain(true, args); err != nil {
+					return err
+				}
+				if audioTrain.BaseModel == "" {
+					audioTrain.BaseModel = audioModel
+				}
+				if audioTrain.SampleRate <= 0 && audioSampleRate > 0 {
+					audioTrain.SampleRate = audioSampleRate
+				}
+				if audioTrain.Seed == -1 {
+					audioTrain.Seed = audioSeed
+				}
+				return runAudioTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.AudioGeneration), audioTrain, joinArgs(args), audioModel, sfx, speech, referencePath)
 			}
-			if asset3dTrain.Enabled {
-				return run3DTrain(cmd.Context(), app, driverID, asset3dTrain, joinArgs(args), "")
+			if len(args) < 1 {
+				return fmt.Errorf("prompt required")
 			}
-			resp, err := app.Core.Generate3D(context.Background(), driverID, driver.Asset3DRequest{
-				Prompt: joinArgs(args), Format: format,
+			req, err := buildAudioRequest(joinArgs(args), audioRequestFields{
+				lyrics: lyrics, negativePrompt: audioNegativePrompt, model: audioModel, duration: audioDuration, durationSet: cmd.Flags().Changed("duration"),
+				overlap: overlap, temperature: audioTemperature, cfgScale: audioCFGScale, topP: audioTopP,
+				topK: audioTopK, sampleRate: audioSampleRate, referencePath: referencePath,
+				voice: voiceName, language: audioLang, speed: audioSpeed, pitch: audioPitch,
+				emotion: audioEmotion, style: audioStyle, energy: audioEnergy,
+				format: audioFormat, sfxRequested: sfx, speechRequested: speech, seed: audioSeed,
 			})
 			if err != nil {
 				return err
 			}
-			fmt.Fprintf(os.Stdout, "%s (%s)\n", resp.Path, resp.Format)
-			return nil
-		},
-	}
-	asset3dCmd.Flags().StringVar(&format, "format", "glb", "output format")
-	add3DTrainFlags(asset3dCmd, &asset3dTrain)
-	addDriverFlag(asset3dCmd, &driverID)
-
-	cmd.AddCommand(textCmd, imageCmd, videoCmd, audioCmd, asset3dCmd)
-	return cmd
-}
-
-func newTTSCmd(app *App) *cobra.Command {
-	var driverID, voice, voiceSample, language, emotion, ttsModel string
-	var speed, temperature, repetitionPenalty float32
-	var ttsSeed int
-	var ttsTrain ttsTrainOpts
-
-	cmd := &cobra.Command{
-		Use:   "tts [text]",
-		Short: "Convert text to speech",
-		Args:  cobra.ArbitraryArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := requirePromptUnlessTrain(ttsTrain.Enabled, args); err != nil {
-				return err
-			}
-			if ttsTrain.Enabled {
-				return runTTSTrain(cmd.Context(), app, driverID, ttsTrain, joinArgs(args), ttsModel)
-			}
-			req := driver.TTSRequest{
-				Text:              joinArgs(args),
-				Voice:             voice,
-				VoiceSamplePath:   voiceSample,
-				Language:          language,
-				Speed:             speed,
-				Emotion:           emotion,
-				Temperature:       temperature,
-				RepetitionPenalty: repetitionPenalty,
-				Model:             ttsModel,
-			}
-			if ttsSeed >= 0 {
-				req.Seed = &ttsSeed
-			}
-			resp, err := app.Core.Synthesize(context.Background(), driverID, req)
+			resp, err := app.Core.GenerateAudio(context.Background(), app.resolveDriver(cmd, capability.AudioGeneration), req)
 			if err != nil {
 				return err
 			}
@@ -363,259 +572,229 @@ func newTTSCmd(app *App) *cobra.Command {
 			return nil
 		},
 	}
-	cmd.Flags().StringVar(&voice, "voice", "default", "speaker ID or preset voice name")
-	cmd.Flags().StringVar(&voiceSample, "voice-sample", "", "path to .wav sample for voice cloning (3–10s)")
-	cmd.Flags().StringVar(&language, "lang", "", "target language (e.g. de, en, es; empty = model default)")
-	cmd.Flags().Float32Var(&speed, "speed", 0, "speaking rate (0.5–2.0, 0 = 1.0)")
-	cmd.Flags().StringVar(&emotion, "emotion", "", "emotion or tone tags (e.g. happy, [sad])")
-	cmd.Flags().Float32Var(&temperature, "temperature", 0, "token creativity (0 = backend default)")
-	cmd.Flags().Float32Var(&repetitionPenalty, "repetition-penalty", 0, "anti-stutter penalty (0 = backend default)")
-	cmd.Flags().StringVar(&ttsModel, "model", "", "TTS model (driver-specific)")
-	cmd.Flags().IntVar(&ttsSeed, "seed", -1, "random seed (-1 = random)")
-	addTTSTrainFlags(cmd, &ttsTrain)
-	addDriverFlag(cmd, &driverID)
+	cmd.Flags().Float32Var(&audioDuration, "duration", 10, "audio length in seconds")
+	cmd.Flags().StringVar(&lyrics, "lyrics", "", "song lyrics with optional tags like [Verse], [Chorus]")
+	cmd.Flags().StringVar(&audioNegativePrompt, "negative-prompt", "", "sounds to avoid (e.g. distortion, clipping)")
+	cmd.Flags().StringVar(&audioModel, "model", "", "audio model (driver-specific)")
+	cmd.Flags().Float32Var(&overlap, "overlap", 0, "crossfade overlap in seconds when --duration exceeds 10s (music tasks only)")
+	cmd.Flags().StringVar(&audioFormat, "format", "", "output format: wav, mp3, flac, ogg, opus, m4a (default: driver native; transcode via ffmpeg)")
+	cmd.Flags().Float32Var(&audioTemperature, "temperature", 0, "creativity (0.7–1.2 typical, 0 = backend default)")
+	cmd.Flags().Float32Var(&audioCFGScale, "cfg-scale", 0, "guidance scale (3.0–15.0, 0 = backend default)")
+	cmd.Flags().Float32Var(&audioTopP, "top-p", 0, "nucleus sampling on audio tokens (0 = backend default)")
+	cmd.Flags().IntVar(&audioTopK, "top-k", 0, "top-k sampling on audio tokens (0 = disabled)")
+	cmd.Flags().IntVar(&audioSampleRate, "sample-rate", 0, "output sample rate in Hz (e.g. 44100, 0 = backend default)")
+	cmd.Flags().StringVar(&referencePath, "reference", "", "reference melody/audio/MIDI path (melody-to-music)")
+	cmd.Flags().BoolVar(&sfx, "sfx", false, "generate sound effects instead of music")
+	cmd.Flags().StringVar(&voiceName, "voice", "", "cloned voice profile name for text-to-speech")
+	cmd.Flags().BoolVar(&speech, "speech", false, "speak text with a generic voice (text-to-speech)")
+	cmd.Flags().StringVar(&audioLang, "lang", "auto", "speech language (auto, de, en, …; text-to-speech only)")
+	cmd.Flags().Float32Var(&audioSpeed, "speed", 0, "speech rate multiplier (0.25–4.0, 0 = backend default)")
+	cmd.Flags().IntVar(&audioPitch, "pitch", 0, "pitch shift in semitones (-12 to +12, text-to-speech only)")
+	cmd.Flags().StringVar(&audioEmotion, "emotion", "", "speech emotion (e.g. happy, sad, angry, neutral; driver-dependent)")
+	cmd.Flags().StringVar(&audioStyle, "style", "", "speech style (e.g. whisper, news, conversational; driver-dependent)")
+	cmd.Flags().Float32Var(&audioEnergy, "energy", 0, "speech energy/intensity (0.0–1.0, 0 = backend default)")
+	cmd.Flags().IntVar(&audioSeed, "seed", -1, "random seed (-1 = random)")
+	addAudioTrainFlags(cmd, &audioTrain, false)
 	return cmd
 }
 
-func newSTTCmd(app *App) *cobra.Command {
-	var driverID, language, sttModel, task string
-	var beamSize int
-	var wordTimestamps, vadEnabled bool
-	var vadThreshold float32
-	var sttTrain sttTrainOpts
-
+func newMeshCmd(app *App) *cobra.Command {
+	var format, taskExplicit, meshModel, meshMode, representation, meshPath, highMeshPath, imagePath, videoPath, scaleInput string
+	var depthPath, pointCloudPath, splatPath, maskPath, styleImagePath, textureImagePath, animationPath string
+	var images []string
+	var targetTris, meshSeed int
+	var retopo, remesh, repair, smooth, refine, segment, rig, animate, retarget, uv, pbr bool
+	var scene, variation, edit, upscale bool
+	var meshTrain meshTrainOpts
 	cmd := &cobra.Command{
-		Use:   "stt [audio-file]",
-		Short: "Transcribe speech to text",
-		Args:  cobra.ArbitraryArgs,
+		Use:     "mesh [prompt]",
+		Aliases: []string{"3d"},
+		Short:   "Generate or transform 3D mesh assets",
+		Long: `Generate or transform mesh assets for games and 3D workflows.
+
+The task is inferred from your flags (see driver mesh_tasks for support):
+
+  wuji mesh "low poly treasure chest"
+      → generate (text-to-mesh)
+
+  wuji mesh --image concept.png
+      → i2m (image-to-mesh)
+
+  wuji mesh --images front.png side.png back.png
+      → multiview
+
+  wuji mesh --video scan.mp4
+      → v2m
+
+  wuji mesh --depth depth.png
+      → depth2m
+
+  wuji mesh --pointcloud cloud.ply
+      → pcd2m
+
+  wuji mesh --splat scene.splat
+      → splat2m
+
+  wuji mesh --mesh hero.glb -p "rusty metal"
+      → texture
+
+  wuji mesh --mesh hero.glb --target-tris 5000
+      → decimate
+
+  wuji mesh --mesh scan.glb --repair
+      → repair
+
+  wuji mesh "medieval room" --scene
+      → scene (multi-object layout)
+
+  wuji mesh --mesh hero.glb --variation
+      → variation
+
+  wuji mesh "add horns" --mesh hero.glb --edit
+      → edit (semantic mesh change)
+
+  wuji mesh --mesh hero.glb --upscale --scale 2
+      → upscale (geometric detail)
+
+  wuji mesh "knight" --mode human
+      → generate with humanoid pipeline profile
+
+  wuji mesh "forest scene" --representation splat
+      → generate Gaussian splat intermediate (driver-dependent export)
+
+Use --task to force a task when inference would be ambiguous.
+`,
+		Args: cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if sttTrain.Enabled {
-				name := joinArgs(args)
-				if name == "" {
-					name = sttModel
+			if meshTrain.Enabled {
+				if err := requirePromptUnlessTrain(true, args); err != nil {
+					return err
 				}
-				return runSTTTrain(cmd.Context(), app, driverID, sttTrain, name, sttModel)
+				if meshTrain.BaseModel == "" {
+					meshTrain.BaseModel = meshModel
+				}
+				if meshTrain.Mode == "" {
+					meshTrain.Mode = meshMode
+				}
+				if meshTrain.Seed == -1 {
+					meshTrain.Seed = meshSeed
+				}
+				return runMeshTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.Mesh), meshTrain, joinArgs(args), meshModel)
 			}
-			if len(args) < 1 {
-				return fmt.Errorf("audio file required unless --train is set")
-			}
-			req := driver.STTRequest{
-				AudioPath:      args[0],
-				Language:       language,
-				Model:          sttModel,
-				Task:           driver.STTTask(task),
-				BeamSize:       beamSize,
-				WordTimestamps: wordTimestamps,
-				VADEnabled:     vadEnabled,
-				VADThreshold:   vadThreshold,
-			}
-			resp, err := app.Core.Transcribe(context.Background(), driverID, req)
+			scaleRequested := cmd.Flags().Changed("scale")
+			scale, scaleRequested, err := parseImageScaleInput(scaleInput, upscale || scaleRequested)
 			if err != nil {
 				return err
 			}
-			fmt.Fprintf(os.Stdout, "%s (confidence: %.0f%%)\n", resp.Text, resp.Confidence*100)
-			for _, w := range resp.Words {
-				fmt.Fprintf(os.Stdout, "  %.2f–%.2fs: %s\n", w.Start, w.End, w.Word)
+			var representationVal driver.MeshRepresentation
+			if cmd.Flags().Changed("representation") {
+				representationVal, err = driver.ParseMeshRepresentation(representation)
+				if err != nil {
+					return err
+				}
 			}
+			req, err := buildMeshRequest(joinArgs(args), false, meshRequestFields{
+				taskExplicit:       taskExplicit,
+				model:              meshModel,
+				format:             format,
+				mode:               meshMode,
+				seed:               meshSeed,
+				targetTris:         targetTris,
+				targetTrisSet:      cmd.Flags().Changed("target-tris"),
+				scale:              scale,
+				scaleSet:           scaleRequested,
+				upscaleRequested:   upscale,
+				meshPath:           meshPath,
+				highMeshPath:       highMeshPath,
+				imagePath:          imagePath,
+				images:             images,
+				videoPath:          videoPath,
+				depthPath:          depthPath,
+				pointCloudPath:     pointCloudPath,
+				splatPath:          splatPath,
+				maskPath:           maskPath,
+				styleImagePath:     styleImagePath,
+				textureImagePath:   textureImagePath,
+				animationPath:      animationPath,
+				retopoRequested:    retopo,
+				remeshRequested:    remesh,
+				repairRequested:    repair,
+				smoothRequested:    smooth,
+				refineRequested:    refine,
+				segmentRequested:   segment,
+				rigRequested:       rig,
+				animateRequested:   animate,
+				retargetRequested:  retarget,
+				uvRequested:        uv,
+				pbrRequested:       pbr,
+				sceneRequested:     scene,
+				variationRequested: variation,
+				editRequested:      edit,
+				representation:     representationVal,
+			})
+			if err != nil {
+				return err
+			}
+			resp, err := app.Core.GenerateMesh(context.Background(), app.resolveDriver(cmd, capability.Mesh), req)
+			if err != nil {
+				return err
+			}
+			fmt.Fprintf(os.Stdout, "%s (%s, task=%s, mode=%s, representation=%s)\n",
+				resp.Path, resp.Format, resp.Task, resp.ModeOrDefault(), resp.RepresentationOrDefault())
 			return nil
 		},
 	}
-	cmd.Flags().StringVar(&language, "lang", "auto", "source language (auto, de, en, …)")
-	cmd.Flags().StringVar(&sttModel, "model", "", "model size (tiny, base, small, medium, large-v3)")
-	cmd.Flags().StringVar(&task, "task", "transcribe", "task: transcribe or translate")
-	cmd.Flags().IntVar(&beamSize, "beam-size", 0, "beam search width (1–5, 0 = backend default)")
-	cmd.Flags().BoolVar(&wordTimestamps, "word-timestamps", false, "include per-word timestamps")
-	cmd.Flags().BoolVar(&vadEnabled, "vad", false, "enable voice activity detection")
-	cmd.Flags().Float32Var(&vadThreshold, "vad-threshold", 0, "VAD/silence threshold (0 = backend default)")
-	addSTTTrainFlags(cmd, &sttTrain)
-	addDriverFlag(cmd, &driverID)
+	cmd.Flags().StringVar(&taskExplicit, "task", "", "mesh task (generate, i2m, texture, decimate, …)")
+	cmd.Flags().StringVar(&format, "format", "glb", "output format (glb, fbx, obj, …)")
+	cmd.Flags().StringVar(&meshModel, "model", "", "mesh model (driver-specific)")
+	cmd.Flags().StringVar(&meshMode, "mode", "", "pipeline profile: prop, human, hardsurface, terrain, environment, face")
+	cmd.Flags().StringVar(&representation, "representation", "", "output representation: mesh, nerf, splat, pointcloud (generation tasks only)")
+	cmd.Flags().IntVar(&meshSeed, "seed", -1, "random seed (-1 = random)")
+	cmd.Flags().StringVar(&meshPath, "mesh", "", "input or output mesh file")
+	cmd.Flags().StringVar(&highMeshPath, "high-mesh", "", "high-poly mesh for baking")
+	cmd.Flags().StringVar(&imagePath, "image", "", "source image for image-to-mesh")
+	cmd.Flags().StringSliceVar(&images, "images", nil, "multiple views for multiview reconstruction")
+	cmd.Flags().StringVar(&videoPath, "video", "", "source video for video-to-mesh")
+	cmd.Flags().StringVar(&depthPath, "depth", "", "depth or normal map for depth-to-mesh")
+	cmd.Flags().StringVar(&pointCloudPath, "pointcloud", "", "point cloud input (.ply, …)")
+	cmd.Flags().StringVar(&splatPath, "splat", "", "Gaussian splat input")
+	cmd.Flags().StringVar(&maskPath, "mask", "", "region mask for mesh inpaint")
+	cmd.Flags().StringVar(&styleImagePath, "style-image", "", "style reference image")
+	cmd.Flags().StringVar(&textureImagePath, "texture-image", "", "reference image for img2tex")
+	cmd.Flags().StringVar(&textureImagePath, "reference-image", "", "alias for --texture-image")
+	cmd.Flags().StringVar(&animationPath, "animation", "", "animation clip for retargeting")
+	cmd.Flags().IntVar(&targetTris, "target-tris", 0, "target triangle count for decimation")
+	cmd.Flags().BoolVar(&retopo, "retopo", false, "retopologize mesh topology")
+	cmd.Flags().BoolVar(&remesh, "remesh", false, "remesh with uniform topology")
+	cmd.Flags().BoolVar(&repair, "repair", false, "repair mesh geometry")
+	cmd.Flags().BoolVar(&smooth, "smooth", false, "smooth mesh geometry")
+	cmd.Flags().BoolVar(&refine, "refine", false, "add geometric detail")
+	cmd.Flags().BoolVar(&segment, "segment", false, "semantic part segmentation")
+	cmd.Flags().BoolVar(&rig, "rig", false, "auto-rig mesh")
+	cmd.Flags().BoolVar(&animate, "animate", false, "generate animation")
+	cmd.Flags().BoolVar(&retarget, "retarget", false, "retarget animation onto mesh")
+	cmd.Flags().BoolVar(&uv, "uv", false, "auto UV unwrap")
+	cmd.Flags().BoolVar(&pbr, "pbr", false, "generate PBR material maps")
+	cmd.Flags().BoolVar(&scene, "scene", false, "generate a multi-object scene from a prompt")
+	cmd.Flags().BoolVar(&variation, "variation", false, "create a mesh variant")
+	cmd.Flags().BoolVar(&edit, "edit", false, "edit mesh geometry from a prompt")
+	cmd.Flags().BoolVar(&upscale, "upscale", false, "increase mesh geometric resolution (default scale 2×; combine with --scale)")
+	cmd.Flags().StringVar(&scaleInput, "scale", "", "scale factor for --upscale: 2, 2.5, 200%")
+	addMeshTrainFlags(cmd, &meshTrain, false)
 	return cmd
 }
 
-func newVoiceCmd(app *App) *cobra.Command {
-	var driverID string
-
+func newGenerateCmd(app *App) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "voice",
-		Short: "Voice cloning operations",
+		Use:        "generate",
+		Short:      "Deprecated alias for wuji text, image, …",
+		Deprecated: "use top-level commands (wuji text, wuji image, wuji video, wuji audio, wuji mesh)",
 	}
-
-	var (
-		sample, targetModel, sourcePath, mode, vocoder string
-		pitchShift, chunkSize int
-		indexRate, protect, denoiseStrength, crossfade float32
-		denoise bool
-		voiceTrain voiceTrainOpts
-	)
-
-	cloneCmd := &cobra.Command{
-		Use:   "clone [name]",
-		Short: "Clone a voice from an audio sample",
-		Args:  cobra.ArbitraryArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if len(args) < 1 && !voiceTrain.Enabled {
-				return fmt.Errorf("voice name required unless --train is set")
-			}
-			name := ""
-			if len(args) >= 1 {
-				name = args[0]
-			}
-			if voiceTrain.Enabled {
-				return runVoiceTrain(cmd.Context(), app, driverID, voiceTrain, name, targetModel)
-			}
-			req := driver.VoiceRequest{
-				Name:            name,
-				SamplePath:      sample,
-				TargetModel:     targetModel,
-				SourcePath:      sourcePath,
-				Mode:            driver.VoiceCloneMode(mode),
-				PitchShift:      pitchShift,
-				IndexRate:       indexRate,
-				Protect:         protect,
-				Vocoder:         vocoder,
-				Denoise:         denoise,
-				DenoiseStrength: denoiseStrength,
-				ChunkSize:       chunkSize,
-				Crossfade:       crossfade,
-			}
-			resp, err := app.Core.CloneVoice(context.Background(), driverID, req)
-			if err != nil {
-				return err
-			}
-			fmt.Fprintf(os.Stdout, "voice %q created (id: %s)\n", resp.Name, resp.VoiceID)
-			if resp.OutputPath != "" {
-				fmt.Fprintf(os.Stdout, "output: %s\n", resp.OutputPath)
-			}
-			return nil
-		},
-	}
-	cloneCmd.Flags().StringVar(&sample, "sample", "", "reference voice audio (.wav/.mp3, required)")
-	_ = cloneCmd.MarkFlagRequired("sample")
-	cloneCmd.Flags().StringVar(&targetModel, "target-model", "", "pre-trained voice model path or ID (RVC .pth/.index)")
-	cloneCmd.Flags().StringVar(&sourcePath, "source", "", "source audio for voice conversion mode")
-	cloneCmd.Flags().StringVar(&mode, "mode", "zero-shot", "workflow: zero-shot or conversion")
-	cloneCmd.Flags().IntVar(&pitchShift, "pitch-shift", 0, "pitch shift in semitones (-12 to +12)")
-	cloneCmd.Flags().Float32Var(&indexRate, "index-rate", 0, "feature retrieval rate (0.0–1.0, 0 = backend default)")
-	cloneCmd.Flags().Float32Var(&protect, "protect", 0, "protect voiceless consonants (0.0–0.5, 0 = backend default)")
-	cloneCmd.Flags().StringVar(&vocoder, "vocoder", "", "vocoder (hifigan, vocos, nsf_hifigan, …)")
-	cloneCmd.Flags().BoolVar(&denoise, "denoise", false, "enable reference noise reduction")
-	cloneCmd.Flags().Float32Var(&denoiseStrength, "denoise-strength", 0, "denoising strength (0 = backend default)")
-	cloneCmd.Flags().IntVar(&chunkSize, "chunk-size", 0, "audio chunk size for long inputs (0 = backend default)")
-	cloneCmd.Flags().Float32Var(&crossfade, "crossfade", 0, "chunk crossfade in seconds (0 = backend default)")
-	addVoiceTrainFlags(cloneCmd, &voiceTrain)
-	addDriverFlag(cloneCmd, &driverID)
-
-	cmd.AddCommand(cloneCmd)
+	cmd.AddCommand(newTextCmd(app), newImageCmd(app), newVideoCmd(app), newAudioCmd(app), newMeshCmd(app))
 	return cmd
-}
-
-func newTrainCmd(app *App) *cobra.Command {
-	var driverID string
-
-	root := &cobra.Command{
-		Use:   "train",
-		Short: "Train models per capability",
-	}
-
-	addTrainSubcommand := func(use, short string, run func(*cobra.Command, []string) error) *cobra.Command {
-		cmd := &cobra.Command{Use: use, Short: short, Args: cobra.ArbitraryArgs, RunE: run}
-		addDriverFlag(cmd, &driverID)
-		return cmd
-	}
-
-	var textOpts textTrainOpts
-	root.AddCommand(func() *cobra.Command {
-		cmd := addTrainSubcommand("text [name]", "Train a text/LLM model", func(cmd *cobra.Command, args []string) error {
-			textOpts.Enabled = true
-			return runTextTrain(cmd.Context(), app, driverID, textOpts, joinArgs(args), textOpts.BaseModel)
-		})
-		addTextTrainFlags(cmd, &textOpts)
-		_ = cmd.MarkFlagRequired("dataset")
-		return cmd
-	}())
-
-	var imageOpts imageTrainOpts
-	root.AddCommand(func() *cobra.Command {
-		cmd := addTrainSubcommand("image [name]", "Train an image/diffusion model", func(cmd *cobra.Command, args []string) error {
-			imageOpts.Enabled = true
-			return runImageTrain(cmd.Context(), app, driverID, imageOpts, joinArgs(args), imageOpts.BaseModel)
-		})
-		addImageTrainFlags(cmd, &imageOpts)
-		_ = cmd.MarkFlagRequired("dataset")
-		return cmd
-	}())
-
-	var videoOpts videoTrainOpts
-	root.AddCommand(func() *cobra.Command {
-		cmd := addTrainSubcommand("video [name]", "Train a video model", func(cmd *cobra.Command, args []string) error {
-			videoOpts.Enabled = true
-			return runVideoTrain(cmd.Context(), app, driverID, videoOpts, joinArgs(args), videoOpts.BaseModel)
-		})
-		addVideoTrainFlags(cmd, &videoOpts)
-		_ = cmd.MarkFlagRequired("dataset")
-		return cmd
-	}())
-
-	var audioOpts audioTrainOpts
-	root.AddCommand(func() *cobra.Command {
-		cmd := addTrainSubcommand("audio [name]", "Train an audio model", func(cmd *cobra.Command, args []string) error {
-			audioOpts.Enabled = true
-			return runAudioTrain(cmd.Context(), app, driverID, audioOpts, joinArgs(args), audioOpts.BaseModel)
-		})
-		addAudioTrainFlags(cmd, &audioOpts)
-		_ = cmd.MarkFlagRequired("dataset")
-		return cmd
-	}())
-
-	var asset3dOpts asset3DTrainOpts
-	root.AddCommand(func() *cobra.Command {
-		cmd := addTrainSubcommand("3d [name]", "Train a 3D asset model", func(cmd *cobra.Command, args []string) error {
-			asset3dOpts.Enabled = true
-			return run3DTrain(cmd.Context(), app, driverID, asset3dOpts, joinArgs(args), asset3dOpts.BaseModel)
-		})
-		add3DTrainFlags(cmd, &asset3dOpts)
-		_ = cmd.MarkFlagRequired("dataset")
-		return cmd
-	}())
-
-	var ttsOpts ttsTrainOpts
-	root.AddCommand(func() *cobra.Command {
-		cmd := addTrainSubcommand("tts [name]", "Train a TTS model", func(cmd *cobra.Command, args []string) error {
-			ttsOpts.Enabled = true
-			return runTTSTrain(cmd.Context(), app, driverID, ttsOpts, joinArgs(args), ttsOpts.BaseModel)
-		})
-		addTTSTrainFlags(cmd, &ttsOpts)
-		_ = cmd.MarkFlagRequired("dataset")
-		return cmd
-	}())
-
-	var sttOpts sttTrainOpts
-	root.AddCommand(func() *cobra.Command {
-		cmd := addTrainSubcommand("stt [name]", "Train an STT model", func(cmd *cobra.Command, args []string) error {
-			sttOpts.Enabled = true
-			return runSTTTrain(cmd.Context(), app, driverID, sttOpts, joinArgs(args), sttOpts.BaseModel)
-		})
-		addSTTTrainFlags(cmd, &sttOpts)
-		_ = cmd.MarkFlagRequired("dataset")
-		return cmd
-	}())
-
-	var voiceOpts voiceTrainOpts
-	root.AddCommand(func() *cobra.Command {
-		cmd := addTrainSubcommand("voice [name]", "Train a voice cloning model", func(cmd *cobra.Command, args []string) error {
-			voiceOpts.Enabled = true
-			return runVoiceTrain(cmd.Context(), app, driverID, voiceOpts, joinArgs(args), voiceOpts.PretrainedModel)
-		})
-		addVoiceTrainFlags(cmd, &voiceOpts)
-		_ = cmd.MarkFlagRequired("dataset")
-		return cmd
-	}())
-
-	return root
 }
 
 func newDatasetCmd(app *App) *cobra.Command {
-	var driverID string
 
 	cmd := &cobra.Command{
 		Use:   "dataset",
@@ -623,22 +802,13 @@ func newDatasetCmd(app *App) *cobra.Command {
 	}
 
 	listCmd := &cobra.Command{
-		Use:   "list",
-		Short: "List datasets",
+		Use:        "list",
+		Short:      "List datasets",
+		Deprecated: "use `wuji list datasets` instead",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			resp, err := app.Core.ManageDataset(context.Background(), driverID, driver.DatasetRequest{
-				Action: driver.DatasetList,
-			})
-			if err != nil {
-				return err
-			}
-			for _, ds := range resp.Datasets {
-				fmt.Fprintf(os.Stdout, "%s\t%s\t%s\t%d bytes\n", ds.ID, ds.Name, ds.Path, ds.Size)
-			}
-			return nil
+			return printDatasetList(app, cmd)
 		},
 	}
-	addDriverFlag(listCmd, &driverID)
 
 	createCmd := &cobra.Command{
 		Use:   "create [name]",
@@ -646,8 +816,9 @@ func newDatasetCmd(app *App) *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path, _ := cmd.Flags().GetString("path")
-			resp, err := app.Core.ManageDataset(context.Background(), driverID, driver.DatasetRequest{
-				Action: driver.DatasetCreate, Name: args[0], Path: path,
+			desc, _ := cmd.Flags().GetString("description")
+			resp, err := app.Core.ManageDataset(context.Background(), app.resolveDriver(cmd, capability.DatasetMgmt), driver.DatasetRequest{
+				Task: driver.DatasetTaskCreate, Name: args[0], Path: path, Description: desc,
 			})
 			if err != nil {
 				return err
@@ -657,16 +828,16 @@ func newDatasetCmd(app *App) *cobra.Command {
 		},
 	}
 	createCmd.Flags().String("path", "", "dataset path (required)")
+	createCmd.Flags().String("description", "", "dataset description")
 	_ = createCmd.MarkFlagRequired("path")
-	addDriverFlag(createCmd, &driverID)
 
 	deleteCmd := &cobra.Command{
 		Use:   "delete [name]",
 		Short: "Delete a dataset",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			resp, err := app.Core.ManageDataset(context.Background(), driverID, driver.DatasetRequest{
-				Action: driver.DatasetDelete, Name: args[0],
+			resp, err := app.Core.ManageDataset(context.Background(), app.resolveDriver(cmd, capability.DatasetMgmt), driver.DatasetRequest{
+				Task: driver.DatasetTaskDelete, Name: args[0],
 			})
 			if err != nil {
 				return err
@@ -675,8 +846,77 @@ func newDatasetCmd(app *App) *cobra.Command {
 			return nil
 		},
 	}
-	addDriverFlag(deleteCmd, &driverID)
 
-	cmd.AddCommand(listCmd, createCmd, deleteCmd)
+	ingestCmd := &cobra.Command{
+		Use:   "ingest [name]",
+		Short: "Import files into a dataset",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			source, _ := cmd.Flags().GetString("source")
+			format, _ := cmd.Flags().GetString("format")
+			recursive, _ := cmd.Flags().GetBool("recursive")
+			resp, err := app.Core.ManageDataset(context.Background(), app.resolveDriver(cmd, capability.DatasetMgmt), driver.DatasetRequest{
+				Task: driver.DatasetTaskIngest, Name: args[0], SourcePath: source, Recursive: recursive, Format: format,
+			})
+			if err != nil {
+				return err
+			}
+			fmt.Fprintf(os.Stdout, "%s (%d files, %d bytes", resp.Message, resp.FilesAdded, resp.BytesAdded)
+			if resp.VersionID != "" {
+				fmt.Fprintf(os.Stdout, ", version %s", resp.VersionID)
+			}
+			fmt.Fprintln(os.Stdout, ")")
+			return nil
+		},
+	}
+	ingestCmd.Flags().String("source", "", "file or directory to import (required)")
+	ingestCmd.Flags().String("format", "", "optional format hint: jsonl, csv, parquet, files")
+	ingestCmd.Flags().Bool("recursive", false, "recursively import directories")
+	_ = ingestCmd.MarkFlagRequired("source")
+
+	versionCmd := &cobra.Command{
+		Use:   "version [name]",
+		Short: "Create a dataset snapshot",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			tag, _ := cmd.Flags().GetString("tag")
+			message, _ := cmd.Flags().GetString("message")
+			resp, err := app.Core.ManageDataset(context.Background(), app.resolveDriver(cmd, capability.DatasetMgmt), driver.DatasetRequest{
+				Task: driver.DatasetTaskVersion, Name: args[0], Tag: tag, Message: message,
+			})
+			if err != nil {
+				return err
+			}
+			if len(resp.Versions) > 0 {
+				v := resp.Versions[0]
+				fmt.Fprintf(os.Stdout, "%s\n%s (%d bytes)\n", resp.Message, v.Path, v.Size)
+				return nil
+			}
+			fmt.Fprintln(os.Stdout, resp.Message)
+			return nil
+		},
+	}
+	versionCmd.Flags().String("tag", "", "version tag (default: backend-generated)")
+	versionCmd.Flags().String("message", "", "optional version note")
+
+	versionsCmd := &cobra.Command{
+		Use:   "versions [name]",
+		Short: "List dataset versions",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			resp, err := app.Core.ManageDataset(context.Background(), app.resolveDriver(cmd, capability.DatasetMgmt), driver.DatasetRequest{
+				Task: driver.DatasetTaskListVersions, Name: args[0],
+			})
+			if err != nil {
+				return err
+			}
+			for _, v := range resp.Versions {
+				fmt.Fprintf(os.Stdout, "%s\t%s\t%s\t%d bytes\t%d\n", v.ID, v.Tag, v.Path, v.Size, v.CreatedAtUnix)
+			}
+			return nil
+		},
+	}
+
+	cmd.AddCommand(listCmd, createCmd, deleteCmd, ingestCmd, versionCmd, versionsCmd)
 	return cmd
 }

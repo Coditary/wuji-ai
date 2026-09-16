@@ -3,11 +3,8 @@ package cli
 import (
 	"fmt"
 	"os"
-	"text/tabwriter"
 
 	"github.com/spf13/cobra"
-
-	"github.com/coditary/wuji/internal/capability"
 )
 
 func newDriverCmd(app *App) *cobra.Command {
@@ -29,49 +26,41 @@ func newDriverCmd(app *App) *cobra.Command {
 			return nil
 		},
 	}
-	connectCmd.Flags().Bool("save", true, "persist endpoint in .wuji/drivers.yaml")
+	connectCmd.Flags().Bool("save", true, "persist endpoint in .wuji/config.yaml (driver_endpoints)")
 
 	cmd.AddCommand(
 		connectCmd,
 		&cobra.Command{
-			Use:   "list",
-			Short: "List registered drivers",
+			Use:        "list",
+			Short:      "List registered drivers",
+			Deprecated: "use `wuji list drivers` instead",
 			RunE: func(cmd *cobra.Command, args []string) error {
-				drivers := app.Core.ListDrivers()
-				if len(drivers) == 0 {
-					fmt.Println("No drivers registered.")
-					return nil
-				}
-
-				w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-				fmt.Fprintln(w, "ID\tNAME\tVERSION\tREMOTE\tCAPABILITIES")
-				for _, d := range drivers {
-					remote := "no"
-					if d.Remote {
-						remote = "yes"
-					}
-
-					caps := ""
-					for i, c := range d.Capabilities {
-						if i > 0 {
-							caps += ", "
-						}
-						caps += c.String()
-					}
-
-					fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", d.ID, d.Name, d.Version, remote, caps)
-				}
-				return w.Flush()
+				return printDriverList(app)
 			},
 		},
 		&cobra.Command{
-			Use:   "capabilities",
-			Short: "List all supported capability types",
+			Use:        "info [driver-id]",
+			Short:      "Show driver details including supported source formats",
+			Deprecated: "use `wuji info driver` instead",
+			Args:       cobra.ExactArgs(1),
+			RunE: func(cmd *cobra.Command, args []string) error {
+				return printDriverInfo(app, args[0])
+			},
+		},
+		&cobra.Command{
+			Use:        "formats",
+			Short:      "List known model/source format identifiers",
+			Deprecated: "use `wuji list formats` instead",
 			Run: func(cmd *cobra.Command, args []string) {
-				fmt.Println("Supported capabilities:")
-				for _, c := range capability.All() {
-					fmt.Printf("  - %s\n", c)
-				}
+				printFormatList()
+			},
+		},
+		&cobra.Command{
+			Use:        "capabilities",
+			Short:      "List all supported capability types",
+			Deprecated: "use `wuji list capabilities` instead",
+			Run: func(cmd *cobra.Command, args []string) {
+				printCapabilityList()
 			},
 		},
 	)
