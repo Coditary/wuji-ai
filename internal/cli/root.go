@@ -91,9 +91,18 @@ See: wuji resources explain`,
 }
 
 func isLocalCommand(args []string) bool {
+	for i := 1; i < len(args); i++ {
+		switch args[i] {
+		case "--help", "-h", "-?", "--version", "-v":
+			return true
+		}
+	}
 	top := commandPath(args)
 	if len(top) == 0 {
-		return false
+		return true
+	}
+	if top[0] == "help" {
+		return true
 	}
 	switch top[0] {
 	case "catalog", "provider", "providers", "auth":
