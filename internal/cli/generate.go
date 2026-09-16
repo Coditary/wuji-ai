@@ -4,18 +4,13 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/spf13/cobra"
 
+	"github.com/coditary/wuji-ai/internal/clix"
 	"github.com/coditary/wuji-core/pkg/capability"
 	"github.com/coditary/wuji-core/pkg/driver"
 )
-
-func joinArgs(args []string) string {
-	return strings.Join(args, " ")
-}
-
 
 func newTextCmd(app *App) *cobra.Command {
 	// text
@@ -33,7 +28,7 @@ func newTextCmd(app *App) *cobra.Command {
 	var textFile, messagesFile, imagePath, videoPath, audioPath, documentPath string
 	var translate bool
 	var targetLang, language string
-	var audioInference audioInferenceFields
+	var audioInference clix.AudioInferenceFields
 	var textTrain textTrainOpts
 	var loraEntries []string
 	var loraWeight float32
@@ -77,24 +72,24 @@ Media flags are mutually exclusive. Multi-step workflows are composed manually v
 				if textTrain.Seed == -1 {
 					textTrain.Seed = seed
 				}
-				return runTextTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.TextGeneration), textTrain, joinArgs(args), model)
+				return runTextTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.TextGeneration), textTrain, clix.JoinArgs(args), model)
 			}
 			loras, err := resolveLoRAs(cmd, app, loraEntries, loraWeight, textLoRAState)
 			if err != nil {
 				return err
 			}
-			req, err := buildTextRequest(args, false, textRequestFields{
-				useStdin: useStdin,
-				textFile: textFile, messagesFile: messagesFile, imagePath: imagePath, videoPath: videoPath,
-				audioPath: audioPath, documentPath: documentPath,
-				translate: translate, targetLang: targetLang, language: language,
-				quality: audioInference.quality, trimSilence: audioInference.trimSilence,
-				silenceLevel: audioInference.silenceLevel,
-				model: model, systemPrompt: systemPrompt, maxTokens: maxTokens,
-				temperature: temperature, topP: topP, topK: topK, minP: minP,
-				frequencyPenalty: frequencyPenalty, presencePenalty: presencePenalty,
-				repetitionPenalty: repetitionPenalty, stopSequences: stopSequences,
-				seed: seed, contextWindow: contextWindow, loras: loras,
+			req, err := clix.BuildTextRequest(args, false, clix.TextRequestFields{
+				UseStdin: useStdin,
+				TextFile: textFile, MessagesFile: messagesFile, ImagePath: imagePath, VideoPath: videoPath,
+				AudioPath: audioPath, DocumentPath: documentPath,
+				Translate: translate, TargetLang: targetLang, Language: language,
+				Quality: audioInference.Quality, TrimSilence: audioInference.TrimSilence,
+				SilenceLevel: audioInference.SilenceLevel,
+				Model:        model, SystemPrompt: systemPrompt, MaxTokens: maxTokens,
+				Temperature: temperature, TopP: topP, TopK: topK, MinP: minP,
+				FrequencyPenalty: frequencyPenalty, PresencePenalty: presencePenalty,
+				RepetitionPenalty: repetitionPenalty, StopSequences: stopSequences,
+				Seed: seed, ContextWindow: contextWindow, LoRAs: loras,
 			})
 			if err != nil {
 				return err
@@ -130,7 +125,7 @@ Media flags are mutually exclusive. Multi-step workflows are composed manually v
 	cmd.Flags().BoolVar(&translate, "translate", false, "translate text input to --target-lang (prompt, --text, or stdin)")
 	cmd.Flags().StringVar(&targetLang, "target-lang", "", "translation target language (default: English)")
 	cmd.Flags().StringVar(&language, "lang", "auto", "source language for --audio or --translate (auto, de, en, …)")
-	addAudioInferenceFlags(cmd, &audioInference)
+	clix.AddAudioInferenceFlags(cmd, &audioInference)
 	cmd.Flags().IntVar(&maxTokens, "max-tokens", 1024, "maximum tokens to generate (-1 for unlimited)")
 	cmd.Flags().Float32Var(&temperature, "temperature", 0.7, "sampling temperature (0.0–2.0)")
 	cmd.Flags().StringVar(&model, "model", "", "model name (driver-specific)")
@@ -168,7 +163,7 @@ func newImageCmd(app *App) *cobra.Command {
 	var loraWeight float32
 	var imageLoRAState loraFlagState
 	var imageTrain imageTrainOpts
-	var imageControls imageControlOptions
+	var imageControls clix.ImageControlOptions
 	cmd := &cobra.Command{
 		Use:   "image [prompt]",
 		Short: "Generate or transform images",
@@ -243,15 +238,15 @@ Short flags: -W width  -H height  -s steps  (-h is help; use --help)
 					imageTrain.ControlType = controlType
 				}
 				if imageTrain.ControlType == "" {
-					units, err := imageControls.buildUnits(cmd)
+					units, err := imageControls.BuildUnits(cmd)
 					if err != nil {
 						return err
 					}
-					if t := firstControlType(units); t != "" {
+					if t := clix.FirstControlType(units); t != "" {
 						imageTrain.ControlType = string(t)
 					}
 				}
-				return runImageTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.ImageGeneration), imageTrain, joinArgs(args), imageModel, cmd)
+				return runImageTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.ImageGeneration), imageTrain, clix.JoinArgs(args), imageModel, cmd)
 			}
 
 			loraRefs, err := resolveLoRAs(cmd, app, loras, loraWeight, imageLoRAState)
@@ -259,61 +254,61 @@ Short flags: -W width  -H height  -s steps  (-h is help; use --help)
 				return err
 			}
 			upscaleRequested := upscale
-			scale, upscaleRequested, err := parseImageScaleInput(scaleInput, upscaleRequested)
+			scale, upscaleRequested, err := clix.ParseImageScaleInput(scaleInput, upscaleRequested)
 			if err != nil {
 				return err
 			}
-			controlUnits, err := imageControls.buildUnits(cmd)
+			controlUnits, err := imageControls.BuildUnits(cmd)
 			if err != nil {
 				return err
 			}
-			controlMode, err := imageControls.controlMode()
+			controlMode, err := imageControls.ControlMode()
 			if err != nil {
 				return err
 			}
 			vramMB := app.Core.ResourcesConfig().TotalVRAMMB
-			req, err := buildImageRequest(joinArgs(args), false, imageRequestFields{
-				negativePrompt:       negativePrompt,
-				model:                imageModel,
-				mode:                 imageMode,
-				width:                width,
-				height:               height,
-				steps:                steps,
-				sampler:              sampler,
-				cfgScale:             cfgScale,
-				batchTotal:           batchTotal,
-				batchSize:            batchSize,
-				batchCount:           batchCount,
-				batchSizeSet:         cmd.Flags().Changed("batch-size"),
-				batchCountSet:        cmd.Flags().Changed("batch-count"),
-				availableVRAMMB:      vramMB,
-				seed:                 imageSeed,
-				denoisingStrength:    denoisingStrength,
-				initImage:            initImage,
-				maskImage:            maskImage,
-				controlImage:         controlImage,
-				controlType:          controlType,
-				controlUnits:         controlUnits,
-				controlMode:          controlMode,
-				styleImage:           styleImage,
-				styleWeight:          styleWeight,
-				scale:                scale,
-				upscaleRequested:     upscaleRequested,
-				editRequested:        edit,
-				spriteRequested:      sprite,
-				referenceImage:       referenceImage,
-				spriteAction:         spriteAction,
-				spriteView:           spriteView,
-				spriteDirections:     spriteDirections,
-				spriteLoop:           spriteLoop,
-				spritePadding:        spritePadding,
-				spriteTransparent:    spriteTransparent,
-				frameWidth:           frameWidth,
-				frameHeight:          frameHeight,
-				columns:              columns,
-				rows:                 rows,
-				frameCount:           frameCount,
-				loras:                loraRefs,
+			req, err := clix.BuildImageRequest(clix.JoinArgs(args), false, clix.ImageRequestFields{
+				NegativePrompt:    negativePrompt,
+				Model:             imageModel,
+				Mode:              imageMode,
+				Width:             width,
+				Height:            height,
+				Steps:             steps,
+				Sampler:           sampler,
+				CFGScale:          cfgScale,
+				BatchTotal:        batchTotal,
+				BatchSize:         batchSize,
+				BatchCount:        batchCount,
+				BatchSizeSet:      cmd.Flags().Changed("batch-size"),
+				BatchCountSet:     cmd.Flags().Changed("batch-count"),
+				AvailableVRAMMB:   vramMB,
+				Seed:              imageSeed,
+				DenoisingStrength: denoisingStrength,
+				InitImage:         initImage,
+				MaskImage:         maskImage,
+				ControlImage:      controlImage,
+				ControlType:       controlType,
+				ControlUnits:      controlUnits,
+				ControlMode:       controlMode,
+				StyleImage:        styleImage,
+				StyleWeight:       styleWeight,
+				Scale:             scale,
+				UpscaleRequested:  upscaleRequested,
+				EditRequested:     edit,
+				SpriteRequested:   sprite,
+				ReferenceImage:    referenceImage,
+				SpriteAction:      spriteAction,
+				SpriteView:        spriteView,
+				SpriteDirections:  spriteDirections,
+				SpriteLoop:        spriteLoop,
+				SpritePadding:     spritePadding,
+				SpriteTransparent: spriteTransparent,
+				FrameWidth:        frameWidth,
+				FrameHeight:       frameHeight,
+				Columns:           columns,
+				Rows:              rows,
+				FrameCount:        frameCount,
+				LoRAs:             loraRefs,
 			})
 			if err != nil {
 				return err
@@ -366,7 +361,7 @@ Short flags: -W width  -H height  -s steps  (-h is help; use --help)
 	cmd.Flags().StringVar(&maskImage, "mask", "", "inpaint mask image (white = replace)")
 	cmd.Flags().StringVar(&controlImage, "control-image", "", "deprecated: use typed control flags (e.g. --depth, --pose)")
 	cmd.Flags().StringVar(&controlType, "control-type", "", "deprecated: use typed control flags (e.g. --pose=full)")
-	registerImageControlFlags(cmd, &imageControls)
+	clix.RegisterImageControlFlags(cmd, &imageControls)
 	cmd.Flags().StringVar(&styleImage, "style", "", "reference style image (style-transfer, IP-Adapter, or --sprite)")
 	cmd.Flags().StringVar(&styleImage, "style-image", "", "alias for --style")
 	cmd.Flags().Float32Var(&styleWeight, "style-weight", 0, "style/IP-Adapter strength (0 = backend default, typically 1.0)")
@@ -437,20 +432,20 @@ Generation tuning (generate / i2v; 0 or empty = backend default):
 				if videoTrain.Frames <= 0 && videoFrames > 0 {
 					videoTrain.Frames = videoFrames
 				}
-				return runVideoTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.VideoGeneration), videoTrain, joinArgs(args), videoModel)
+				return runVideoTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.VideoGeneration), videoTrain, clix.JoinArgs(args), videoModel)
 			}
 			scaleRequested := cmd.Flags().Changed("scale")
-			scale, scaleRequested, err := parseImageScaleInput(scaleInput, scaleRequested)
+			scale, scaleRequested, err := clix.ParseImageScaleInput(scaleInput, scaleRequested)
 			if err != nil {
 				return err
 			}
-			req, err := buildVideoRequest(joinArgs(args), false, videoRequestFields{
-				duration: duration, fps: videoFPS, frames: videoFrames, fpsSet: cmd.Flags().Changed("fps"),
-				motionStrength: motionStrength, contextLength: contextLength, sampler: videoSampler,
-				scheduler: videoScheduler,
-				imagePath: imagePath, videoPath: videoPath, cameraControl: cameraControl,
-				negativePrompt: videoNegativePrompt, model: videoModel, seed: videoSeed,
-				scale: scale, scaleSet: scaleRequested,
+			req, err := clix.BuildVideoRequest(clix.JoinArgs(args), false, clix.VideoRequestFields{
+				Duration: duration, FPS: videoFPS, Frames: videoFrames, FPSSet: cmd.Flags().Changed("fps"),
+				MotionStrength: motionStrength, ContextLength: contextLength, Sampler: videoSampler,
+				Scheduler: videoScheduler,
+				ImagePath: imagePath, VideoPath: videoPath, CameraControl: cameraControl,
+				NegativePrompt: videoNegativePrompt, Model: videoModel, Seed: videoSeed,
+				Scale: scale, ScaleSet: scaleRequested,
 			})
 			if err != nil {
 				return err
@@ -544,18 +539,18 @@ Generation tuning (0 or empty = backend default):
 				if audioTrain.Seed == -1 {
 					audioTrain.Seed = audioSeed
 				}
-				return runAudioTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.AudioGeneration), audioTrain, joinArgs(args), audioModel, sfx, speech, referencePath)
+				return runAudioTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.AudioGeneration), audioTrain, clix.JoinArgs(args), audioModel, sfx, speech, referencePath)
 			}
 			if len(args) < 1 {
 				return fmt.Errorf("prompt required")
 			}
-			req, err := buildAudioRequest(joinArgs(args), audioRequestFields{
-				lyrics: lyrics, negativePrompt: audioNegativePrompt, model: audioModel, duration: audioDuration, durationSet: cmd.Flags().Changed("duration"),
-				overlap: overlap, temperature: audioTemperature, cfgScale: audioCFGScale, topP: audioTopP,
-				topK: audioTopK, sampleRate: audioSampleRate, referencePath: referencePath,
-				voice: voiceName, language: audioLang, speed: audioSpeed, pitch: audioPitch,
-				emotion: audioEmotion, style: audioStyle, energy: audioEnergy,
-				format: audioFormat, sfxRequested: sfx, speechRequested: speech, seed: audioSeed,
+			req, err := clix.BuildAudioRequest(clix.JoinArgs(args), clix.AudioRequestFields{
+				Lyrics: lyrics, NegativePrompt: audioNegativePrompt, Model: audioModel, Duration: audioDuration, DurationSet: cmd.Flags().Changed("duration"),
+				Overlap: overlap, Temperature: audioTemperature, CFGScale: audioCFGScale, TopP: audioTopP,
+				TopK: audioTopK, SampleRate: audioSampleRate, ReferencePath: referencePath,
+				Voice: voiceName, Language: audioLang, Speed: audioSpeed, Pitch: audioPitch,
+				Emotion: audioEmotion, Style: audioStyle, Energy: audioEnergy,
+				Format: audioFormat, SFXRequested: sfx, SpeechRequested: speech, Seed: audioSeed,
 			})
 			if err != nil {
 				return err
@@ -679,10 +674,10 @@ Use --task to force a task when inference would be ambiguous.
 				if meshTrain.Seed == -1 {
 					meshTrain.Seed = meshSeed
 				}
-				return runMeshTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.Mesh), meshTrain, joinArgs(args), meshModel)
+				return runMeshTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.Mesh), meshTrain, clix.JoinArgs(args), meshModel)
 			}
 			scaleRequested := cmd.Flags().Changed("scale")
-			scale, scaleRequested, err := parseImageScaleInput(scaleInput, upscale || scaleRequested)
+			scale, scaleRequested, err := clix.ParseImageScaleInput(scaleInput, upscale || scaleRequested)
 			if err != nil {
 				return err
 			}
@@ -693,44 +688,44 @@ Use --task to force a task when inference would be ambiguous.
 					return err
 				}
 			}
-			req, err := buildMeshRequest(joinArgs(args), false, meshRequestFields{
-				taskExplicit:       taskExplicit,
-				model:              meshModel,
-				format:             format,
-				mode:               meshMode,
-				seed:               meshSeed,
-				targetTris:         targetTris,
-				targetTrisSet:      cmd.Flags().Changed("target-tris"),
-				scale:              scale,
-				scaleSet:           scaleRequested,
-				upscaleRequested:   upscale,
-				meshPath:           meshPath,
-				highMeshPath:       highMeshPath,
-				imagePath:          imagePath,
-				images:             images,
-				videoPath:          videoPath,
-				depthPath:          depthPath,
-				pointCloudPath:     pointCloudPath,
-				splatPath:          splatPath,
-				maskPath:           maskPath,
-				styleImagePath:     styleImagePath,
-				textureImagePath:   textureImagePath,
-				animationPath:      animationPath,
-				retopoRequested:    retopo,
-				remeshRequested:    remesh,
-				repairRequested:    repair,
-				smoothRequested:    smooth,
-				refineRequested:    refine,
-				segmentRequested:   segment,
-				rigRequested:       rig,
-				animateRequested:   animate,
-				retargetRequested:  retarget,
-				uvRequested:        uv,
-				pbrRequested:       pbr,
-				sceneRequested:     scene,
-				variationRequested: variation,
-				editRequested:      edit,
-				representation:     representationVal,
+			req, err := clix.BuildMeshRequest(clix.JoinArgs(args), false, clix.MeshRequestFields{
+				TaskExplicit:       taskExplicit,
+				Model:              meshModel,
+				Format:             format,
+				Mode:               meshMode,
+				Seed:               meshSeed,
+				TargetTris:         targetTris,
+				TargetTrisSet:      cmd.Flags().Changed("target-tris"),
+				Scale:              scale,
+				ScaleSet:           scaleRequested,
+				UpscaleRequested:   upscale,
+				MeshPath:           meshPath,
+				HighMeshPath:       highMeshPath,
+				ImagePath:          imagePath,
+				Images:             images,
+				VideoPath:          videoPath,
+				DepthPath:          depthPath,
+				PointCloudPath:     pointCloudPath,
+				SplatPath:          splatPath,
+				MaskPath:           maskPath,
+				StyleImagePath:     styleImagePath,
+				TextureImagePath:   textureImagePath,
+				AnimationPath:      animationPath,
+				RetopoRequested:    retopo,
+				RemeshRequested:    remesh,
+				RepairRequested:    repair,
+				SmoothRequested:    smooth,
+				RefineRequested:    refine,
+				SegmentRequested:   segment,
+				RigRequested:       rig,
+				AnimateRequested:   animate,
+				RetargetRequested:  retarget,
+				UVRequested:        uv,
+				PBRRequested:       pbr,
+				SceneRequested:     scene,
+				VariationRequested: variation,
+				EditRequested:      edit,
+				Representation:     representationVal,
 			})
 			if err != nil {
 				return err

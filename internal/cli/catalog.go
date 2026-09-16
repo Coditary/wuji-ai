@@ -10,8 +10,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	wujicfg "github.com/coditary/wuji-core/pkg/config"
+	"github.com/coditary/wuji-ai/internal/clix"
 	"github.com/coditary/wuji-core/pkg/capability"
+	wujicfg "github.com/coditary/wuji-core/pkg/config"
 	"github.com/coditary/wuji-core/pkg/data"
 	"github.com/coditary/wuji-core/pkg/driver"
 	"github.com/coditary/wuji-core/pkg/mcp"
@@ -392,11 +393,11 @@ func printRAGCollections(app *App, cmd *cobra.Command) error {
 			continue
 		}
 		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n",
-			fieldString(rec, "collection"),
-			fieldString(rec, "chunk_count"),
-			fieldString(rec, "dims"),
-			fieldString(rec, "embed_model"),
-			fieldString(rec, "updated_at"),
+			clix.FieldString(rec, "collection"),
+			clix.FieldString(rec, "chunk_count"),
+			clix.FieldString(rec, "dims"),
+			clix.FieldString(rec, "embed_model"),
+			clix.FieldString(rec, "updated_at"),
 		)
 	}
 	return w.Flush()
@@ -419,17 +420,17 @@ func printRAGCollectionInfo(app *App, cmd *cobra.Command, name string) error {
 		if rec.Role != "collection" {
 			continue
 		}
-		fmt.Printf("Collection:  %s\n", fieldString(rec, "collection"))
-		fmt.Printf("Embed model: %s\n", fieldString(rec, "embed_model"))
-		fmt.Printf("Dimensions:  %s\n", fieldString(rec, "dims"))
-		fmt.Printf("Chunks:      %s\n", fieldString(rec, "chunk_count"))
-		if v := fieldString(rec, "chunk_size"); v != "" {
+		fmt.Printf("Collection:  %s\n", clix.FieldString(rec, "collection"))
+		fmt.Printf("Embed model: %s\n", clix.FieldString(rec, "embed_model"))
+		fmt.Printf("Dimensions:  %s\n", clix.FieldString(rec, "dims"))
+		fmt.Printf("Chunks:      %s\n", clix.FieldString(rec, "chunk_count"))
+		if v := clix.FieldString(rec, "chunk_size"); v != "" {
 			fmt.Printf("Chunk size:  %s\n", v)
 		}
-		if v := fieldString(rec, "overlap"); v != "" {
+		if v := clix.FieldString(rec, "overlap"); v != "" {
 			fmt.Printf("Overlap:     %s\n", v)
 		}
-		if v := fieldString(rec, "updated_at"); v != "" {
+		if v := clix.FieldString(rec, "updated_at"); v != "" {
 			fmt.Printf("Updated:     %s\n", v)
 		}
 		return nil

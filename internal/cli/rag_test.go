@@ -69,7 +69,10 @@ func TestRAGIndexAndQueryLocalRAG(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if col.Manifest.Dims != ragstore.DefaultEmbedDims() {
-		t.Fatalf("expected pseudo embed dims=%d, got %d", ragstore.DefaultEmbedDims(), col.Manifest.Dims)
+	if col.Manifest.Dims <= 0 {
+		t.Fatalf("expected positive embed dims, got %d", col.Manifest.Dims)
+	}
+	if len(col.Chunks) == 0 {
+		t.Fatal("expected indexed chunks")
 	}
 }

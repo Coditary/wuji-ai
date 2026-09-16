@@ -1,0 +1,162 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: linux-x86_64
+            runner: ubuntu-24.04
+            platform: linux
+            arch: x86_64
+            binary_path: bin/wuji
+          - name: linux-aarch64
+            runner: ubuntu-24.04-arm
+            platform: linux
+            arch: aarch64
+            binary_path: bin/wuji
+          - name: macos-x86_64
+            runner: macos-15-intel
+            platform: macos
+            arch: x86_64
+            binary_path: bin/wuji
+          - name: macos-aarch64
+            runner: macos-15
+            platform: macos
+            arch: aarch64
+            binary_path: bin/wuji
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve wuji-core ref
+        id: dep_ref
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          REF="main"
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            if gh api "repos/${GITHUB_REPOSITORY_OWNER}/wuji-core/git/ref/tags/${GITHUB_REF_NAME}" >/dev/null 2>&1; then
+              REF="${GITHUB_REF_NAME}"
+            fi
+          fi
+          echo "ref=${REF}" >> "${GITHUB_OUTPUT}"
+
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/wuji-core
+          path: wuji-core
+          ref: ${{ steps.dep_ref.outputs.ref }}
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Point go.mod at checked-out wuji-core
+        run: go mod edit -replace=github.com/coditary/wuji-core=./wuji-core
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends zstd
+
+      - name: Install macOS dependencies
+        if: runner.os == 'macOS'
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: 1
+          HOMEBREW_NO_INSTALL_UPGRADE: 1
+        run: brew install zstd
+
+      - name: Build release binary
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME#v}"
+          LDFLAGS="-s -w \
+            -X github.com/coditary/wuji-core/pkg/version.Version=${VERSION} \
+            -X github.com/coditary/wuji-core/pkg/version.Commit=${GITHUB_SHA} \
+            -X github.com/coditary/wuji-core/pkg/version.BuildDate=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          mkdir -p bin
+          go build -ldflags "${LDFLAGS}" -o bin/wuji ./cmd/wuji
+
+      - name: Smoke test binary
+        run: ./bin/wuji --help
+
+      - name: Package release archive
+        run: |
+          set -euo pipefail
+          python3 scripts/ci/package_binary.py \
+            --version "$GITHUB_REF_NAME" \
+            --platform "${{ matrix.platform }}" \
+            --arch "${{ matrix.arch }}" \
+            --binary "${{ matrix.binary_path }}" \
+            --output-dir dist
+
+      - name: Package ReqPack artifact
+        run: |
+          set -euo pipefail
+          python3 scripts/ci/package_reqpack.py \
+            --version "$GITHUB_REF_NAME" \
+            --platform "${{ matrix.platform }}" \
+            --arch "${{ matrix.arch }}" \
+            --binary "${{ matrix.binary_path }}" \
+            --output-dir dist
+
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.platform }}-${{ matrix.arch }}
+          path: |
+            dist/*.tar.gz
+            dist/*.rqp
+          if-no-files-found: error
+
+  release:
+    name: Publish GitHub Release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download packaged artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          merge-multiple: true
+          path: dist
+
+      - name: Build ReqPack repository index
+        run: |
+          set -euo pipefail
+          python3 scripts/ci/build_reqpack_index.py --dist-dir dist --output dist/index.json
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME#v}"
+          NOTES="Automated release for wuji ${VERSION}.
+
+          Includes tar.gz binaries and ReqPack .rqp packages for Linux and macOS (x86_64 and aarch64), plus index.json for ReqPack repositories."
+          if ! gh release view "$GITHUB_REF_NAME" --repo "$GH_REPO" >/dev/null 2>&1; then
+            gh release create "$GITHUB_REF_NAME" --repo "$GH_REPO" --title "wuji ${VERSION}" --notes "$NOTES"
+          fi
+          gh release edit "$GITHUB_REF_NAME" --repo "$GH_REPO" --draft=false --latest --title "wuji ${VERSION}" --notes "$NOTES"
+          gh release upload "$GITHUB_REF_NAME" dist/*.tar.gz dist/*.rqp dist/index.json --repo "$GH_REPO" --clobber

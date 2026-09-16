@@ -7,21 +7,15 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/coditary/wuji-ai/internal/clix"
 	"github.com/coditary/wuji-core/pkg/data"
 	"github.com/coditary/wuji-core/pkg/driver"
 )
 
-func TestParseExportFormatDefaultJSON(t *testing.T) {
-	f, err := parseExportFormat(false, false, false, false, "")
-	if err != nil || f != "json" {
-		t.Fatalf("format=%q err=%v", f, err)
-	}
-}
-
 func TestDataEmbedDummy(t *testing.T) {
 	app := newTestApp(t)
-	req, err := buildDataRequest([]string{"Hallo Welt"}, dataRequestFields{
-		taskFlags: dataTaskFlags{embed: true},
+	req, err := clix.BuildDataRequest([]string{"Hallo Welt"}, clix.DataRequestFields{
+		TaskFlags: clix.DataTaskFlags{Embed: true},
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -44,7 +38,7 @@ func TestDataConvertCSVToJSON(t *testing.T) {
 	path := writeTempCSV(t, "a,b\n1,2\n")
 	defer os.Remove(path)
 
-	table, err := loadDataFromPath(path, driver.DataInputCSV)
+	table, err := clix.LoadDataFromPath(path, driver.DataInputCSV)
 	if err != nil {
 		t.Fatal(err)
 	}

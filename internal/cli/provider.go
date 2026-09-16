@@ -10,19 +10,20 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/coditary/wuji-ai/internal/clix"
 	"github.com/coditary/wuji-core/pkg/auth"
 	"github.com/coditary/wuji-core/pkg/catalog"
 )
 
 var providerHints = map[string]string{
-	"anthropic":      "Create an API key at https://console.anthropic.com/",
-	"openai":         "Use an OpenAI API key from https://platform.openai.com/api-keys",
-	"github-copilot": "Use a GitHub token with Copilot scope, or run: gh auth token",
-	"google":         "Use a Google AI API key from https://aistudio.google.com/apikey",
-	"openrouter":     "Create an API key at https://openrouter.ai/keys",
-	"deepseek":       "Create an API key at https://platform.deepseek.com/",
-	"vercel":         "Create an API key at https://vercel.link/ai-gateway-token",
-	"amazon-bedrock": "Configure AWS credentials (AWS_PROFILE, AWS_REGION) or a bearer token.",
+	"anthropic":             "Create an API key at https://console.anthropic.com/",
+	"openai":                "Use an OpenAI API key from https://platform.openai.com/api-keys",
+	"github-copilot":        "Use a GitHub token with Copilot scope, or run: gh auth token",
+	"google":                "Use a Google AI API key from https://aistudio.google.com/apikey",
+	"openrouter":            "Create an API key at https://openrouter.ai/keys",
+	"deepseek":              "Create an API key at https://platform.deepseek.com/",
+	"vercel":                "Create an API key at https://vercel.link/ai-gateway-token",
+	"amazon-bedrock":        "Configure AWS credentials (AWS_PROFILE, AWS_REGION) or a bearer token.",
 	"cloudflare-ai-gateway": "Set CLOUDFLARE_GATEWAY_ID, CLOUDFLARE_ACCOUNT_ID, and CLOUDFLARE_API_TOKEN.",
 }
 
@@ -92,7 +93,7 @@ func runProviderLogin(app *App, args []string) error {
 	}
 
 	if providerID == "__other__" {
-		id, err := readLine("Enter provider id (a-z, 0-9, hyphens): ", os.Stdin)
+		id, err := clix.ReadLine("Enter provider id (a-z, 0-9, hyphens): ", os.Stdin)
 		if err != nil {
 			return err
 		}
@@ -192,7 +193,7 @@ func resolveProviderSelection(idx *catalog.Index, args []string) (string, error)
 		names[i] = name
 	}
 
-	choice, err := selectOption("Select provider", names)
+	choice, err := clix.SelectOption("Select provider", names)
 	if err != nil {
 		return "", err
 	}
@@ -205,7 +206,7 @@ func resolveProviderSelection(idx *catalog.Index, args []string) (string, error)
 func promptProviderCredential(providerID string, entry catalog.ProviderEntry, inCatalog bool) (auth.Entry, error) {
 	envVars := entry.Env
 	if !inCatalog || len(envVars) == 0 {
-		key, err := readPassword("Enter your API key: ")
+		key, err := clix.ReadPassword("Enter your API key: ")
 		if err != nil {
 			return auth.Entry{}, err
 		}
@@ -216,7 +217,7 @@ func promptProviderCredential(providerID string, entry catalog.ProviderEntry, in
 	}
 
 	if len(envVars) == 1 {
-		key, err := readPassword(fmt.Sprintf("Enter your API key (%s): ", envVars[0]))
+		key, err := clix.ReadPassword(fmt.Sprintf("Enter your API key (%s): ", envVars[0]))
 		if err != nil {
 			return auth.Entry{}, err
 		}
@@ -232,7 +233,7 @@ func promptProviderCredential(providerID string, entry catalog.ProviderEntry, in
 
 	values := map[string]string{}
 	for _, env := range envVars {
-		val, err := readPassword(fmt.Sprintf("Enter value for %s: ", env))
+		val, err := clix.ReadPassword(fmt.Sprintf("Enter value for %s: ", env))
 		if err != nil {
 			return auth.Entry{}, err
 		}
@@ -274,7 +275,7 @@ func runProviderLogout(app *App, args []string) error {
 			}
 			labels[i] = name
 		}
-		choice, err := selectOption("Remove credential", labels)
+		choice, err := clix.SelectOption("Remove credential", labels)
 		if err != nil {
 			return err
 		}

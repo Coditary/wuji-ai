@@ -6,6 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/coditary/wuji-ai/internal/clix"
 	"github.com/coditary/wuji-core/pkg/capability"
 	"github.com/coditary/wuji-core/pkg/data"
 	"github.com/coditary/wuji-core/pkg/driver"
@@ -13,16 +14,16 @@ import (
 
 func newDataCmd(app *App) *cobra.Command {
 	var (
-		model string
+		model                                              string
 		textFile, imagePath, csvPath, graphPath, inputPath string
-		inputFormat, outputFormat, format string
-		inputShape, outputShape string
-		useStdin bool
-		jsonOut, csvOut, ndjsonOut, msgpackOut bool
-		csvView, csvVector string
-		prettyJSON bool
-		horizon int
-		taskFlags dataTaskFlags
+		inputFormat, outputFormat, format                  string
+		inputShape, outputShape                            string
+		useStdin                                           bool
+		jsonOut, csvOut, ndjsonOut, msgpackOut             bool
+		csvView, csvVector                                 string
+		prettyJSON                                         bool
+		horizon                                            int
+		taskFlags                                          clix.DataTaskFlags
 	)
 
 	cmd := &cobra.Command{
@@ -67,7 +68,7 @@ CSV options:
   --csv-vector json|expand|dims`,
 		Args: cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			exportFmt, err := parseExportFormat(jsonOut, csvOut, ndjsonOut, msgpackOut, format)
+			exportFmt, err := clix.ParseExportFormat(jsonOut, csvOut, ndjsonOut, msgpackOut, format)
 			if err != nil {
 				return err
 			}
@@ -75,12 +76,12 @@ CSV options:
 				exportFmt = data.ExportFormat(outputFormat)
 			}
 
-			req, err := buildDataRequest(args, dataRequestFields{
-				taskFlags: taskFlags, model: model, textFile: textFile, imagePath: imagePath,
-				csvPath: csvPath, graphPath: graphPath, inputPath: inputPath,
-				useStdin: useStdin, inputFormat: driver.DataInputFormat(inputFormat),
-				inputShape: data.ShapeKind(inputShape), outputShape: data.ShapeKind(outputShape),
-				horizon: horizon,
+			req, err := clix.BuildDataRequest(args, clix.DataRequestFields{
+				TaskFlags: taskFlags, Model: model, TextFile: textFile, ImagePath: imagePath,
+				CSVPath: csvPath, GraphPath: graphPath, InputPath: inputPath,
+				UseStdin: useStdin, InputFormat: driver.DataInputFormat(inputFormat),
+				InputShape: data.ShapeKind(inputShape), OutputShape: data.ShapeKind(outputShape),
+				Horizon: horizon,
 			})
 			if err != nil {
 				return err
@@ -106,7 +107,7 @@ CSV options:
 		},
 	}
 
-	addDataTaskFlags(cmd, &taskFlags)
+	clix.AddDataTaskFlags(cmd, &taskFlags)
 	cmd.Flags().StringVar(&model, "model", "", "model name (driver-specific)")
 	cmd.Flags().StringVar(&textFile, "text", "", "read text input from file")
 	cmd.Flags().StringVar(&imagePath, "image", "", "image file for vision tasks")

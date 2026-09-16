@@ -7,17 +7,12 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/coditary/wuji-ai/internal/clix"
 	"github.com/coditary/wuji-core/pkg/capability"
 	"github.com/coditary/wuji-core/pkg/driver"
 )
 
-type trainBase struct {
-	Enabled    bool
-	Dataset    string
-	Epochs     int
-	Output     string
-	MethodFlag string
-}
+type trainBase = clix.TrainBase
 
 func requirePromptUnlessTrain(train bool, args []string) error {
 	if train || len(args) >= 1 {
@@ -52,10 +47,10 @@ type textTrainOpts struct {
 }
 
 func addTextTrainFlags(cmd *cobra.Command, o *textTrainOpts, persistent bool) {
-	addTrainBaseFlags(cmd, &o.trainBase, persistent)
-	flags := trainFlagSet(cmd, persistent)
+	clix.AddTrainBaseFlags(cmd, &o.trainBase, persistent)
+	flags := clix.TrainFlagSet(cmd, persistent)
 	flags.StringVar(&o.BaseModel, "base-model", "", "base checkpoint to fine-tune")
-	registerTrainModelAlias(cmd, &o.BaseModel, persistent)
+	clix.RegisterTrainModelAlias(cmd, &o.BaseModel, persistent)
 	flags.Float32Var(&o.LearningRate, "learning-rate", 0, "learning rate (0 = backend default)")
 	flags.IntVar(&o.LoRARank, "lora-rank", 0, "LoRA rank (required for lora/qlora)")
 	flags.IntVar(&o.LoRAAlpha, "lora-alpha", 0, "LoRA alpha / network alpha (0 = backend default)")
@@ -71,7 +66,9 @@ func addTextTrainFlags(cmd *cobra.Command, o *textTrainOpts, persistent bool) {
 }
 
 func runTextTrain(ctx context.Context, app *App, driverID string, o textTrainOpts, name, defaultBase string) error {
-	method := resolveTextMethod(o)
+	method := clix.ResolveTextMethod(clix.TextTrainOpts{
+		Method: o.Method, MethodFlag: o.MethodFlag, QLoRA: o.QLoRA, LoRARank: o.LoRARank,
+	})
 	base := o.BaseModel
 	if base == "" {
 		base = defaultBase
@@ -113,14 +110,14 @@ type imageTrainOpts struct {
 	RegDataset        string
 	BatchSize         int
 	Seed              int
-	controls          imageControlOptions
+	controls          clix.ImageControlOptions
 }
 
 func addImageTrainFlags(cmd *cobra.Command, o *imageTrainOpts, persistent bool) {
-	addTrainBaseFlags(cmd, &o.trainBase, persistent)
-	flags := trainFlagSet(cmd, persistent)
+	clix.AddTrainBaseFlags(cmd, &o.trainBase, persistent)
+	flags := clix.TrainFlagSet(cmd, persistent)
 	flags.StringVar(&o.BaseModel, "base-model", "", "base diffusion checkpoint")
-	registerTrainModelAlias(cmd, &o.BaseModel, persistent)
+	clix.RegisterTrainModelAlias(cmd, &o.BaseModel, persistent)
 	flags.Float32Var(&o.LearningRate, "learning-rate", 0, "learning rate")
 	flags.IntVar(&o.LoRARank, "lora-rank", 0, "LoRA rank (required for lora)")
 	flags.IntVar(&o.LoRAAlpha, "lora-alpha", 0, "LoRA alpha (0 = backend default)")
@@ -135,7 +132,7 @@ func addImageTrainFlags(cmd *cobra.Command, o *imageTrainOpts, persistent bool) 
 		flags.StringVar(&o.Mode, "mode", "", "pipeline profile: prop, pixel, tile, ui, character, texture, …")
 		flags.IntVar(&o.BatchSize, "batch-size", 0, "training batch size")
 		flags.IntVar(&o.Seed, "seed", -1, "random seed (-1 = random)")
-		registerImageControlFlags(cmd, &o.controls)
+		clix.RegisterImageControlFlags(cmd, &o.controls)
 	} else {
 		flags.IntVar(&o.Width, "train-width", 0, "training resolution width (defaults to -W)")
 		flags.IntVar(&o.Height, "train-height", 0, "training resolution height (defaults to -H)")
@@ -143,7 +140,10 @@ func addImageTrainFlags(cmd *cobra.Command, o *imageTrainOpts, persistent bool) 
 }
 
 func runImageTrain(ctx context.Context, app *App, driverID string, o imageTrainOpts, name, defaultBase string, cmd *cobra.Command) error {
-	method := resolveImageMethod(o)
+	method := clix.ResolveImageMethod(clix.ImageTrainOpts{
+		Method: o.Method, MethodFlag: o.MethodFlag, ClassToken: o.ClassToken,
+		Token: o.Token, ControlType: o.ControlType, LoRARank: o.LoRARank,
+	})
 	base := o.BaseModel
 	if base == "" {
 		base = defaultBase
@@ -151,11 +151,11 @@ func runImageTrain(ctx context.Context, app *App, driverID string, o imageTrainO
 
 	ct := o.ControlType
 	if ct == "" && cmd != nil {
-		units, err := o.controls.buildUnits(cmd)
+		units, err := o.controls.BuildUnits(cmd)
 		if err != nil {
 			return err
 		}
-		if t := firstControlType(units); t != "" {
+		if t := clix.FirstControlType(units); t != "" {
 			ct = string(t)
 		}
 	}
@@ -211,10 +211,10 @@ type videoTrainOpts struct {
 }
 
 func addVideoTrainFlags(cmd *cobra.Command, o *videoTrainOpts, persistent bool) {
-	addTrainBaseFlags(cmd, &o.trainBase, persistent)
-	flags := trainFlagSet(cmd, persistent)
+	clix.AddTrainBaseFlags(cmd, &o.trainBase, persistent)
+	flags := clix.TrainFlagSet(cmd, persistent)
 	flags.StringVar(&o.BaseModel, "base-model", "", "base video model checkpoint")
-	registerTrainModelAlias(cmd, &o.BaseModel, persistent)
+	clix.RegisterTrainModelAlias(cmd, &o.BaseModel, persistent)
 	flags.Float32Var(&o.LearningRate, "learning-rate", 0, "learning rate")
 	flags.IntVar(&o.LoRARank, "lora-rank", 0, "LoRA rank (required for lora)")
 	flags.IntVar(&o.Frames, "train-frames", 0, "training clip length in frames")
@@ -227,7 +227,9 @@ func addVideoTrainFlags(cmd *cobra.Command, o *videoTrainOpts, persistent bool) 
 }
 
 func runVideoTrain(ctx context.Context, app *App, driverID string, o videoTrainOpts, name, defaultBase string) error {
-	method := resolveVideoMethod(o)
+	method := clix.ResolveVideoMethod(clix.VideoTrainOpts{
+		Method: o.Method, MethodFlag: o.MethodFlag, LoRARank: o.LoRARank,
+	})
 	base := o.BaseModel
 	if base == "" {
 		base = defaultBase
@@ -262,10 +264,10 @@ type audioTrainOpts struct {
 }
 
 func addAudioTrainFlags(cmd *cobra.Command, o *audioTrainOpts, persistent bool) {
-	addTrainBaseFlags(cmd, &o.trainBase, persistent)
-	flags := trainFlagSet(cmd, persistent)
+	clix.AddTrainBaseFlags(cmd, &o.trainBase, persistent)
+	flags := clix.TrainFlagSet(cmd, persistent)
 	flags.StringVar(&o.BaseModel, "base-model", "", "base audio model checkpoint")
-	registerTrainModelAlias(cmd, &o.BaseModel, persistent)
+	clix.RegisterTrainModelAlias(cmd, &o.BaseModel, persistent)
 	flags.Float32Var(&o.LearningRate, "learning-rate", 0, "learning rate")
 	if persistent {
 		flags.IntVar(&o.SampleRate, "sample-rate", 0, "target audio sample rate (Hz)")
@@ -275,7 +277,9 @@ func addAudioTrainFlags(cmd *cobra.Command, o *audioTrainOpts, persistent bool) 
 }
 
 func runAudioTrain(ctx context.Context, app *App, driverID string, o audioTrainOpts, name, defaultBase string, sfx, speech bool, referencePath string) error {
-	method := resolveAudioMethod(o, sfx, speech, referencePath)
+	method := clix.ResolveAudioMethod(clix.AudioTrainOpts{
+		Method: o.Method, MethodFlag: o.MethodFlag,
+	}, sfx, speech, referencePath)
 	base := o.BaseModel
 	if base == "" {
 		base = defaultBase
@@ -310,10 +314,10 @@ type meshTrainOpts struct {
 }
 
 func addMeshTrainFlags(cmd *cobra.Command, o *meshTrainOpts, persistent bool) {
-	addTrainBaseFlags(cmd, &o.trainBase, persistent)
-	flags := trainFlagSet(cmd, persistent)
+	clix.AddTrainBaseFlags(cmd, &o.trainBase, persistent)
+	flags := clix.TrainFlagSet(cmd, persistent)
 	flags.StringVar(&o.BaseModel, "base-model", "", "base mesh model checkpoint")
-	registerTrainModelAlias(cmd, &o.BaseModel, persistent)
+	clix.RegisterTrainModelAlias(cmd, &o.BaseModel, persistent)
 	flags.Float32Var(&o.LearningRate, "learning-rate", 0, "learning rate")
 	flags.IntVar(&o.LoRARank, "lora-rank", 0, "LoRA rank (required for lora)")
 	flags.StringVar(&o.Format, "train-format", "", "output format for trained weights")
@@ -324,7 +328,9 @@ func addMeshTrainFlags(cmd *cobra.Command, o *meshTrainOpts, persistent bool) {
 }
 
 func runMeshTrain(ctx context.Context, app *App, driverID string, o meshTrainOpts, name, defaultBase string) error {
-	method := resolveMeshMethod(o)
+	method := clix.ResolveMeshMethod(clix.MeshTrainOpts{
+		Method: o.Method, MethodFlag: o.MethodFlag, LoRARank: o.LoRARank,
+	})
 	base := o.BaseModel
 	if base == "" {
 		base = defaultBase
@@ -368,8 +374,8 @@ type voiceTrainOpts struct {
 }
 
 func addVoiceTrainFlags(cmd *cobra.Command, o *voiceTrainOpts, persistent bool) {
-	addTrainBaseFlags(cmd, &o.trainBase, persistent)
-	flags := trainFlagSet(cmd, persistent)
+	clix.AddTrainBaseFlags(cmd, &o.trainBase, persistent)
+	flags := clix.TrainFlagSet(cmd, persistent)
 	flags.StringVar(&o.SamplePath, "sample", "", "reference voice sample (WAV)")
 	flags.StringVar(&o.PretrainedModel, "pretrained-model", "", "pretrained RVC base model")
 	flags.IntVar(&o.PitchShift, "pitch-shift", 0, "pitch shift in semitones")
@@ -380,7 +386,9 @@ func addVoiceTrainFlags(cmd *cobra.Command, o *voiceTrainOpts, persistent bool) 
 }
 
 func runVoiceTrain(ctx context.Context, app *App, driverID string, o voiceTrainOpts, name string) error {
-	method := resolveVoiceMethod(o)
+	method := clix.ResolveVoiceMethod(clix.VoiceTrainOpts{
+		Method: o.Method, MethodFlag: o.MethodFlag,
+	})
 	req := driver.VoiceTrainRequest{
 		Method: method, Name: name, DatasetID: o.Dataset, OutputPath: o.Output,
 		Epochs: o.Epochs, SamplePath: o.SamplePath, PretrainedModel: o.PretrainedModel,
@@ -434,7 +442,7 @@ func addCapabilityTrainSubcommands(cap *cobra.Command, catalog []driver.TrainMet
 	cap.RunE = runDefault
 	_ = cap.MarkPersistentFlagRequired("dataset")
 	for _, info := range catalog {
-		cap.AddCommand(newTrainMethodCmd(info.Method, info.Description, info, runMethod(info)))
+		cap.AddCommand(clix.NewTrainMethodCmd(info.Method, info.Description, info, runMethod(info)))
 	}
 }
 
@@ -443,20 +451,20 @@ func newTextTrainCmd(app *App) *cobra.Command {
 	cap := &cobra.Command{
 		Use:   "text [name]",
 		Short: "Train text / LLM models",
-		Long:  "Methods:\n" + formatMethodCatalog(driver.TextTrainMethodCatalog()),
+		Long:  "Methods:\n" + clix.FormatMethodCatalog(driver.TextTrainMethodCatalog()),
 		Args:  cobra.ArbitraryArgs,
 	}
 	addTextTrainFlags(cap, &opts, true)
 	addCapabilityTrainSubcommands(cap, driver.TextTrainMethodCatalog(),
 		func(cmd *cobra.Command, args []string) error {
 			opts.Method = driver.TextTrainMethodFull
-			return runTextTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.TextGeneration), opts, joinArgs(args), opts.BaseModel)
+			return runTextTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.TextGeneration), opts, clix.JoinArgs(args), opts.BaseModel)
 		},
 		func(info driver.TrainMethodInfo) func(*cobra.Command, []string) error {
 			method, _ := driver.ParseTextTrainMethod(info.Method)
 			return func(cmd *cobra.Command, args []string) error {
 				opts.Method = method
-				return runTextTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.TextGeneration), opts, joinArgs(args), opts.BaseModel)
+				return runTextTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.TextGeneration), opts, clix.JoinArgs(args), opts.BaseModel)
 			}
 		},
 	)
@@ -468,20 +476,20 @@ func newImageTrainCmd(app *App) *cobra.Command {
 	cap := &cobra.Command{
 		Use:   "image [name]",
 		Short: "Train image / diffusion models",
-		Long:  "Methods:\n" + formatMethodCatalog(driver.ImageTrainMethodCatalog()),
+		Long:  "Methods:\n" + clix.FormatMethodCatalog(driver.ImageTrainMethodCatalog()),
 		Args:  cobra.ArbitraryArgs,
 	}
 	addImageTrainFlags(cap, &opts, true)
 	addCapabilityTrainSubcommands(cap, driver.ImageTrainMethodCatalog(),
 		func(cmd *cobra.Command, args []string) error {
 			opts.Method = driver.ImageTrainMethodFull
-			return runImageTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.ImageGeneration), opts, joinArgs(args), opts.BaseModel, cmd)
+			return runImageTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.ImageGeneration), opts, clix.JoinArgs(args), opts.BaseModel, cmd)
 		},
 		func(info driver.TrainMethodInfo) func(*cobra.Command, []string) error {
 			method, _ := driver.ParseImageTrainMethod(info.Method)
 			return func(cmd *cobra.Command, args []string) error {
 				opts.Method = method
-				return runImageTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.ImageGeneration), opts, joinArgs(args), opts.BaseModel, cmd)
+				return runImageTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.ImageGeneration), opts, clix.JoinArgs(args), opts.BaseModel, cmd)
 			}
 		},
 	)
@@ -493,20 +501,20 @@ func newVideoTrainCmd(app *App) *cobra.Command {
 	cap := &cobra.Command{
 		Use:   "video [name]",
 		Short: "Train video models",
-		Long:  "Methods:\n" + formatMethodCatalog(driver.VideoTrainMethodCatalog()),
+		Long:  "Methods:\n" + clix.FormatMethodCatalog(driver.VideoTrainMethodCatalog()),
 		Args:  cobra.ArbitraryArgs,
 	}
 	addVideoTrainFlags(cap, &opts, true)
 	addCapabilityTrainSubcommands(cap, driver.VideoTrainMethodCatalog(),
 		func(cmd *cobra.Command, args []string) error {
 			opts.Method = driver.VideoTrainMethodFull
-			return runVideoTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.VideoGeneration), opts, joinArgs(args), opts.BaseModel)
+			return runVideoTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.VideoGeneration), opts, clix.JoinArgs(args), opts.BaseModel)
 		},
 		func(info driver.TrainMethodInfo) func(*cobra.Command, []string) error {
 			method, _ := driver.ParseVideoTrainMethod(info.Method)
 			return func(cmd *cobra.Command, args []string) error {
 				opts.Method = method
-				return runVideoTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.VideoGeneration), opts, joinArgs(args), opts.BaseModel)
+				return runVideoTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.VideoGeneration), opts, clix.JoinArgs(args), opts.BaseModel)
 			}
 		},
 	)
@@ -518,20 +526,20 @@ func newAudioTrainCmd(app *App) *cobra.Command {
 	cap := &cobra.Command{
 		Use:   "audio [name]",
 		Short: "Train audio models",
-		Long:  "Methods:\n" + formatMethodCatalog(driver.AudioTrainMethodCatalog()),
+		Long:  "Methods:\n" + clix.FormatMethodCatalog(driver.AudioTrainMethodCatalog()),
 		Args:  cobra.ArbitraryArgs,
 	}
 	addAudioTrainFlags(cap, &opts, true)
 	addCapabilityTrainSubcommands(cap, driver.AudioTrainMethodCatalog(),
 		func(cmd *cobra.Command, args []string) error {
 			opts.Method = driver.AudioTrainMethodMusic
-			return runAudioTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.AudioGeneration), opts, joinArgs(args), opts.BaseModel, false, false, "")
+			return runAudioTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.AudioGeneration), opts, clix.JoinArgs(args), opts.BaseModel, false, false, "")
 		},
 		func(info driver.TrainMethodInfo) func(*cobra.Command, []string) error {
 			method, _ := driver.ParseAudioTrainMethod(info.Method)
 			return func(cmd *cobra.Command, args []string) error {
 				opts.Method = method
-				return runAudioTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.AudioGeneration), opts, joinArgs(args), opts.BaseModel, false, false, "")
+				return runAudioTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.AudioGeneration), opts, clix.JoinArgs(args), opts.BaseModel, false, false, "")
 			}
 		},
 	)
@@ -543,20 +551,20 @@ func newMeshTrainCmd(app *App) *cobra.Command {
 	cap := &cobra.Command{
 		Use:   "mesh [name]",
 		Short: "Train mesh / 3D models",
-		Long:  "Methods:\n" + formatMethodCatalog(driver.MeshTrainMethodCatalog()),
+		Long:  "Methods:\n" + clix.FormatMethodCatalog(driver.MeshTrainMethodCatalog()),
 		Args:  cobra.ArbitraryArgs,
 	}
 	addMeshTrainFlags(cap, &opts, true)
 	addCapabilityTrainSubcommands(cap, driver.MeshTrainMethodCatalog(),
 		func(cmd *cobra.Command, args []string) error {
 			opts.Method = driver.MeshTrainMethodFull
-			return runMeshTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.Mesh), opts, joinArgs(args), opts.BaseModel)
+			return runMeshTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.Mesh), opts, clix.JoinArgs(args), opts.BaseModel)
 		},
 		func(info driver.TrainMethodInfo) func(*cobra.Command, []string) error {
 			method, _ := driver.ParseMeshTrainMethod(info.Method)
 			return func(cmd *cobra.Command, args []string) error {
 				opts.Method = method
-				return runMeshTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.Mesh), opts, joinArgs(args), opts.BaseModel)
+				return runMeshTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.Mesh), opts, clix.JoinArgs(args), opts.BaseModel)
 			}
 		},
 	)
@@ -568,20 +576,20 @@ func newVoiceTrainCmd(app *App) *cobra.Command {
 	cap := &cobra.Command{
 		Use:   "voice [name]",
 		Short: "Train voice cloning models",
-		Long:  "Methods:\n" + formatMethodCatalog(driver.VoiceTrainMethodCatalog()),
+		Long:  "Methods:\n" + clix.FormatMethodCatalog(driver.VoiceTrainMethodCatalog()),
 		Args:  cobra.ArbitraryArgs,
 	}
 	addVoiceTrainFlags(cap, &opts, true)
 	addCapabilityTrainSubcommands(cap, driver.VoiceTrainMethodCatalog(),
 		func(cmd *cobra.Command, args []string) error {
 			opts.Method = driver.VoiceTrainMethodRVC
-			return runVoiceTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.VoiceCloning), opts, joinArgs(args))
+			return runVoiceTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.VoiceCloning), opts, clix.JoinArgs(args))
 		},
 		func(info driver.TrainMethodInfo) func(*cobra.Command, []string) error {
 			method, _ := driver.ParseVoiceTrainMethod(info.Method)
 			return func(cmd *cobra.Command, args []string) error {
 				opts.Method = method
-				return runVoiceTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.VoiceCloning), opts, joinArgs(args))
+				return runVoiceTrain(cmd.Context(), app, app.resolveDriver(cmd, capability.VoiceCloning), opts, clix.JoinArgs(args))
 			}
 		},
 	)
