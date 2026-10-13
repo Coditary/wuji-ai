@@ -45,15 +45,27 @@ Run without a subcommand for an overview, or pick a topic:
 	modelsCmd.Flags().String("provider", "", "list models for a catalog provider id (e.g. github-copilot)")
 	modelsCmd.Flags().String("lab", "", "filter canonical models by lab id (e.g. google)")
 
-	cmd.AddCommand(
-		&cobra.Command{
-			Use:     "drivers",
-			Aliases: []string{"driver"},
-			Short:   "List registered drivers",
-			RunE: func(cmd *cobra.Command, args []string) error {
-				return printDriverList(app)
-			},
+	driversCmd := &cobra.Command{
+		Use:     "drivers",
+		Aliases: []string{"driver"},
+		Short:   "List registered drivers",
+		Long: `Lists drivers currently registered with Wuji.
+
+By default, Wuji connects configured and ReqPack-installed plugin drivers first
+(auto-start when enabled), so llama, a1111, and similar backends appear here.
+Use --connect=false to only show drivers already running.`,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			connect, _ := cmd.Flags().GetBool("connect")
+			if connect {
+				connectConfiguredDrivers(cmd.Context(), app)
+			}
+			return printDriverList(app)
 		},
+	}
+	driversCmd.Flags().Bool("connect", true, "connect configured plugin drivers before listing")
+
+	cmd.AddCommand(
+		driversCmd,
 		&cobra.Command{
 			Use:   "mcp",
 			Short: "List configured MCP servers and their status",

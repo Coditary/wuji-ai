@@ -2,6 +2,8 @@
 
 Frontend CLI — includes **wuji-core** in-process (single `wuji` binary).
 
+**Documentation:** [Wuji Wiki](https://github.com/Coditary/wuji-ai/wiki) (source in [`wuji-ai.wiki/`](wuji-ai.wiki/Home.md) when cloned with the repo).
+
 Related repos in `~/Dev/Coditary/`:
 
 - `core/wuji-core/` — backend daemon

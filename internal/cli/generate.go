@@ -488,7 +488,7 @@ func newAudioCmd(app *App) *cobra.Command {
 	var audioEmotion, audioStyle string
 	var audioSpeed, audioEnergy float32
 	var audioPitch int
-	var sfx, speech bool
+	var sfx, speech, playAudio bool
 	var audioTrain audioTrainOpts
 	cmd := &cobra.Command{
 		Use:   "audio [prompt]",
@@ -516,6 +516,7 @@ Generation tuning (0 or empty = backend default):
   --duration, --overlap             total length; overlap stitches 10s chunks for longer music
   --format wav|mp3|flac|ogg|opus    output format (transcoded via ffmpeg when needed)
   --voice, --speech                 speak text (--voice uses a cloned profile)
+  --play                            play audio and discard the temp file afterward
   --lang, --speed, --pitch          speech language, rate, and pitch (text-to-speech only)
   --emotion, --style, --energy      speech expression (text-to-speech only)
   --lyrics                          song lyrics with tags like [Verse], [Chorus]
@@ -559,6 +560,13 @@ Generation tuning (0 or empty = backend default):
 			if err != nil {
 				return err
 			}
+			if playAudio {
+				if err := playAudioFile(resp.Path); err != nil {
+					return err
+				}
+				_ = os.Remove(resp.Path)
+				return nil
+			}
 			if resp.SampleRate > 0 {
 				fmt.Fprintf(os.Stdout, "%s (%.1fs, %d Hz, %s)\n", resp.Path, resp.Duration, resp.SampleRate, resp.Format)
 				return nil
@@ -582,6 +590,7 @@ Generation tuning (0 or empty = backend default):
 	cmd.Flags().BoolVar(&sfx, "sfx", false, "generate sound effects instead of music")
 	cmd.Flags().StringVar(&voiceName, "voice", "", "cloned voice profile name for text-to-speech")
 	cmd.Flags().BoolVar(&speech, "speech", false, "speak text with a generic voice (text-to-speech)")
+	cmd.Flags().BoolVar(&playAudio, "play", false, "play generated audio and discard the temp file afterward")
 	cmd.Flags().StringVar(&audioLang, "lang", "auto", "speech language (auto, de, en, …; text-to-speech only)")
 	cmd.Flags().Float32Var(&audioSpeed, "speed", 0, "speech rate multiplier (0.25–4.0, 0 = backend default)")
 	cmd.Flags().IntVar(&audioPitch, "pitch", 0, "pitch shift in semitones (-12 to +12, text-to-speech only)")

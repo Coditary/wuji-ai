@@ -69,6 +69,7 @@ func New() (*App, error) {
 		newGenerateCmd(app),
 		newTrainCmd(app),
 		newDataCmd(app),
+		newDecideCmd(app),
 		newRAGCmd(app),
 		newCatalogCmd(app),
 		newProviderCmd(app),
