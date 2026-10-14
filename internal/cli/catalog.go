@@ -64,31 +64,7 @@ func printInfoOverview() error {
 }
 
 func printDriverList(app *App) error {
-	drivers := app.Core.ListDrivers()
-	if len(drivers) == 0 {
-		fmt.Println("No drivers registered.")
-		return nil
-	}
-
-	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-	fmt.Fprintln(w, "ID\tNAME\tVERSION\tREMOTE\tCAPABILITIES")
-	for _, d := range drivers {
-		remote := "no"
-		if d.Remote {
-			remote = "yes"
-		}
-
-		caps := ""
-		for i, c := range d.Capabilities {
-			if i > 0 {
-				caps += ", "
-			}
-			caps += c.String()
-		}
-
-		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", d.ID, d.Name, d.Version, remote, caps)
-	}
-	return w.Flush()
+	return printDriverInventory(app)
 }
 
 func printDriverInfo(app *App, driverID string) error {
@@ -163,7 +139,10 @@ func printDriverInfo(app *App, driverID string) error {
 		}
 		return nil
 	}
-	return fmt.Errorf("driver %q not found", driverID)
+	if isConfiguredPluginDriver(app, driverID) {
+		return printInactivePluginDriverInfo(app, driverID)
+	}
+	return fmt.Errorf("driver %q not found (see: wuji list drivers)", driverID)
 }
 
 func printCapabilityList() {

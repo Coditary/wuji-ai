@@ -49,11 +49,14 @@ Run without a subcommand for an overview, or pick a topic:
 		Use:     "drivers",
 		Aliases: []string{"driver"},
 		Short:   "List registered drivers",
-		Long: `Lists drivers currently registered with Wuji.
+		Long: `Lists built-in and configured plugin drivers.
 
-By default, Wuji connects configured and ReqPack-installed plugin drivers first
-(auto-start when enabled), so llama, a1111, and similar backends appear here.
-Use --connect=false to only show drivers already running.`,
+Shows active drivers (registered with Wuji) and configured plugins with status
+stopped, missing, or listening (gRPC up but not attached) without starting them.
+Plugins start on first use (text, image, decide, …) when auto_start_driver is enabled.
+
+Use --connect to attach or auto-start every configured plugin before listing
+(default: false; use this if you relied on the old auto-connect behavior).`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			connect, _ := cmd.Flags().GetBool("connect")
 			if connect {
@@ -62,7 +65,7 @@ Use --connect=false to only show drivers already running.`,
 			return printDriverList(app)
 		},
 	}
-	driversCmd.Flags().Bool("connect", true, "connect configured plugin drivers before listing")
+	driversCmd.Flags().Bool("connect", false, "attach or auto-start all configured plugin drivers before listing")
 
 	cmd.AddCommand(
 		driversCmd,

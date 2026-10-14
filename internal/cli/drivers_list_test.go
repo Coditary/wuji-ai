@@ -2,7 +2,10 @@ package cli
 
 import (
 	"context"
+	"net"
 	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/coditary/wuji-core/pkg/capability"
@@ -51,6 +54,83 @@ func TestReqpackInstalledDriverIDs(t *testing.T) {
 	got := reqpackInstalledDriverIDs()
 	if len(got) != 1 || got[0] != "llama" {
 		t.Fatalf("got %#v", got)
+	}
+}
+
+func TestPluginDriverStatus(t *testing.T) {
+	dir := t.TempDir()
+	bin := filepath.Join(dir, "wuji-driver-llama")
+	if err := os.WriteFile(bin, []byte{0}, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	cfg := &config.Config{
+		Root: dir,
+		CapabilityDrivers: config.CapabilityDrivers{"text": "llama"},
+		Drivers: config.DriversConfig{
+			Registry: map[string]config.DriverSection{
+				"llama": {DriverBin: bin},
+			},
+		},
+	}
+	if got := pluginDriverStatus(cfg, "llama"); got != "stopped" {
+		t.Fatalf("stopped: got %q", got)
+	}
+	if got := pluginDriverStatus(cfg, "dummy"); got != "" {
+		t.Fatalf("built-in: got %q", got)
+	}
+	if got := pluginDriverStatus(cfg, "missing"); got != "missing" {
+		t.Fatalf("missing binary: got %q", got)
+	}
+}
+
+func TestInventoryPluginStatus_Listening(t *testing.T) {
+	dir := t.TempDir()
+	bin := filepath.Join(dir, "wuji-driver-llama")
+	if err := os.WriteFile(bin, []byte{0}, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	ln, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer ln.Close()
+
+	cfg := &config.Config{
+		Root: dir,
+		CapabilityDrivers: config.CapabilityDrivers{"text": "custom"},
+		Drivers: config.DriversConfig{
+			Registry: map[string]config.DriverSection{
+				"custom": {DriverBin: bin, GRPCAddr: ln.Addr().String()},
+			},
+		},
+	}
+	if got := inventoryPluginStatus(cfg, "custom"); got != "listening" {
+		t.Fatalf("got %q, want listening", got)
+	}
+}
+
+func TestPrintDriverInventory_ConfiguredPlugin(t *testing.T) {
+	app := newTestApp(t)
+	dir := t.TempDir()
+	bin := filepath.Join(dir, "wuji-driver-llama")
+	if err := os.WriteFile(bin, []byte{0}, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	app.Config.CapabilityDrivers = config.CapabilityDrivers{"text": "llama"}
+	app.Config.Drivers.Registry = map[string]config.DriverSection{
+		"llama": {DriverBin: bin},
+	}
+
+	out, err := captureStdout(func() error {
+		return printDriverInventory(app)
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, part := range []string{"STATUS", "dummy", "active", "llama", "stopped"} {
+		if !strings.Contains(out, part) {
+			t.Fatalf("expected %q in output:\n%s", part, out)
+		}
 	}
 }
 

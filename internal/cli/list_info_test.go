@@ -7,6 +7,8 @@ import (
 	"testing"
 
 	"github.com/spf13/cobra"
+
+	"github.com/coditary/wuji-core/pkg/config"
 )
 
 func captureStdout(fn func() error) (string, error) {
@@ -60,6 +62,32 @@ func TestInfoDriver(t *testing.T) {
 	}
 	if !bytes.Contains([]byte(out), []byte("dummy")) {
 		t.Fatalf("expected dummy driver info, got: %s", out)
+	}
+}
+
+func TestInfoDriver_ConfiguredPluginNotRegistered(t *testing.T) {
+	app := newTestApp(t)
+	dir := t.TempDir()
+	bin := dir + "/wuji-driver-llama"
+	if err := os.WriteFile(bin, []byte{0}, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	app.Config.CapabilityDrivers = config.CapabilityDrivers{"text": "llama"}
+	app.Config.Drivers.Registry = map[string]config.DriverSection{
+		"llama": {DriverBin: bin},
+	}
+
+	out, err := captureStdout(func() error {
+		return printDriverInfo(app, "llama")
+	})
+	if err != nil {
+		t.Fatalf("printDriverInfo: %v", err)
+	}
+	if !bytes.Contains([]byte(out), []byte("not registered with Wuji")) {
+		t.Fatalf("expected inactive plugin info, got: %s", out)
+	}
+	if !bytes.Contains([]byte(out), []byte("stopped")) {
+		t.Fatalf("expected stopped status, got: %s", out)
 	}
 }
 

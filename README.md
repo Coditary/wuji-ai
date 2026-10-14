@@ -25,6 +25,14 @@ Config lives in `~/.wuji/config.yaml` (or under `WUJI_ROOT` when set).
 
 For development with a separate daemon: `export WUJI_DAEMON=1`, start `wuji-core`, then run `wuji`.
 
+Driver inventory:
+
+```bash
+wuji list drivers              # active + configured plugins (no auto-start)
+wuji list drivers --connect    # attach / auto-start plugins, then list
+wuji info driver <id>          # details; shows plugin status when not yet registered
+```
+
 ## CI
 
 GitHub Actions runs on pushes and pull requests to `main`/`master`:

@@ -98,10 +98,15 @@ func isLocalCommand(args []string) bool {
 		return true
 	case "config":
 		return true
+	case "info":
+		if len(top) >= 2 && top[1] == "config" {
+			return true
+		}
 	case "list":
 		if len(top) >= 2 {
 			switch top[1] {
-			case "providers", "provider", "models", "model", "labs", "lab", "routes", "route":
+			case "providers", "provider", "models", "model", "labs", "lab", "routes", "route",
+				"loras", "lora", "capabilities", "formats", "format", "mcp":
 				return true
 			}
 		}

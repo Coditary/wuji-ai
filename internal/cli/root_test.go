@@ -17,6 +17,12 @@ func TestIsLocalCommand(t *testing.T) {
 		{[]string{"wuji", "text", "hello"}, false},
 		{[]string{"wuji", "list", "drivers"}, false},
 		{[]string{"wuji", "list", "providers"}, true},
+		{[]string{"wuji", "list", "loras"}, true},
+		{[]string{"wuji", "list", "capabilities"}, true},
+		{[]string{"wuji", "list", "formats"}, true},
+		{[]string{"wuji", "list", "mcp"}, true},
+		{[]string{"wuji", "info", "config"}, true},
+		{[]string{"wuji", "info", "driver", "dummy"}, false},
 	}
 	for _, tc := range tests {
 		if got := isLocalCommand(tc.args); got != tc.want {
